@@ -2,12 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "../Interface/Action_Interface.h"
 #include "IBCharBase.generated.h"
 
 class UInputAction;
 
 UCLASS()
-class IMBUPORTFOLIO_API AIBCharBase : public ACharacter
+class IMBUPORTFOLIO_API AIBCharBase : public ACharacter, public IAction_Interface
 {
 	GENERATED_BODY()
 
@@ -15,6 +16,11 @@ class IMBUPORTFOLIO_API AIBCharBase : public ACharacter
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
+	class UCombatComponent* CombatComponent;
+	
 
 public:
 	AIBCharBase();
@@ -61,5 +67,8 @@ private:
 public:
 	FHitResult OutHit;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuerry;
+
+public:
+	virtual void Equip(int32 WeaponNumber, AActor* Caller) override;
 
 };

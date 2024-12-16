@@ -4,8 +4,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
-
 #include "Kismet\KismetSystemLibrary.h"
+#include "../Components/CombatComponent.h"
+#include "../Interface/Action_Interface.h"
 
 AIBCharBase::AIBCharBase()
 {
@@ -25,6 +26,9 @@ AIBCharBase::AIBCharBase()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	
 
 }
 
@@ -104,5 +108,10 @@ void AIBCharBase::Interact()
 	bool Hit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), VLocation, VLocation, InteractRadius,
 		ObjectTypeQuerry, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
+}
+
+void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
+{
+
 }
 
