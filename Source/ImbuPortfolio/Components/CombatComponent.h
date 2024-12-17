@@ -19,11 +19,19 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	ABaseEquippable* BaseEquippable;
+	ABaseEquippable* MainWeapon;
 	bool IsCombatEnabled;
-	int32 AttackCount;
 	bool IsAttackSaved;
+	int32 AttackCount;
 
+public:
+	ABaseEquippable* GetMainWeapon() { return MainWeapon; }
+	void SetCombatEnabled(bool IsEnable);
 
-		
+	void ResetAttack();
+	bool IsCombatEnable();
+	void SetMainWeapon(ABaseEquippable* NewWeapon);
+
+	
+	
 };

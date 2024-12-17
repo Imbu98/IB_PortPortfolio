@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet\KismetSystemLibrary.h"
 #include "../Components/CombatComponent.h"
+#include "../Components/InventoryComponent.h"
 #include "../Interface/Action_Interface.h"
 
 AIBCharBase::AIBCharBase()
@@ -28,6 +29,7 @@ AIBCharBase::AIBCharBase()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	
 
 }

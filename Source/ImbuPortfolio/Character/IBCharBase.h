@@ -20,6 +20,7 @@ class IMBUPORTFOLIO_API AIBCharBase : public ACharacter, public IAction_Interfac
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UCombatComponent* CombatComponent;
+	class UInventoryComponent* InventoryComponent;
 	
 
 public:
@@ -69,6 +70,7 @@ public:
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuerry;
 
 public:
+	
 	virtual void Equip(int32 WeaponNumber, AActor* Caller) override;
 
 };
