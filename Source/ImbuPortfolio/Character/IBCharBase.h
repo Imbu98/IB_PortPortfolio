@@ -44,6 +44,8 @@ public:
 	UInputAction* IA_IBChar_Dodge;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_Interact;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_OpenInventory;
 
 
 	UFUNCTION(BlueprintCallable)
@@ -54,6 +56,8 @@ public:
 	void Dodge();
 	UFUNCTION(BlueprintCallable)
 	void Interact();
+	UFUNCTION(BlueprintCallable)
+	void OpenInventory();
 	
 public:
 	FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

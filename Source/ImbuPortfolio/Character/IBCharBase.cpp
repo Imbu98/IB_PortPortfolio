@@ -4,10 +4,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet\KismetSystemLibrary.h"
 #include "../Components/CombatComponent.h"
 #include "../Components/InventoryComponent.h"
 #include "../Interface/Action_Interface.h"
+#include "../IB_Framework/IB_PlayerController.h"
 
 AIBCharBase::AIBCharBase()
 {
@@ -66,6 +68,7 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Jump, ETriggerEvent::Started, this, &ThisClass::Jump);
 		EnhancedInputComponent->BindAction(IA_IBChar_Dodge, ETriggerEvent::Started, this, &ThisClass::Dodge);
 		EnhancedInputComponent->BindAction(IA_IBChar_Interact, ETriggerEvent::Started, this, &ThisClass::Interact);
+		EnhancedInputComponent->BindAction(IA_IBChar_OpenInventory, ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 	}
 
 }
@@ -110,6 +113,12 @@ void AIBCharBase::Interact()
 	bool Hit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), VLocation, VLocation, InteractRadius,
 		ObjectTypeQuerry, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
+}
+
+void AIBCharBase::OpenInventory()
+{
+	AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	PlayerController->OpenInventory();
 }
 
 void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)

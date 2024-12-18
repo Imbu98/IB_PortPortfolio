@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ItemStructure.h"
 #include "BaseEquippable.generated.h"
 
 UCLASS()
@@ -23,6 +24,9 @@ public:
 	UStaticMeshComponent* ItemStaticMesh;*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* ItemSKeletalMesh;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Item)
+	FItemStruct ItemInfo;
 
 public:	
 	UFUNCTION(BluePrintPure, Category = ItemMesh)

@@ -22,10 +22,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 ItemQuantity; 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTexture* Thumnail;
+	UTexture2D* Thumnail;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* Mesh;
+	UStaticMesh* Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float WeaponNumber;
+	int WeaponNumber;
 
 };

@@ -3,8 +3,8 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "../Interface/Action_Interface.h"
+#include "../Item/ItemStructure.h"
 #include "InventoryComponent.generated.h"
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class IMBUPORTFOLIO_API UInventoryComponent : public UActorComponent, public IAction_Interface
@@ -17,6 +17,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+public:
+	TArray<FItemStruct*> Items;
 
 public:	
 	virtual void ChangeWeapon(ABaseEquippable* MainWeapon) override;
