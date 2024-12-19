@@ -18,17 +18,17 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UButton> ItemSlot;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	TObjectPtr<class UTextBlock> ItemQuientity;
+	TObjectPtr<class UTextBlock> ItemQuantity;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UInventoryComponent* InventoryComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Items")
 	FItemStruct Item;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Items")
 	int32 Index;
-
+	
 public:
+	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 	UFUNCTION()
 	void OnButtonClicked();

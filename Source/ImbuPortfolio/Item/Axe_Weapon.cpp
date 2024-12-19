@@ -5,7 +5,7 @@
 
 AAxe_Weapon::AAxe_Weapon()
 {
-	ItemInfo.ItemName = TEXT("Axe");
+	ItemInfo.ItemName = FText::FromString(TEXT("Axe"));
 	ItemInfo.Stackable = false;
 	ItemInfo.ItemQuantity = 1;
 	ItemInfo.Thumnail = AxeThumnail;

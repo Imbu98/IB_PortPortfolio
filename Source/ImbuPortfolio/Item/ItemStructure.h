@@ -16,7 +16,7 @@ struct FItemStruct
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	FName ItemName;
+	FText ItemName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool Stackable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

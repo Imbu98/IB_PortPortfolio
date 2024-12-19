@@ -69,9 +69,6 @@ public:
 private:
 	float InteractRadius=20.f;
 
-public:
-	FHitResult OutHit;
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypeQuerry;
 
 public:
 	

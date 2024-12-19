@@ -19,10 +19,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	TArray<FItemStruct*> Items;
+	TArray<FItemStruct> Items;
+	FItemStruct Item;
+	
 
 public:	
 	virtual void ChangeWeapon(ABaseEquippable* MainWeapon) override;
-
+	virtual void Interaction() override;
 		
 };

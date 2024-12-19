@@ -24,6 +24,8 @@ public:
 	UStaticMeshComponent* ItemStaticMesh;*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* ItemSKeletalMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UCapsuleComponent* CapsuleComponent;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Item)
 	FItemStruct ItemInfo;

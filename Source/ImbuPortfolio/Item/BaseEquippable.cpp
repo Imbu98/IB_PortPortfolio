@@ -1,5 +1,6 @@
 #include "BaseEquippable.h"
 #include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 #include "Components\SkeletalMeshComponent.h"
 
 ABaseEquippable::ABaseEquippable()
@@ -14,6 +15,9 @@ ABaseEquippable::ABaseEquippable()
 
 	ItemSKeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMesh"));
 	ItemSKeletalMesh->SetupAttachment(DefaultSceneRoot);
+
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
+	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 
 }
 

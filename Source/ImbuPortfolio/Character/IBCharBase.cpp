@@ -106,13 +106,7 @@ void AIBCharBase::Dodge()
 
 void AIBCharBase::Interact()
 {
-	FVector VLocation = GetActorLocation() - FVector(0.f, 0.f, 50.f);
-	TArray<AActor*> ActorsToIgnore;
-	ObjectTypeQuerry.Add(EObjectTypeQuery::ObjectTypeQuery2);
-
-	bool Hit = UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), VLocation, VLocation, InteractRadius,
-		ObjectTypeQuerry, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
+	InventoryComponent->Interaction();
 }
 
 void AIBCharBase::OpenInventory()
