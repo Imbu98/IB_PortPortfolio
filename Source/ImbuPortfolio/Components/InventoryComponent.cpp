@@ -23,7 +23,7 @@ void UInventoryComponent::BeginPlay()
 
 	// InventoryWidget에 LoadInventory를 할 때 필요한 InventoryComponent를 넣어준다
 	AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	UW_Inventory* PlayerInventory = PlayerController->GetInventoryWidget();
+	PlayerInventory = PlayerController->GetInventoryWidget();
 	PlayerInventory->LoadInventory(this);
 
 
@@ -65,50 +65,39 @@ void UInventoryComponent::Interaction()
 
 		if (Weapon != nullptr)
 		{
-			bool IsSameItem = UKismetTextLibrary::EqualEqual_TextText(Item.ItemName, Weapon->ItemInfo.ItemName);
-			bool IsNotFull = (Item.ItemQuantity + Weapon->ItemInfo.ItemQuantity) <= 64;
-			bool IsStackableItem = Weapon->ItemInfo.Stackable;
-
+			
 			for (int ArrayIndex=0; ArrayIndex<Items.Num();ArrayIndex++)
 			{
+				FItemStruct& InventoryItem = Items[ArrayIndex];
+				bool IsSameItem = UKismetTextLibrary::EqualEqual_TextText(InventoryItem.ItemName, Weapon->ItemInfo.ItemName);
+				bool IsNotFull = (Item.ItemQuantity + Weapon->ItemInfo.ItemQuantity) <= 64;
+				bool IsStackableItem = Weapon->ItemInfo.Stackable;
+
 				// 같은 아이템이고, 아이템이 다 안찼고, 스택형 아이템일 때 그대로 넣어준다
 				if (IsSameItem && IsNotFull && IsStackableItem)
 				{
-					Item = Items[ArrayIndex];
-
-					Item.ItemName = Weapon->ItemInfo.ItemName;
-					Item.Stackable = Weapon->ItemInfo.Stackable;
-					Item.ItemQuantity = Item.ItemQuantity+ Weapon->ItemInfo.ItemQuantity;
-					Item.Thumnail = Weapon->ItemInfo.Thumnail;
-					Item.Mesh = Weapon->ItemInfo.Mesh;
-					Item.WeaponNumber = Weapon->ItemInfo.WeaponNumber;
-
-					Items[ArrayIndex] = Item;
-
+					InventoryItem.ItemQuantity += Weapon->ItemInfo.ItemQuantity;
+					
+					break;
 				}
 				else
 				{
 					// 그게 아니고 아이템 수량이 0이면 
-					if (Item.ItemQuantity == 0)
+					if (InventoryItem.ItemQuantity == 0)
 					{
-						Item = Items[ArrayIndex];
-
-						Item.ItemName = Weapon->ItemInfo.ItemName;
-						Item.Stackable = Weapon->ItemInfo.Stackable;
-						Item.ItemQuantity = Item.ItemQuantity + Weapon->ItemInfo.ItemQuantity;
-						Item.Thumnail = Weapon->ItemInfo.Thumnail;
-						Item.Mesh = Weapon->ItemInfo.Mesh;
-						Item.WeaponNumber = Weapon->ItemInfo.WeaponNumber;
-
-						Items[ArrayIndex] = Item;
+						InventoryItem = Weapon->ItemInfo;
+						
+						break;
 					}
+
 				}
 				
 			}
 			AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-			UW_Inventory* PlayerInventory = PlayerController->GetInventoryWidget();
+			PlayerInventory = PlayerController->GetInventoryWidget();
 			PlayerInventory->LoadInventory(this);
 			Weapon->Destroy();
+			
 		}
 		
 

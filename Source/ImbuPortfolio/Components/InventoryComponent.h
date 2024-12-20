@@ -6,6 +6,8 @@
 #include "../Item/ItemStructure.h"
 #include "InventoryComponent.generated.h"
 
+class UW_Inventory;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class IMBUPORTFOLIO_API UInventoryComponent : public UActorComponent, public IAction_Interface
 {
@@ -21,6 +23,7 @@ protected:
 public:
 	TArray<FItemStruct> Items;
 	FItemStruct Item;
+	UW_Inventory* PlayerInventory;
 	
 
 public:	
