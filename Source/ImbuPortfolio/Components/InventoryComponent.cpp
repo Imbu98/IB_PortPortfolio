@@ -66,9 +66,8 @@ void UInventoryComponent::Interaction()
 		if (Weapon != nullptr)
 		{
 			
-			for (int ArrayIndex=0; ArrayIndex<Items.Num();ArrayIndex++)
+			for (FItemStruct& InventoryItem : Items)
 			{
-				FItemStruct& InventoryItem = Items[ArrayIndex];
 				bool IsSameItem = UKismetTextLibrary::EqualEqual_TextText(InventoryItem.ItemName, Weapon->ItemInfo.ItemName);
 				bool IsNotFull = (Item.ItemQuantity + Weapon->ItemInfo.ItemQuantity) <= 64;
 				bool IsStackableItem = Weapon->ItemInfo.Stackable;
