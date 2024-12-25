@@ -1,0 +1,50 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "CollisionComponent.generated.h"
+
+
+class UMeshComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHitDelegate,FHitResult,HitResult);
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class IMBUPORTFOLIO_API UCollisionComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+public:	
+	UCollisionComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	TArray<AActor*> AlreadyHitActors;
+	TArray<AActor*> ActorsToIgnore;
+	AActor* HitActor;
+	UPrimitiveComponent* CollisionMeshComponent;
+	bool IsCollisionEnabled;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Defaults)
+	FName StartSocketName;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Defaults)
+	FName EndSocketName;
+	float SphereRadius=10.f;
+	TEnumAsByte<EObjectTypeQuery> ObjectType;
+	FHitResult LastHit;
+	
+	FOnHitDelegate Onhit;
+	
+public:
+	void EnableCollision();
+	void DisableCollision();
+	void ClearHitActors();
+	void SetCollisionMesh(UPrimitiveComponent* MeshComponent);
+	void CollisionTrace();
+	void AddActorsToIgnore(AActor* InActors);
+	
+
+		
+};

@@ -2,6 +2,10 @@
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Components\SkeletalMeshComponent.h"
+#include "../Components/CombatComponent.h"
+#include "Components/BoxComponent.h"
+#include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Components/CollisionComponent.h"
 
 ABaseEquippable::ABaseEquippable()
 {
@@ -19,11 +23,21 @@ ABaseEquippable::ABaseEquippable()
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 
+	CollisionComponent = CreateDefaultSubobject<UCollisionComponent>(TEXT("CollisionComponent"));
+
+	
+	
+
 }
 
 void ABaseEquippable::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (CollisionComponent!=nullptr)
+	{
+		CollisionComponent->Onhit.AddDynamic(this,&ThisClass::OnHitActor);
+	}
 	
 }
 
@@ -48,17 +62,31 @@ UPrimitiveComponent* ABaseEquippable::GetItemMesh()
 void ABaseEquippable::AttachActor(FName SocketName)
 {
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if (Character != nullptr) // ¹«±â¸¦ ¼ÒÀ¯ÇÑ ¿À³Ê°¡ ÀÖÀ¸¸é ¼ÒÄÏ¿¡ ºÙ¿©ÁØ´Ù
+	if (Character != nullptr) // 
 	{
 		FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, true);
 		AttachToComponent(Character->GetMesh(), Rules, SocketName);
 	}
 }
 
-void ABaseEquippable::OnEquipped_Implementation()
+void ABaseEquippable::OnEquipped()
 {
 	IsEquipped = true;
-	AttachActor(AttachSocketName);
+	CombatComponent = this->GetOwner()->FindComponentByClass<UCombatComponent>();
+	if (CombatComponent != nullptr)
+	{
+		AttachActor(AttachSocketName);
+		CombatComponent->SetMainWeapon(this);
+		
+	}
+	if (CollisionComponent!=nullptr)
+	{
+		CollisionComponent->SetCollisionMesh(GetItemMesh());
+		CollisionComponent->AddActorsToIgnore(this->GetOwner());
+
+		//ë‚˜ì¤‘ì— ì €ìž¥ê¸°ëŠ¥ ìƒì„± í›„ ë„£ê¸°
+		//SaveEquippedWeapon();
+	}
 }
 
 void ABaseEquippable::OnUnEquipped()
@@ -75,5 +103,12 @@ void ABaseEquippable::SaveEquippedWeapon(ABaseEquippable* Weapon)
 		IGI->SaveGame();
 	}*/
 }
+
+void ABaseEquippable::OnHitActor(FHitResult HitResult)
+{
+	AIBCharBase* IBCharBase = Cast<AIBCharBase>( this->GetOwner());
+	
+}
+
 
 

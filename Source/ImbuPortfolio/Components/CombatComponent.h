@@ -24,6 +24,9 @@ public:
 	bool IsAttackSaved;
 	int32 AttackCount;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Weapon)
+	TArray<TSubclassOf<ABaseEquippable>> WeaponArray;
+
 public:
 	ABaseEquippable* GetMainWeapon() { return MainWeapon; }
 	void SetCombatEnabled(bool IsEnable);

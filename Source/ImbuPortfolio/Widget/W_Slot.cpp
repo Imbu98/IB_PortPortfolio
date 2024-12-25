@@ -6,52 +6,50 @@
 #include "../Item/ItemStructure.h"
 #include "../Character/IBCharBase.h"
 #include "W_Inventory.h"
+#include "Components/Image.h"
 #include "Components\Button.h"
 #include "Components/TextBlock.h"
 #include "Widgets\Images\SImage.h"
 
 
-
 void UW_Slot::NativePreConstruct()
 {
-	if (ItemImage!=nullptr &&Item.Thumnail != nullptr)
-	{
-		ItemImage->SetBrushFromTexture(Item.Thumnail, false);
-	}
-	FText TextItemQuantity = FText::AsNumber(Item.ItemQuantity);
+		if (ItemImage != nullptr && Item.Thumnail != nullptr  )
+		{
+			ItemImage->SetBrushFromTexture(Item.Thumnail, false);
+		}
+		FText TextItemQuantity = FText::AsNumber(Item.ItemQuantity);
 
 
-	ItemQuantity->SetText(TextItemQuantity);
-	if (Item.ItemQuantity > 1)
-	{
-		ItemQuantity->SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		ItemQuantity->SetVisibility(ESlateVisibility::Hidden);
-	}
+		ItemQuantity->SetText(TextItemQuantity);
+		if (Item.ItemQuantity > 1)
+		{
+			ItemQuantity->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			ItemQuantity->SetVisibility(ESlateVisibility::Hidden);
+		}
+	
 }
 
 void UW_Slot::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	// Áßº¹ ¹ÙÀÎµù ¹æÁö
+
+	// ï¿½ßºï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (ItemSlot)
 	{
-		// ¹ÙÀÎµù Á¦°ÅÈÄ 
+		// ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
 		ItemSlot->OnClicked.RemoveDynamic(this, &UW_Slot::OnButtonClicked);
 
-		// ´Ù½Ã ¹ÙÀÎµù
+		// ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½Îµï¿½
 		ItemSlot->OnClicked.AddDynamic(this, &UW_Slot::OnButtonClicked);
 	}
-	
-	
 }
 
 void UW_Slot::OnButtonClicked()
 {
-	
 	FText TextItemQuantity = UKismetTextLibrary::Conv_IntToText(Item.ItemQuantity);
 	FString StringItemQuantity = TextItemQuantity.ToString();
 	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("%s"), *StringItemQuantity));
@@ -60,13 +58,10 @@ void UW_Slot::OnButtonClicked()
 	InventoryComponent = PlayerCharacter->InventoryComponent;
 	W_Inventory = InventoryComponent->PlayerInventory;
 
-	PlayerCharacter->Equip(InventoryComponent->Items[Index].WeaponNumber,PlayerCharacter);
+	PlayerCharacter->Equip(InventoryComponent->Items[Index].WeaponNumber, PlayerCharacter);
 
 	ClearSlot();
 	W_Inventory->LoadInventory(InventoryComponent);
-	
-	
-
 }
 
 void UW_Slot::ClearSlot()
@@ -79,7 +74,7 @@ void UW_Slot::ClearSlot()
 	}
 	else
 	{
-		// ½½·Ô ÀÎµ¦½º¿¡ ÇØ´çÇÏ´Â ÀÎº¥Åä¸®ÄÄÆ÷³ÍÆ®ÀÇ ¾ÆÀÌÅÛ ¹è¿­ÀÇ ¾ÆÀÌÅÛ ÃÊ±âÈ­
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
 		InventoryItem.ItemName = FText::FromString(TEXT(""));
 		InventoryItem.Stackable = false;
 		InventoryItem.ItemQuantity = 0;
@@ -87,5 +82,4 @@ void UW_Slot::ClearSlot()
 		InventoryItem.Mesh = nullptr;
 		InventoryItem.WeaponNumber = 0;
 	}
-
 }

@@ -10,6 +10,7 @@
 #include "../Components/InventoryComponent.h"
 #include "../Interface/Action_Interface.h"
 #include "../IB_Framework/IB_PlayerController.h"
+#include "../Item/BaseEquippable.h"
 
 AIBCharBase::AIBCharBase()
 {
@@ -117,6 +118,30 @@ void AIBCharBase::OpenInventory()
 
 void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 {
+	if (CombatComponent&& WeaponNumber!=0)
+	{
+		// Parameter for Spawn
+		APawn* Pawn = Cast<APawn>(Caller);
+		FTransform SpawnTransform = Pawn->GetActorTransform();
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		ActorSpawnParameters.TransformScaleMethod = ESpawnActorScaleMethod::MultiplyWithRoot;
+		ActorSpawnParameters.Owner = Caller;
+		ActorSpawnParameters.Instigator = Pawn;
+		
+		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[WeaponNumber];
+		if (WeaponClass != nullptr)
+		{
+			
+			// SpawnActor�� ȣ���Ͽ� ���⸦ ����
+			ABaseEquippable* SpawnedWeapon = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
+			
+			SpawnedWeapon->OnEquipped();
+			
+		}
+		
 
+	}
+	
 }
 
