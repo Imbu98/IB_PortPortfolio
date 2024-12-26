@@ -45,7 +45,7 @@ public:
 	UFUNCTION(BluePrintCallable)
 	void OnUnEquipped();
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FName AttachSocketName;
 
 	UPROPERTY(VisibleDefaultsOnly)

@@ -137,6 +137,23 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 			ABaseEquippable* SpawnedWeapon = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
 			
 			SpawnedWeapon->OnEquipped();
+
+			// 아래 코드 참고, 장착 무기 ENum값 만들기, ENum값에 따라 axe는 따로 왼쪽 오른쪽 2개를 스폰해주고 , OnEquipped도 어태치하는 곳을 바꿔준다
+			// 그에 따라 GetMainWeapon 로직에 영향을 주는지 확인 ( axe는 mainweapon으로 그대로 두되 2개의 axe만 변수로 따로 만들어 스폰을 따로해주면될듯)
+			// ABaseEquippable* RightHandAxe = GetWorld()->SpawnActor<ABaseEquippable>(AxeClass);
+			// if (RightHandAxe)
+			// {
+			// 	RightHandAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RightHandSocket"));
+			// 	UE_LOG(LogTemp, Log, TEXT("RightHand Axe equipped!"));
+			// }
+			//
+			// // 두 번째 무기 (왼손)
+			// ABaseEquippable* LeftHandAxe = GetWorld()->SpawnActor<ABaseEquippable>(AxeClass);
+			// if (LeftHandAxe)
+			// {
+			// 	LeftHandAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("LeftHandSocket"));
+			// 	UE_LOG(LogTemp, Log, TEXT("LeftHand Axe equipped!"));
+			// }
 			
 		}
 		

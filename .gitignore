@@ -96,6 +96,9 @@ NetworkBasic/Build/*
 Content/Maw_J_Laygo/*
 Content/ParagonKhaimera/*
 
+# Rider 
+.idea/*
+
 # NetworkBasic 추가
 Platform/Intermediate/*
 Platform/Saved/*
