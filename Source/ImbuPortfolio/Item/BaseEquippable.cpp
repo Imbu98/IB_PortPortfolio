@@ -75,9 +75,7 @@ void ABaseEquippable::OnEquipped()
 	CombatComponent = this->GetOwner()->FindComponentByClass<UCombatComponent>();
 	if (CombatComponent != nullptr)
 	{
-		AttachActor(AttachSocketName);
 		CombatComponent->SetMainWeapon(this);
-		
 	}
 	if (CollisionComponent!=nullptr)
 	{

@@ -18,7 +18,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
+	TArray<ABaseEquippable*> EquippedWeapons; 
 	ABaseEquippable* MainWeapon;
 	bool IsCombatEnabled;
 	bool IsAttackSaved;

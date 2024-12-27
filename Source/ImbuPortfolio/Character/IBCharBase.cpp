@@ -11,6 +11,9 @@
 #include "../Interface/Action_Interface.h"
 #include "../IB_Framework/IB_PlayerController.h"
 #include "../Item/BaseEquippable.h"
+#include "../Item/EItems.h"
+#include "../Item/Axe_Weapon.h"
+#include "ImbuPortfolio/Item/Axe_Weapon.h"
 
 AIBCharBase::AIBCharBase()
 {
@@ -116,49 +119,74 @@ void AIBCharBase::OpenInventory()
 	PlayerController->OpenInventory();
 }
 
+
 void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 {
+	
 	if (CombatComponent&& WeaponNumber!=0)
 	{
-		// Parameter for Spawn
-		APawn* Pawn = Cast<APawn>(Caller);
+		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[WeaponNumber];
+		if (WeaponClass != nullptr)
+		{
+			
+			// 먼저 onequipped를 하고 spawnandattach를 해주면 될거같음
+			ABaseEquippable* Weapon =  SpawnAndAttachWeapon(WeaponNumber,WeaponClass,Caller);
+			if (Weapon)
+			{
+				Weapon->OnEquipped();
+			}
+		}
+	}
+}
+
+// weaponNumber에 따라 스폰후 attach
+ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller)
+{
+	// Parameter for Spawn
+	APawn* Pawn = Cast<APawn>(Caller);
+	if (Pawn!=nullptr)
+	{
 		FTransform SpawnTransform = Pawn->GetActorTransform();
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		ActorSpawnParameters.TransformScaleMethod = ESpawnActorScaleMethod::MultiplyWithRoot;
 		ActorSpawnParameters.Owner = Caller;
 		ActorSpawnParameters.Instigator = Pawn;
+
+		ItemEnum = static_cast<E_Items>(WeaponNumber);
 		
-		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[WeaponNumber];
-		if (WeaponClass != nullptr)
+		switch (ItemEnum)
 		{
-			
-			// SpawnActor�� ȣ���Ͽ� ���⸦ ����
-			ABaseEquippable* SpawnedWeapon = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
-			
-			SpawnedWeapon->OnEquipped();
-
-			// 아래 코드 참고, 장착 무기 ENum값 만들기, ENum값에 따라 axe는 따로 왼쪽 오른쪽 2개를 스폰해주고 , OnEquipped도 어태치하는 곳을 바꿔준다
-			// 그에 따라 GetMainWeapon 로직에 영향을 주는지 확인 ( axe는 mainweapon으로 그대로 두되 2개의 axe만 변수로 따로 만들어 스폰을 따로해주면될듯)
-			// ABaseEquippable* RightHandAxe = GetWorld()->SpawnActor<ABaseEquippable>(AxeClass);
-			// if (RightHandAxe)
-			// {
-			// 	RightHandAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("RightHandSocket"));
-			// 	UE_LOG(LogTemp, Log, TEXT("RightHand Axe equipped!"));
-			// }
-			//
-			// // 두 번째 무기 (왼손)
-			// ABaseEquippable* LeftHandAxe = GetWorld()->SpawnActor<ABaseEquippable>(AxeClass);
-			// if (LeftHandAxe)
-			// {
-			// 	LeftHandAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("LeftHandSocket"));
-			// 	UE_LOG(LogTemp, Log, TEXT("LeftHand Axe equipped!"));
-			// }
-			
+		case E_Items::None:
+			{
+				return nullptr;
+				break;
+			}
+		case E_Items::Axe:
+			{
+				ABaseEquippable* Axe_L = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
+				if (Axe_L)
+				{
+					Axe_L->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandL_Axe"));
+				}
+				ABaseEquippable* Axe_R = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
+				if (Axe_R)
+				{
+					Axe_R->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));
+				}
+				ABaseEquippable* Weapon = Cast<ABaseEquippable>(Axe_L);
+				return Weapon;
+				break;
+			}
+		case E_Items::Sword:
+			{
+				return nullptr;
+				break;
+			}
+		default:
+			return nullptr;
+			break;
 		}
-		
-
 	}
-	
+	return nullptr;
 }
-

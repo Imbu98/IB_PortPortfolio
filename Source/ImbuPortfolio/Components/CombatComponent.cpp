@@ -44,7 +44,7 @@ bool UCombatComponent::IsCombatEnable()
 void UCombatComponent::SetMainWeapon(ABaseEquippable* NewWeapon)
 {
 	
-	// MainWeaponÀÌ ÀÌ¹Ì ÀÖÀ¸¸é WeaponÀ» ¹Ù²Ù°í ÆÄ±«
+	// MainWeaponï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Weaponï¿½ï¿½ ï¿½Ù²Ù°ï¿½ ï¿½Ä±ï¿½
 	if (MainWeapon)
 	{
 		MainWeapon->OnUnEquipped();
@@ -56,15 +56,29 @@ void UCombatComponent::SetMainWeapon(ABaseEquippable* NewWeapon)
 		{
 			InventoryComponent->ChangeWeapon(MainWeapon);
 		}
-		MainWeapon->Destroy();
-
+		
+		// ë˜ê¸´í•˜ëŠ”ë° ì¥ì°©í›„ ë¶€ìˆ´ë²„ë¦¬ë‹ˆ ì¥ì°©ëœê²ƒë„ ë¶€ìˆ´ë²„ë¦¼
+		TArray<AActor*> FoundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseEquippable::StaticClass(), FoundActors);
+		for (AActor* Actor :FoundActors)
+		{
+			if (Actor)
+			{
+				ABaseEquippable* Weapon = Cast<ABaseEquippable>(Actor);
+				if (Weapon!=nullptr)
+				{
+					Weapon->Destroy();
+				}
+			}
+		}
 		MainWeapon = NewWeapon;
 	}
-	// MainWeaponÀÌ ¾øÀ¸¸é NewWeaponÀ» ¹Ù·Î MainWeaponÀ¸·Î ¼³Á¤
+	// MainWeaponï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ NewWeaponï¿½ï¿½ ï¿½Ù·ï¿½ MainWeaponï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	else if (MainWeapon == nullptr)
 	{
 		MainWeapon = NewWeapon;
 	}
 	
 }
+
 
