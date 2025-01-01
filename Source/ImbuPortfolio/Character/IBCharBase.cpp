@@ -125,11 +125,22 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 	
 	if (CombatComponent&& WeaponNumber!=0)
 	{
+		if (InventoryComponent)
+		{
+			TArray<ABaseEquippable*> WeaponsToDestroy = InventoryComponent->EquippedWeapon;
+			for (ABaseEquippable* Equippable : WeaponsToDestroy)
+			{
+				if (Equippable)
+				{
+					Equippable->Destroy();
+				}
+			}
+			InventoryComponent->EquippedWeapon.Empty();
+		}
+		
 		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[WeaponNumber];
 		if (WeaponClass != nullptr)
 		{
-			
-			// 먼저 onequipped를 하고 spawnandattach를 해주면 될거같음
 			ABaseEquippable* Weapon =  SpawnAndAttachWeapon(WeaponNumber,WeaponClass,Caller);
 			if (Weapon)
 			{
@@ -174,8 +185,17 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 				{
 					Axe_R->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));
 				}
-				ABaseEquippable* Weapon = Cast<ABaseEquippable>(Axe_L);
-				return Weapon;
+				if (InventoryComponent!=nullptr)
+				{
+					InventoryComponent->EquippedWeapon.Add(Axe_L);
+					InventoryComponent->EquippedWeapon.Add(Axe_R);
+				}
+				
+				AAxe_Weapon* Axe_Weapon = Cast<AAxe_Weapon>(Axe_L);
+				if (Axe_Weapon!=nullptr)
+				{
+					return Axe_Weapon;
+				}
 				break;
 			}
 		case E_Items::Sword:

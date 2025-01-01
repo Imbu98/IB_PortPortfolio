@@ -21,8 +21,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY()
+	TArray<class ABaseEquippable*> EquippedWeapon;
+	UPROPERTY()
 	TArray<FItemStruct> Items;
+	UPROPERTY()
 	FItemStruct Item;
+	UPROPERTY()
 	UW_Inventory* PlayerInventory;
 	
 

@@ -51,25 +51,10 @@ void UCombatComponent::SetMainWeapon(ABaseEquippable* NewWeapon)
 
 		AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 		UInventoryComponent* InventoryComponent = PlayerCharacter->FindComponentByClass <UInventoryComponent>();
-		//Change Weapon
 		if (InventoryComponent)
 		{
 			InventoryComponent->ChangeWeapon(MainWeapon);
-		}
-		
-		// 되긴하는데 장착후 부숴버리니 장착된것도 부숴버림
-		TArray<AActor*> FoundActors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseEquippable::StaticClass(), FoundActors);
-		for (AActor* Actor :FoundActors)
-		{
-			if (Actor)
-			{
-				ABaseEquippable* Weapon = Cast<ABaseEquippable>(Actor);
-				if (Weapon!=nullptr)
-				{
-					Weapon->Destroy();
-				}
-			}
+			
 		}
 		MainWeapon = NewWeapon;
 	}
