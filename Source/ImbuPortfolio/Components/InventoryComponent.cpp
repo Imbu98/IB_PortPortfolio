@@ -11,7 +11,6 @@
 UInventoryComponent::UInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
 }
 
 
@@ -21,7 +20,7 @@ void UInventoryComponent::BeginPlay()
 
 	Items.SetNum(10);
 
-	// InventoryWidget¿¡ LoadInventory¸¦ ÇÒ ¶§ ÇÊ¿äÇÑ InventoryComponent¸¦ ³Ö¾îÁØ´Ù
+	// InventoryWidgetï¿½ï¿½ LoadInventoryï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½ InventoryComponentï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½Ø´ï¿½
 	AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	PlayerInventory = PlayerController->GetInventoryWidget();
 	PlayerInventory->LoadInventory(this);
@@ -39,16 +38,48 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UInventoryComponent::ChangeWeapon(ABaseEquippable* MainWeapon)
 {
+	if (MainWeapon != nullptr)
+	{
+		for (FItemStruct& InventoryItem : Items)
+		{
+			bool IsSameItem = UKismetTextLibrary::EqualEqual_TextText(InventoryItem.ItemName, MainWeapon->ItemInfo.ItemName);
+			bool IsNotFull = (Item.ItemQuantity + MainWeapon->ItemInfo.ItemQuantity) <= 64;
+			bool IsStackableItem = MainWeapon->ItemInfo.Stackable;
+
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì°ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ã¡ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½×´ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½Ø´ï¿½
+			if (IsSameItem && IsNotFull && IsStackableItem)
+			{
+				InventoryItem.ItemQuantity += MainWeapon->ItemInfo.ItemQuantity;
+					
+				break;
+			}
+			else
+			{
+				// ï¿½×°ï¿½ ï¿½Æ´Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½Ì¸ï¿½ 
+				if (InventoryItem.ItemQuantity == 0)
+				{
+					InventoryItem = MainWeapon->ItemInfo;
+						
+					break;
+				}
+
+			}
+				
+		}
+		AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		PlayerInventory = PlayerController->GetInventoryWidget();
+		PlayerInventory->LoadInventory(this);
+	}
 }
 
 void UInventoryComponent::Interaction()
 {
-	// ½ºÇÇ¾î Æ®·¹ÀÌ½º º¯¼ö
+	// ï¿½ï¿½ï¿½Ç¾ï¿½ Æ®ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	FHitResult OutHit;
 	TArray<AActor*> ActorsToIgnore;
 	float InteractRadius = 100.0f;
 
-	// ½ºÇÇ¾î À§Ä¡ °è»ê
+	// ï¿½ï¿½ï¿½Ç¾ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½
 	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(GetOwner());
 	FVector VCharacterLocation = PlayerCharacter->GetActorLocation();
 	FVector VLocation = VCharacterLocation - FVector(0.f, 0.f, 50.f);
@@ -58,7 +89,7 @@ void UInventoryComponent::Interaction()
 		ETraceTypeQuery::TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
 
-	// ¹«±â ÀÎº¥Åä¸®¿¡ ³Ö±â
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ï¿½ä¸®ï¿½ï¿½ ï¿½Ö±ï¿½
 	if (Hit)
 	{
 		ABaseEquippable* Weapon = Cast<ABaseEquippable>(OutHit.GetActor());
@@ -72,7 +103,7 @@ void UInventoryComponent::Interaction()
 				bool IsNotFull = (Item.ItemQuantity + Weapon->ItemInfo.ItemQuantity) <= 64;
 				bool IsStackableItem = Weapon->ItemInfo.Stackable;
 
-				// °°Àº ¾ÆÀÌÅÛÀÌ°í, ¾ÆÀÌÅÛÀÌ ´Ù ¾ÈÃ¡°í, ½ºÅÃÇü ¾ÆÀÌÅÛÀÏ ¶§ ±×´ë·Î ³Ö¾îÁØ´Ù
+				// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì°ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ã¡ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½×´ï¿½ï¿½ ï¿½Ö¾ï¿½ï¿½Ø´ï¿½
 				if (IsSameItem && IsNotFull && IsStackableItem)
 				{
 					InventoryItem.ItemQuantity += Weapon->ItemInfo.ItemQuantity;
@@ -81,7 +112,7 @@ void UInventoryComponent::Interaction()
 				}
 				else
 				{
-					// ±×°Ô ¾Æ´Ï°í ¾ÆÀÌÅÛ ¼ö·®ÀÌ 0ÀÌ¸é 
+					// ï¿½×°ï¿½ ï¿½Æ´Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½Ì¸ï¿½ 
 					if (InventoryItem.ItemQuantity == 0)
 					{
 						InventoryItem = Weapon->ItemInfo;
