@@ -74,6 +74,8 @@ private:
 	float InteractRadius=20.f;
 	UPROPERTY()
 	E_Items ItemEnum;
+	UPROPERTY(EditAnywhere)
+	TSoftClassPtr<ABaseEquippable> Equippable22;
 
 
 public:
