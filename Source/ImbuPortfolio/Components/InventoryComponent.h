@@ -29,6 +29,10 @@ public:
 	FItemStruct Item;
 	UPROPERTY()
 	UW_Inventory* PlayerInventory;
+
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FItemStruct EquippedWeaponInfo;
 	
 
 public:	

@@ -1,4 +1,4 @@
-#include "IBCharBase.h"
+﻿#include "IBCharBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -127,6 +127,7 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 	{
 		if (InventoryComponent)
 		{
+			
 			TArray<ABaseEquippable*> WeaponsToDestroy = InventoryComponent->EquippedWeapon;
 			for (ABaseEquippable* Equippable : WeaponsToDestroy)
 			{
@@ -145,6 +146,10 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 			if (Weapon)
 			{
 				Weapon->OnEquipped();
+				if (InventoryComponent)
+				{
+					InventoryComponent->EquippedWeaponInfo=Weapon->ItemInfo;
+				}
 			}
 		}
 	}

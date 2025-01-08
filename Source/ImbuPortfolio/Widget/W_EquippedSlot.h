@@ -23,6 +23,7 @@ public:
 
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 	UFUNCTION(BlueprintCallable)
 	void ButtonOnClicked();
 	UFUNCTION(BlueprintCallable)
