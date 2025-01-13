@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../Item/ItemStructure.h"
 #include "W_EquippedSlot.generated.h"
 
 class UInventoryComponent;
@@ -20,6 +21,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UInventoryComponent* InventoryComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FItemStruct EquippedItemInfo;
 
 public:
 	virtual void NativeConstruct() override;
@@ -28,6 +31,8 @@ public:
 	void ButtonOnClicked();
 	UFUNCTION(BlueprintCallable)
 	void ClearSlot();
+	UFUNCTION(BlueprintCallable)
+	void SetEquippedItemThumnail();
 	
 	
 };

@@ -3,13 +3,16 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Components/InventoryComponent.h"
 #include "../Widget/W_Inventory.h"
+#include "Components/Image.h"
 #include "Components\Button.h"
+#include "ImbuPortfolio/Components/CombatComponent.h"
 
 void UW_EquippedSlot::NativePreConstruct()
 {
-	
-	
-	
+	if (EquippedItemImage)
+	{
+		EquippedItemImage->SetBrushFromTexture(EquippedItemInfo.Thumnail);
+	}
 }
 
 void UW_EquippedSlot::NativeConstruct()
@@ -28,15 +31,20 @@ void UW_EquippedSlot::NativeConstruct()
 
 void UW_EquippedSlot::ButtonOnClicked()
 {
-	// 장착 해체를 의미, 다시 인벤토리에 넣어주어야 함
+	// 장착 해체를 의미, 다시 인벤토리에 넣어주어야 함 
 	
 	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (PlayerCharacter==nullptr)
+	UCombatComponent* CombatComponent =PlayerCharacter->CombatComponent;
+	InventoryComponent = PlayerCharacter->InventoryComponent;
+	if (PlayerCharacter!=nullptr)
 	{
-		return;
+		PlayerCharacter->UnEquip();
 	}
 	
-	InventoryComponent = PlayerCharacter->InventoryComponent;
+	if (CombatComponent!=nullptr)
+	{
+		CombatComponent->MainWeapon=nullptr;
+	}
 	
 	if (InventoryComponent!=nullptr)
 	{
@@ -45,9 +53,6 @@ void UW_EquippedSlot::ButtonOnClicked()
 		W_Inventory->LoadInventory(InventoryComponent);
 		
 	}
-
-
-	
 }
 
 
@@ -63,4 +68,11 @@ void UW_EquippedSlot::ClearSlot()
 		InventoryComponent->EquippedWeaponInfo.Mesh = nullptr;
 		InventoryComponent->EquippedWeaponInfo.WeaponNumber = 0;
 	}
+}
+
+void UW_EquippedSlot::SetEquippedItemThumnail()
+{
+	
+		EquippedItemImage->SetBrushFromTexture(EquippedItemInfo.Thumnail);
+	
 }

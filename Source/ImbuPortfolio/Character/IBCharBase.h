@@ -80,5 +80,6 @@ private:
 
 public:
 	virtual void Equip(int32 WeaponNumber, AActor* Caller) override;
+	void UnEquip();
 
 };

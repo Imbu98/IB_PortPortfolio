@@ -32,7 +32,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory") 
 	TSubclassOf<class UUserWidget> ItemSlotWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory") 
+	TSubclassOf<class UUserWidget> EquippedItemSlotWidgetClass;
 
 public:
+	
 	
 };

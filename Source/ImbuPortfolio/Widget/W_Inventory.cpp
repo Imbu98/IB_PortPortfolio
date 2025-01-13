@@ -8,6 +8,10 @@
 
 void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 {
+	if (InventoryWrapBox==nullptr)
+	{
+		return;
+	}
 	InventoryWrapBox->ClearChildren();
 	
 	if (ItemSlotWidgetClass != nullptr&& Inventory!=nullptr)
@@ -28,17 +32,17 @@ void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 			}
 			
 		}
+	}
 		// Equipped Weapon Texture Update
-		if (!Inventory->EquippedWeapon.IsEmpty())
+		if (EquippedWeapon1!=nullptr&&EquippedWeapon2!=nullptr&&Inventory!=nullptr)
 		{
-			EquippedWeapon1->EquippedItemImage->SetBrushFromTexture(Inventory->EquippedWeapon[0]->ItemInfo.Thumnail);
-			EquippedWeapon2->EquippedItemImage->SetBrushFromTexture(Inventory->EquippedWeapon[1]->ItemInfo.Thumnail);
+			EquippedWeapon1->EquippedItemInfo=Inventory->EquippedWeaponInfo;
+			EquippedWeapon1->SetEquippedItemThumnail();
+			EquippedWeapon2->EquippedItemInfo=Inventory->EquippedWeaponInfo;
+			EquippedWeapon2->SetEquippedItemThumnail();
+			
 		}
 		// add armor and make function all of this 
-			
-		
-	}
-
-	
 
 }
+
