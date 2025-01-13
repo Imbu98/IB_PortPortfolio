@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
 	UW_Inventory* W_Inventory;
 	
-
+	
 
 	
 public:

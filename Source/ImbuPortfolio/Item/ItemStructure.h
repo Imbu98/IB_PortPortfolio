@@ -28,4 +28,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int WeaponNumber;
 
+	FItemStruct():ItemName(FText::FromString(TEXT("")))
+	, Stackable(false)
+	, ItemQuantity(0)
+	,Thumnail(nullptr)
+	, Mesh(nullptr)
+	,WeaponNumber(0)
+	{
+		
+	}
+
 };

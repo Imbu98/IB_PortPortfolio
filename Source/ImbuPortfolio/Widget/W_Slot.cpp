@@ -14,22 +14,31 @@
 
 void UW_Slot::NativePreConstruct()
 {
-		if (ItemImage != nullptr && Item.Thumnail != nullptr  )
-		{
-			ItemImage->SetBrushFromTexture(Item.Thumnail, false);
-		}
-		FText TextItemQuantity = FText::AsNumber(Item.ItemQuantity);
+	FText TextItemQuantity = FText::AsNumber(Item.ItemQuantity);
 
 
-		ItemQuantity->SetText(TextItemQuantity);
-		if (Item.ItemQuantity > 1)
+	ItemQuantity->SetText(TextItemQuantity);
+	if (Item.ItemQuantity > 1)
+	{
+		ItemQuantity->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		ItemQuantity->SetVisibility(ESlateVisibility::Hidden);
+	}
+		if (ItemImage != nullptr )
 		{
-			ItemQuantity->SetVisibility(ESlateVisibility::Visible);
+			if (Item.Thumnail == nullptr)
+			{
+				return;
+			}
+			else if (Item.Thumnail != nullptr)
+			{
+				ItemImage->SetBrushFromTexture(Item.Thumnail, false);
+			}
+			
 		}
-		else
-		{
-			ItemQuantity->SetVisibility(ESlateVisibility::Hidden);
-		}
+		
 	
 }
 

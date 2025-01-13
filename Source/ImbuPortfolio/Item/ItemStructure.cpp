@@ -2,6 +2,7 @@
 
 ItemStructure::ItemStructure()
 {
+	
 }
 
 ItemStructure::~ItemStructure()
