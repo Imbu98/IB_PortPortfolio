@@ -33,6 +33,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FItemStruct EquippedWeaponInfo;
+
+public:
+	void UnEquip();
+	void ItemToInventory(ABaseEquippable* Equippable);
 	
 
 public:	

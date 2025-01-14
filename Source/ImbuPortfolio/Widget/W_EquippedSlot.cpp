@@ -1,4 +1,4 @@
-#include "W_EquippedSlot.h"
+﻿#include "W_EquippedSlot.h"
 #include "../Character/IBCharBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Components/InventoryComponent.h"
@@ -38,7 +38,7 @@ void UW_EquippedSlot::ButtonOnClicked()
 	InventoryComponent = PlayerCharacter->InventoryComponent;
 	if (PlayerCharacter!=nullptr)
 	{
-		PlayerCharacter->UnEquip();
+		InventoryComponent->UnEquip();
 	}
 	
 	if (CombatComponent!=nullptr)

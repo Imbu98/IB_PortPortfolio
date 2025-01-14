@@ -145,18 +145,6 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 
 void AIBCharBase::UnEquip()
 {
-	if (InventoryComponent)
-	{
-		TArray<ABaseEquippable*> WeaponsToDestroy = InventoryComponent->EquippedWeapon;
-		for (ABaseEquippable* Equippable : WeaponsToDestroy)
-		{
-			if (Equippable)
-			{
-				Equippable->Destroy();
-			}
-		}
-		InventoryComponent->EquippedWeapon.Empty();
-	}
 
 	// 이제 장착 무기를 인벤토리에 넣어주는 것만 하면 된다 inventory component참고
 	// inventory component에서 함수 만들고 그 함수 실행시켜줘도 될듯
