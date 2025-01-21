@@ -77,6 +77,15 @@ void UInventoryComponent::Interaction()
 	TArray<AActor*> ActorsToIgnore;
 	float InteractRadius = 100.0f;
 
+	// 장착한 아이템은 인터렉션 되지 않게
+	if (!EquippedWeapon.IsEmpty())
+	{
+		for (AActor* Actor : EquippedWeapon)
+		{
+			ActorsToIgnore.Add(Actor);
+		}
+	}
+
 	// ���Ǿ� ��ġ ���
 	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(GetOwner());
 	FVector VCharacterLocation = PlayerCharacter->GetActorLocation();
