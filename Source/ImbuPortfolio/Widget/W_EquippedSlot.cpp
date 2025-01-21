@@ -21,26 +21,32 @@ void UW_EquippedSlot::NativeConstruct()
 
 	if (EquippedItemSlot)
 	{
-		// ���ε� ������ 
+		
 		EquippedItemSlot->OnClicked.RemoveDynamic(this, &UW_EquippedSlot::ButtonOnClicked);
 
-		// �ٽ� ���ε�
+		
 		EquippedItemSlot->OnClicked.AddDynamic(this, &UW_EquippedSlot::ButtonOnClicked);
 	}
 }
 
 void UW_EquippedSlot::ButtonOnClicked()
 {
-	// 장착 해체를 의미, 다시 인벤토리에 넣어주어야 함 
+	// 장착 해체를 의미, 다시 인벤토리에 넣어주어야 함
+	
 	
 	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	UCombatComponent* CombatComponent =PlayerCharacter->CombatComponent;
-	InventoryComponent = PlayerCharacter->InventoryComponent;
-	if (PlayerCharacter!=nullptr)
+	if (PlayerCharacter==nullptr)
 	{
-		InventoryComponent->UnEquip();
+		return;
 	}
+
 	
+	UCombatComponent* CombatComponent =PlayerCharacter->CombatComponent;
+	
+	InventoryComponent = PlayerCharacter->InventoryComponent;
+
+
+	// 이 아래로는 나중에 방어구 등을 추가하면 따로 함수를 만들어 무기와 방어구 해제를 한번에 관리하기 
 	if (CombatComponent!=nullptr)
 	{
 		CombatComponent->MainWeapon=nullptr;
@@ -48,9 +54,14 @@ void UW_EquippedSlot::ButtonOnClicked()
 	
 	if (InventoryComponent!=nullptr)
 	{
+		InventoryComponent->UnEquip();
 		UW_Inventory* W_Inventory= InventoryComponent->PlayerInventory;
-		ClearSlot();
-		W_Inventory->LoadInventory(InventoryComponent);
+		if (W_Inventory!=nullptr)
+		{
+			ClearSlot();
+			W_Inventory->LoadInventory(InventoryComponent);
+		}
+		
 		
 	}
 }

@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite,Category="Weapon")
 	TArray<class ABaseEquippable*> EquippedWeapon;
 	UPROPERTY()
 	TArray<FItemStruct> Items;
@@ -29,14 +29,18 @@ public:
 	FItemStruct Item;
 	UPROPERTY()
 	UW_Inventory* PlayerInventory;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
+	float RetrieveWeaponIndex=0; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FItemStruct EquippedWeaponInfo;
 
 public:
+	UFUNCTION()
 	void UnEquip();
-	void ItemToInventory(ABaseEquippable* Equippable);
+	UFUNCTION()
+	void ItemToInventory(ABaseEquippable* RootedItem);
 	
 
 public:	

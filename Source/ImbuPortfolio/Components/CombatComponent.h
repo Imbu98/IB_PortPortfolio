@@ -19,11 +19,17 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	TArray<ABaseEquippable*> EquippedWeapons; 
+	UPROPERTY()
+	TArray<ABaseEquippable*> EquippedWeapons;
+	UPROPERTY()
 	ABaseEquippable* MainWeapon;
+	UPROPERTY()
 	bool IsCombatEnabled;
+	UPROPERTY()
 	bool IsAttackSaved;
+	UPROPERTY()
 	int32 AttackCount;
+	
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Weapon)
 	TArray<TSubclassOf<ABaseEquippable>> WeaponArray;

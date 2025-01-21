@@ -30,7 +30,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Item)
 	FItemStruct ItemInfo;
 
-	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UCombatComponent* CombatComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UCollisionComponent* CollisionComponent;
@@ -47,9 +47,10 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FName AttachSocketName;
-
 	UPROPERTY(VisibleDefaultsOnly)
 	bool IsEquipped = false;
+	UPROPERTY(VisibleDefaultsOnly)
+	bool IsAttachtoHand;
 
 public:
 	void SetIsEquipped(bool Equip) { IsEquipped = Equip; }

@@ -38,16 +38,23 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UInventoryComponent::UnEquip()
 {
-	TArray<ABaseEquippable*> WeaponsToDestroy = EquippedWeapon;
-	float RetrieveWeaponIndex=0;
-	ABaseEquippable* RetrieveWeapon = EquippedWeapon[RetrieveWeaponIndex];
-	for (ABaseEquippable* Equippable : WeaponsToDestroy)
+	if (EquippedWeapon.IsEmpty())
 	{
-		if (Equippable)
+		return;
+	}
+	
+	TArray<ABaseEquippable*> WeaponsToDestroy = EquippedWeapon;
+	
+	for (ABaseEquippable* Equipable : WeaponsToDestroy)
+	{
+		if (Equipable)
 		{
-			Equippable->Destroy();
+			Equipable->Destroy();
 		}
 	}
+	
+	ABaseEquippable* RetrieveWeapon = EquippedWeapon[RetrieveWeaponIndex];
+	
 	if (RetrieveWeapon!=nullptr)
 	{
 		ItemToInventory(RetrieveWeapon);
@@ -76,6 +83,15 @@ void UInventoryComponent::Interaction()
 	FHitResult OutHit;
 	TArray<AActor*> ActorsToIgnore;
 	float InteractRadius = 100.0f;
+
+	// 장착한 아이템은 인터렉션 되지 않게
+	if (!EquippedWeapon.IsEmpty())
+	{
+		for (AActor* Actor : EquippedWeapon)
+		{
+			ActorsToIgnore.Add(Actor);
+		}
+	}
 
 	// ���Ǿ� ��ġ ���
 	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(GetOwner());
@@ -117,7 +133,7 @@ void UInventoryComponent::ItemToInventory(ABaseEquippable* RootedItem)
 			bool IsNotFull = (Item.ItemQuantity + RootedItem->ItemInfo.ItemQuantity) <= 64;
 			bool IsStackableItem = RootedItem->ItemInfo.Stackable;
 
-			// ���� �������̰�, �������� �� ��á��, ������ �������� �� �״�� �־��ش�
+			// 같은아이템, 아이템개수가 64개이하, 스택형 아이템일때 
 			if (IsSameItem && IsNotFull && IsStackableItem)
 			{
 				InventoryItem.ItemQuantity += RootedItem->ItemInfo.ItemQuantity;
@@ -126,7 +142,7 @@ void UInventoryComponent::ItemToInventory(ABaseEquippable* RootedItem)
 			}
 			else
 			{
-				// �װ� �ƴϰ� ������ ������ 0�̸� 
+				
 				if (InventoryItem.ItemQuantity == 0)
 				{
 					InventoryItem = RootedItem->ItemInfo;

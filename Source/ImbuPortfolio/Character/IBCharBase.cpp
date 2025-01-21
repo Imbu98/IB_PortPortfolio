@@ -73,6 +73,7 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Dodge, ETriggerEvent::Started, this, &ThisClass::Dodge);
 		EnhancedInputComponent->BindAction(IA_IBChar_Interact, ETriggerEvent::Started, this, &ThisClass::Interact);
 		EnhancedInputComponent->BindAction(IA_IBChar_OpenInventory, ETriggerEvent::Started, this, &ThisClass::OpenInventory);
+		EnhancedInputComponent->BindAction(IA_IBChar_Attack,ETriggerEvent::Started,this,&AIBCharBase::Attack);
 	}
 
 }
@@ -117,6 +118,25 @@ void AIBCharBase::OpenInventory()
 {
 	AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	PlayerController->OpenInventory();
+}
+
+void AIBCharBase::Attack()
+{
+	if (CombatComponent==nullptr)
+	{
+		return;
+	}
+	ABaseEquippable* MainWeapon= CombatComponent->GetMainWeapon();
+	if (MainWeapon==nullptr)
+	{
+		return;
+	}
+	bool CanAttack = MainWeapon->IsAttachtoHand;
+	if (CanAttack==true)
+	{
+		
+	}
+	
 }
 
 

@@ -72,6 +72,7 @@ void ABaseEquippable::AttachActor(FName SocketName)
 void ABaseEquippable::OnEquipped()
 {
 	IsEquipped = true;
+	IsAttachtoHand=true;
 	CombatComponent = this->GetOwner()->FindComponentByClass<UCombatComponent>();
 	if (CombatComponent != nullptr)
 	{
@@ -90,6 +91,7 @@ void ABaseEquippable::OnEquipped()
 void ABaseEquippable::OnUnEquipped()
 {
 	SetIsEquipped(false);
+	IsAttachtoHand=false;
 }
 
 void ABaseEquippable::SaveEquippedWeapon(ABaseEquippable* Weapon)

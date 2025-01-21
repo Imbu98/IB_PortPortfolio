@@ -48,18 +48,21 @@ public:
 	UInputAction* IA_IBChar_Interact;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_OpenInventory;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_Attack;
 
-
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void Look(const FInputActionValue& Value);
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void Dodge();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void Interact();
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void OpenInventory();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void Attack();
 
 	ABaseEquippable* SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller) ;
 public:
