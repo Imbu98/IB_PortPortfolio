@@ -16,7 +16,6 @@ class IMBUPORTFOLIO_API IAction_Interface
 	GENERATED_BODY()
 
 public:
-	
 	virtual void Equip(int32 WeaponNumber, AActor* Caller) { }
 
 
