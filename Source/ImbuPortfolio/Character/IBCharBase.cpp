@@ -13,7 +13,15 @@
 #include "../Item/BaseEquippable.h"
 #include "../Item/EItems.h"
 #include "../Item/Axe_Weapon.h"
+#include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
+
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusIdle,"Status.Idle","Tag Character In Idle")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDie,"Status.Die","Tag Character In Die")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusAction,"Status.Action","Tag Character In Action")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attacking")
+
+
 
 AIBCharBase::AIBCharBase()
 {
@@ -36,6 +44,7 @@ AIBCharBase::AIBCharBase()
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	StateComponent=CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	
 
 }
@@ -43,6 +52,11 @@ AIBCharBase::AIBCharBase()
 void AIBCharBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
+	SetupGamePlayTag();
+
+	StateComponent->SetState(TAG_StatusIdle);
 	
 }
 
@@ -126,6 +140,10 @@ void AIBCharBase::Attack()
 	{
 		return;
 	}
+	if (StateComponent==nullptr)
+	{
+		return;
+	}
 	ABaseEquippable* MainWeapon= CombatComponent->GetMainWeapon();
 	if (MainWeapon==nullptr)
 	{
@@ -134,9 +152,84 @@ void AIBCharBase::Attack()
 	bool CanAttack = MainWeapon->IsAttachtoHand;
 	if (CanAttack==true)
 	{
-		
+		if (StateComponent->GetCurrentState() != TAG_StatusActionAttack)
+		{
+			AttackEvent();
+		}
 	}
 	
+}
+
+void AIBCharBase::AttackEvent()
+{
+	if (CanPerformToggleCombat()==true)
+	{
+		if (CombatComponent!=nullptr)
+		{
+			float AttackCount = CombatComponent->AttackCount;
+			PerformAttack(AttackCount);
+		}
+		bUseControllerRotationYaw=true;
+	}
+}
+
+void AIBCharBase::PerformAttack(float InAttackCount, FGameplayTag InAttackType)
+{
+	if (StateComponent==nullptr)
+	{
+		return;
+	}
+	if (CombatComponent==nullptr)
+	{
+		return;
+	}
+		ABaseEquippable* MainWeapon= CombatComponent->GetMainWeapon();
+		if (MainWeapon)
+		{
+			bool IsAttackMontageEmpty =  MainWeapon->AttackMontage.IsEmpty();
+			if (!IsAttackMontageEmpty)
+			{
+				UAnimMontage* CurrentAttackMontage= MainWeapon->AttackMontage[InAttackCount];
+				if (CurrentAttackMontage)
+				{
+					StateComponent->SetState(TAG_StatusActionAttack);
+					StateComponent->SetCurrentAction(InAttackType);
+
+					PlayAnimMontage(CurrentAttackMontage);
+					CombatComponent->AttackCount++;
+				
+					if (CombatComponent->AttackCount > MainWeapon->AttackMontage.Max())
+					{
+						CombatComponent->AttackCount=0;
+					}
+				
+				}
+			}
+			
+		}
+}
+
+bool AIBCharBase::CanPerformToggleCombat()
+{
+	TArray<FGameplayTag> StatusTag;
+	StatusTag.Add(TAG_StatusAction);
+	StatusTag.Add(TAG_StatusDie);
+
+	if (StateComponent==nullptr)
+	{
+		return false;
+	}
+	bool InActionOrDie = StateComponent->IsCurrentStateEqualtoAny(StatusTag);
+
+	if (GetCharacterMovement()==nullptr)
+	{
+		return false;
+	}
+	bool IsFalling = GetCharacterMovement()->IsFalling();
+
+	bool CharacterInIdle = StateComponent->GetCurrentState() == TAG_StatusIdle;
+
+	return !InActionOrDie && !IsFalling && CharacterInIdle;
 }
 
 
@@ -232,4 +325,12 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 		}
 	}
 	return nullptr;
+}
+
+void AIBCharBase::SetupGamePlayTag()
+{
+	GameplayContatiner.AddTag(TAG_StatusIdle);
+	GameplayContatiner.AddTag(TAG_StatusDie);
+	GameplayContatiner.AddTag(TAG_StatusAction);
+	GameplayContatiner.AddTag(TAG_StatusActionAttack);
 }

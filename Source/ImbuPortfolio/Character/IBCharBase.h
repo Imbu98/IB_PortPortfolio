@@ -4,9 +4,17 @@
 #include "GameFramework/Character.h"
 #include "../Interface/Action_Interface.h"
 #include "../Item/EItems.h"
+#include "GameplayTagContainer.h"
+#include "NativeGameplayTags.h"
 #include "IBCharBase.generated.h"
 
+
 class UInputAction;
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusIdle)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDie)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
 
 
 UCLASS()
@@ -22,7 +30,16 @@ class IMBUPORTFOLIO_API AIBCharBase : public ACharacter, public IAction_Interfac
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UCombatComponent* CombatComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UInventoryComponent* InventoryComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
+	class UStateComponent* StateComponent;
+
+protected:
+	FGameplayTagContainer GameplayContatiner;
+
+protected:
+	void SetupGamePlayTag();
 	
 
 public:
@@ -64,7 +81,7 @@ public:
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Attack();
 
-	ABaseEquippable* SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller) ;
+	
 public:
 	FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE  UCameraComponent* GetFollowCamera() const { return FollowCamera; }
@@ -80,9 +97,21 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<ABaseEquippable> Equippable22;
 
+private:
+	UFUNCTION()
+	void AttackEvent();
+	UFUNCTION()
+	void PerformAttack(float InAttackCount,FGameplayTag InAttackType=TAG_StatusIdle);
+	UFUNCTION()
+	bool CanPerformToggleCombat();
+
+
 
 public:
 	virtual void Equip(int32 WeaponNumber, AActor* Caller) override;
+	UFUNCTION()
 	void UnEquip();
+	UFUNCTION()
+	ABaseEquippable* SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller) ;
 
 };

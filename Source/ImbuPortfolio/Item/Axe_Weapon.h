@@ -18,4 +18,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemInfo)
 	class UStaticMesh* AxeStaticMesh;
 
+
+
 };
