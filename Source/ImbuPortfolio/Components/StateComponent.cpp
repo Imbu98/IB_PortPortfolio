@@ -20,17 +20,22 @@ FGameplayTag UStateComponent::GetCurrentState()
 	return CurrentState;
 }
 
-void UStateComponent::SetState()
+void UStateComponent::SetState(FGameplayTag NewState)
 {
+	if (NewState!=CurrentState)
+	{
+		CurrentState=NewState;
+	}
+	// 나중에 StateEnd, StateBegin Event Call도 필요하다면 해줄 것
 }
 
 void UStateComponent::ResetState()
 {
 }
 
-bool UStateComponent::IsCurrentStateEqualtoAny(FGameplayTagContainer StateToCheck)
+bool UStateComponent::IsCurrentStateEqualtoAny(TArray<FGameplayTag> StateToCheck)
 {
-	return StateToCheck.HasTag(CurrentState);
+	return StateToCheck.Contains(CurrentState);
 }
 
 void UStateComponent::SetCurrentAction(FGameplayTag NewCharacterAction)

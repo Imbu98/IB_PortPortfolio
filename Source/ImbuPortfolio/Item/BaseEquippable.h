@@ -60,4 +60,9 @@ public:
 	UFUNCTION()
 	void OnHitActor(FHitResult HitResult);
 
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=AttackMontage)
+	TArray<UAnimMontage*> AttackMontage;
+	
+
 };

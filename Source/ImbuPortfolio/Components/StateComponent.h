@@ -27,11 +27,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FGameplayTag GetCurrentState();
 	UFUNCTION(BlueprintCallable)
-	void SetState();
+	void SetState(FGameplayTag NewState);
 	UFUNCTION(BlueprintCallable)
 	void ResetState();
 	UFUNCTION(BlueprintCallable)
-	bool IsCurrentStateEqualtoAny(FGameplayTagContainer StateToCheck);
+	bool IsCurrentStateEqualtoAny(TArray<FGameplayTag> StateToCheck);
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentAction(FGameplayTag NewCharacterAction);
 	
