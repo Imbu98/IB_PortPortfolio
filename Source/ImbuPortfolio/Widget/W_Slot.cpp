@@ -61,14 +61,30 @@ void UW_Slot::OnButtonClicked()
 {
 	FText TextItemQuantity = UKismetTextLibrary::Conv_IntToText(Item.ItemQuantity);
 	FString StringItemQuantity = TextItemQuantity.ToString();
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("%s"), *StringItemQuantity));
 
 	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "PlayerCharacter is null");
+		return;
+	}
+	
 	InventoryComponent = PlayerCharacter->InventoryComponent;
+	
+	if (InventoryComponent==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "InventoryComponent is null");
+		return;
+	}
+	
 	W_Inventory = InventoryComponent->PlayerInventory;
 
-	PlayerCharacter->Equip(InventoryComponent->Items[Index].WeaponNumber, PlayerCharacter);
+	if (Item.ItemType==E_ItemType::Weapon)
+	{
+		PlayerCharacter->Equip(InventoryComponent->Items[Index].WeaponNumber, PlayerCharacter);
 
+	}
+	
 	ClearSlot();
 	W_Inventory->LoadInventory(InventoryComponent);
 }

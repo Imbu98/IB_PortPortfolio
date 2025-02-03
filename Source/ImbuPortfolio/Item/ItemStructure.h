@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EItems.h"
+#include "Engine/DataTable.h"
 #include "ItemStructure.generated.h"
 
 class IMBUPORTFOLIO_API ItemStructure
@@ -11,7 +13,7 @@ public:
 };
 
 USTRUCT(Atomic,BlueprintType)
-struct FItemStruct
+struct FItemStruct : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 public:
@@ -27,6 +29,10 @@ public:
 	UStaticMesh* Mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int WeaponNumber;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	E_ItemType ItemType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	E_Weapon WeaponType;
 
 	FItemStruct():ItemName(FText::FromString(TEXT("")))
 	, Stackable(false)
@@ -34,6 +40,8 @@ public:
 	,Thumnail(nullptr)
 	, Mesh(nullptr)
 	,WeaponNumber(0)
+	,ItemType(E_ItemType::None)
+	,WeaponType(E_Weapon::None)
 	{
 		
 	}

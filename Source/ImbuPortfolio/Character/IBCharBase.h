@@ -93,7 +93,7 @@ public:
 private:
 	float InteractRadius=20.f;
 	UPROPERTY()
-	E_Items ItemEnum;
+	E_Weapon WeaponEnum;
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<ABaseEquippable> Equippable22;
 
@@ -104,6 +104,10 @@ private:
 	void PerformAttack(float InAttackCount,FGameplayTag InAttackType=TAG_StatusIdle);
 	UFUNCTION()
 	bool CanPerformToggleCombat();
+	
+public:
+	UFUNCTION()
+	void ResetAttack();
 
 
 

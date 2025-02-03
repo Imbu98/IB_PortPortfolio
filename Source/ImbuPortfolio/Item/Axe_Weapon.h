@@ -11,6 +11,8 @@ class IMBUPORTFOLIO_API AAxe_Weapon : public ABaseEquippable
 
 public:
 	AAxe_Weapon();
+	protected:
+	virtual void BeginPlay() override;
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemInfo)

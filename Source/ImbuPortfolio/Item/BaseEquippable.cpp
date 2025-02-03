@@ -41,6 +41,61 @@ void ABaseEquippable::BeginPlay()
 	
 }
 
+void ABaseEquippable::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	FName ItemRowName = Item.RowName;
+	
+	if (Item.DataTable==nullptr)
+	{
+		
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DataTable Is Null"));
+		return;
+		
+	}
+	FItemStruct* ItemStruct = Item.DataTable->FindRow<FItemStruct>(ItemRowName,FString(""));
+	
+	if (ItemStruct==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ItemStruct Is Null"));
+		return;
+		
+	}
+
+	switch (ItemStruct->WeaponType)
+	{
+	case E_Weapon::Axe:
+		{
+			if (AxeAsset!=nullptr)
+			{
+				ItemSKeletalMesh->SetSkeletalMesh(AxeAsset);
+			}
+		}break;
+	case E_Weapon::Sword:
+		{
+			if (SwordAsset!=nullptr)
+			{
+				ItemSKeletalMesh->SetSkeletalMesh(SwordAsset);
+			}
+		}break;
+	default:
+		break;
+	}
+	
+	ItemInfo.ItemName = ItemStruct->ItemName;
+	ItemInfo.Stackable = ItemStruct->Stackable;
+	ItemInfo.ItemQuantity = ItemStruct->ItemQuantity;
+	ItemInfo.Thumnail = ItemStruct->Thumnail;
+	ItemInfo.Mesh = ItemStruct->Mesh;
+	ItemInfo.WeaponNumber = ItemStruct->WeaponNumber;
+	ItemInfo.ItemType=ItemStruct->ItemType;
+	ItemInfo.WeaponType=ItemStruct->WeaponType;
+
+	
+	
+}
+
 
 void ABaseEquippable::Tick(float DeltaTime)
 {

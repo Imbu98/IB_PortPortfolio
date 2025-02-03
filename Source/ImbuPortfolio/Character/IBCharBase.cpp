@@ -198,7 +198,7 @@ void AIBCharBase::PerformAttack(float InAttackCount, FGameplayTag InAttackType)
 					PlayAnimMontage(CurrentAttackMontage);
 					CombatComponent->AttackCount++;
 				
-					if (CombatComponent->AttackCount > MainWeapon->AttackMontage.Max())
+					if (CombatComponent->AttackCount > MainWeapon->AttackMontage.Num())
 					{
 						CombatComponent->AttackCount=0;
 					}
@@ -230,6 +230,14 @@ bool AIBCharBase::CanPerformToggleCombat()
 	bool CharacterInIdle = StateComponent->GetCurrentState() == TAG_StatusIdle;
 
 	return !InActionOrDie && !IsFalling && CharacterInIdle;
+}
+
+void AIBCharBase::ResetAttack()
+{
+	CombatComponent->ResetAttack();
+	StateComponent->ResetState();
+	StateComponent->SetCurrentAction(TAG_StatusIdle);
+	bUseControllerRotationYaw = false;
 }
 
 
@@ -277,17 +285,17 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 		ActorSpawnParameters.Owner = Caller;
 		ActorSpawnParameters.Instigator = Pawn;
 
-		ItemEnum = static_cast<E_Items>(WeaponNumber);
+		WeaponEnum = static_cast<E_Weapon>(WeaponNumber);
 		
-		switch (ItemEnum)
+		switch (WeaponEnum)
 		{
-		case E_Items::None:
+		case E_Weapon::None:
 			{
 				return nullptr;
 				break;
 			}
 			// Weapon Axe
-		case E_Items::Axe:
+		case E_Weapon::Axe:
 			{
 				ABaseEquippable* Axe_L = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
 				if (Axe_L)
@@ -314,7 +322,7 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 				break;
 			}
 			// Weapon Sword
-		case E_Items::Sword:
+		case E_Weapon::Sword:
 			{
 				return nullptr;
 				break;

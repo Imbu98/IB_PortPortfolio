@@ -16,6 +16,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -29,6 +30,8 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Item)
 	FItemStruct ItemInfo;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Item)
+	FDataTableRowHandle Item;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UCombatComponent* CombatComponent;
@@ -40,6 +43,11 @@ public:
 	UPrimitiveComponent* GetItemMesh();
 	UFUNCTION(BluePrintCallable, Category = ItemMesh)
 	void AttachActor(FName SocketName);
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemMesh)
+	TObjectPtr<USkeletalMesh> AxeAsset;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemMesh)
+	TObjectPtr<USkeletalMesh> SwordAsset;
+	
 	UFUNCTION(BluePrintCallable)
 	void OnEquipped();
 	UFUNCTION(BluePrintCallable)
@@ -63,6 +71,9 @@ public:
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=AttackMontage)
 	TArray<UAnimMontage*> AttackMontage;
+
+protected:
+	
 	
 
 };
