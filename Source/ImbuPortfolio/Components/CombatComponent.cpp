@@ -7,6 +7,9 @@
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	
+	AttackCount = 0;
+	IsAttackSaved = false;
 
 }
 

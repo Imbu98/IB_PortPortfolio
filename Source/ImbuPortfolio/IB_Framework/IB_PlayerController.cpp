@@ -6,7 +6,7 @@
 
 void AIB_PlayerController::BeginPlay()
 {
-	// InventoryWidget 생성
+	// InventoryWidget 
 	if (InventoryWidgetClass != nullptr)
 	{
 		Inventory = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
@@ -18,14 +18,14 @@ void AIB_PlayerController::OpenInventory()
 {
 	if (Inventory != nullptr)
 	{
-		// 켜있으면 끄기
+		
 		if (Inventory->IsVisible() == true)
 		{
 			bShowMouseCursor = false;
 			Inventory->RemoveFromParent();
 			UWidgetBlueprintLibrary::SetInputMode_GameOnly(this, false);
 		}
-		// 꺼있으면 켜기
+		
 		else if (Inventory->IsVisible() == false)
 		{
 			bShowMouseCursor = true;

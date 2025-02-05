@@ -46,13 +46,13 @@ void UW_Slot::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// �ߺ� ���ε� ����
+	
 	if (ItemSlot)
 	{
-		// ���ε� ������ 
+		
 		ItemSlot->OnClicked.RemoveDynamic(this, &UW_Slot::OnButtonClicked);
 
-		// �ٽ� ���ε�
+		
 		ItemSlot->OnClicked.AddDynamic(this, &UW_Slot::OnButtonClicked);
 	}
 }
@@ -101,7 +101,7 @@ void UW_Slot::ClearSlot()
 		}
 		else
 		{
-			// ���� �ε����� �ش��ϴ� �κ��丮������Ʈ�� ������ �迭�� ������ �ʱ�ȭ
+			
 			InventoryItem.ItemName = FText::FromString(TEXT(""));
 			InventoryItem.Stackable = false;
 			InventoryItem.ItemQuantity = 0;

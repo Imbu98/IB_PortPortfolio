@@ -197,8 +197,9 @@ void AIBCharBase::PerformAttack(float InAttackCount, FGameplayTag InAttackType)
 
 					PlayAnimMontage(CurrentAttackMontage);
 					CombatComponent->AttackCount++;
+					float AttackMontageCount= MainWeapon->AttackMontage.Num()-1;
 				
-					if (CombatComponent->AttackCount > MainWeapon->AttackMontage.Num())
+					if (CombatComponent->AttackCount > AttackMontageCount)
 					{
 						CombatComponent->AttackCount=0;
 					}
@@ -312,7 +313,6 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 					InventoryComponent->EquippedWeapon.Add(Axe_L);
 					InventoryComponent->EquippedWeapon.Add(Axe_R);
 				}
-
 				
 				AAxe_Weapon* Axe_Weapon = Cast<AAxe_Weapon>(Axe_L);
 				if (Axe_Weapon!=nullptr)
