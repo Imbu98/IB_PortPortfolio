@@ -69,7 +69,7 @@ void UInventoryComponent::ChangeWeapon(ABaseEquippable* MainWeapon)
 {
 	if (MainWeapon != nullptr)
 	{
-		ItemToInventory(MainWeapon);
+		
 		
 		AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		PlayerInventory = PlayerController->GetInventoryWidget();

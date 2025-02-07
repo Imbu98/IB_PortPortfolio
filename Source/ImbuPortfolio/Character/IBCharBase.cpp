@@ -245,9 +245,10 @@ void AIBCharBase::ResetAttack()
 void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 {
 	
-	if (CombatComponent&& WeaponNumber!=0)
+	if (CombatComponent&& WeaponNumber!=0&&InventoryComponent)
 	{
-		UnEquip();
+		
+		InventoryComponent->UnEquip();
 		
 		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[WeaponNumber];
 		if (WeaponClass != nullptr)
