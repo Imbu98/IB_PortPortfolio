@@ -13,6 +13,7 @@
 #include "../Item/BaseEquippable.h"
 #include "../Item/EItems.h"
 #include "../Item/Axe_Weapon.h"
+#include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
 
@@ -45,6 +46,9 @@ AIBCharBase::AIBCharBase()
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	StateComponent=CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
+	DamageSystemComponent=CreateDefaultSubobject<UDamageSystemComponent>(TEXT("DamageSystemComponent"));
+
+	OnDamageResponse.AddUObject(this,&ThisClass::DamageResponse);
 	
 
 }
@@ -58,12 +62,15 @@ void AIBCharBase::BeginPlay()
 
 	StateComponent->SetState(TAG_StatusIdle);
 	
+	
 }
 
 
 void AIBCharBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	
 
 }
 
@@ -241,6 +248,12 @@ void AIBCharBase::ResetAttack()
 	bUseControllerRotationYaw = false;
 }
 
+void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
+{
+	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"IBChar DamageResponse");
+	
+}
+
 
 void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 {
@@ -264,6 +277,17 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 			}
 		}
 	}
+}
+
+bool AIBCharBase::TakeDamage(FDamageInfo& DamageInfo, AActor* Cursor)
+{
+	return DamageSystemComponent->TakeDamage(DamageInfo, Cursor);
+	
+}
+
+float AIBCharBase::SetHealth()
+{
+	return CharMaxHealth;
 }
 
 void AIBCharBase::UnEquip()

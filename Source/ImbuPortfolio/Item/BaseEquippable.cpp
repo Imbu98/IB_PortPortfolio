@@ -4,8 +4,10 @@
 #include "Components\SkeletalMeshComponent.h"
 #include "../Components/CombatComponent.h"
 #include "Components/BoxComponent.h"
+#include "../Structure/DamageInfo.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
-#include "ImbuPortfolio/Components/CollisionComponent.h"
+#include "Kismet/GameplayStatics.h"
+
 
 ABaseEquippable::ABaseEquippable()
 {
@@ -25,7 +27,7 @@ ABaseEquippable::ABaseEquippable()
 
 	CollisionComponent = CreateDefaultSubobject<UCollisionComponent>(TEXT("CollisionComponent"));
 
-	
+	OnHit.AddDynamic(this,&ThisClass::OnHitActor);
 	
 
 }
@@ -161,7 +163,35 @@ void ABaseEquippable::SaveEquippedWeapon(ABaseEquippable* Weapon)
 
 void ABaseEquippable::OnHitActor(FHitResult HitResult)
 {
-	AIBCharBase* IBCharBase = Cast<AIBCharBase>( this->GetOwner());
+	// AIBCharBase* IBCharBase = Cast<AIBCharBase>( this->GetOwner());
+	// if (IBCharBase == nullptr)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("IBChar Is Null"));
+	// 	return;
+	// }
+if (HitResult.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass())==true)
+{
+	IDamageInterface* DamageInterface=Cast<IDamageInterface>(HitResult.GetActor());
+	if (DamageInterface==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DamageInterface Is Null"));
+		return;
+	}
+	else
+	{
+		FDamageInfo DamageInfo;
+		DamageInfo.DamageAmount=Damage;
+		DamageInterface->TakeDamage(DamageInfo,HitResult.GetActor());
+		if (HitEffects!=nullptr)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),HitEffects,HitResult.Location,FRotator::ZeroRotator,FVector::ZeroVector,true);
+			
+		}
+		
+	}
+}
+	
+	
 	
 }
 

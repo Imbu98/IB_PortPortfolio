@@ -73,14 +73,15 @@ void UCollisionComponent::CollisionTrace()
 		for (FHitResult& Result : OutHits)
 		{
 			LastHit = Result;
-			if (AlreadyHitActors.Contains(Result.GetActor())!=true)
+			if (!AlreadyHitActors.Contains(Result.GetActor())==true)
 				{
 					HitActor= Result.GetActor();
 					AlreadyHitActors.Add(HitActor);
+				Onhit.Broadcast(LastHit);
 				
 				}
 		}
-		Onhit.Broadcast(LastHit);
+		
 	}
 }
 

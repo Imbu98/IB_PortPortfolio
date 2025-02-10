@@ -6,6 +6,7 @@
 #include "../Item/EItems.h"
 #include "GameplayTagContainer.h"
 #include "NativeGameplayTags.h"
+#include "ImbuPortfolio/Interface/DamageInterface.h"
 #include "IBCharBase.generated.h"
 
 
@@ -18,7 +19,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
 
 
 UCLASS()
-class IMBUPORTFOLIO_API AIBCharBase : public ACharacter, public IAction_Interface
+class IMBUPORTFOLIO_API AIBCharBase : public ACharacter, public IAction_Interface , public IDamageInterface
 {
 	GENERATED_BODY()
 
@@ -34,6 +35,8 @@ public:
 	class UInventoryComponent* InventoryComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UStateComponent* StateComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
+	class UDamageSystemComponent* DamageSystemComponent;
 
 protected:
 	FGameplayTagContainer GameplayContatiner;
@@ -90,12 +93,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
 	UAnimMontage* AM_Dodge;
 	
-private:
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InteractRadius=20.f;
 	UPROPERTY()
 	E_Weapon WeaponEnum;
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<ABaseEquippable> Equippable22;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
+	float CharMaxHealth;
 
 private:
 	UFUNCTION()
@@ -108,14 +116,20 @@ private:
 public:
 	UFUNCTION()
 	void ResetAttack();
+	UFUNCTION()
+	void DamageResponse(E_DamageResponse DamageResponse);
 
 
 
 public:
-	virtual void Equip(int32 WeaponNumber, AActor* Caller) override;
 	UFUNCTION()
 	void UnEquip();
 	UFUNCTION()
 	ABaseEquippable* SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller) ;
+
+public:
+	virtual void Equip(int32 WeaponNumber, AActor* Caller) override;
+	virtual bool TakeDamage(FDamageInfo& DamageInfo,AActor* Cursor) override;
+	virtual float SetHealth() override;
 
 };

@@ -96,6 +96,14 @@ NetworkBasic/Build/*
 Content/Maw_J_Laygo/*
 Content/ParagonKhaimera/*
 
+#Maps
+Content/Cave_Ruins/*
+Content/Dragon_Rise/*
+
+#Contents
+Content/FXVarietyPack/*
+Content/StarterContent/*
+
 # Rider 
 .idea/*
 

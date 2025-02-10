@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ItemStructure.h"
+#include "ImbuPortfolio/Components/CollisionComponent.h"
 #include "BaseEquippable.generated.h"
 
 UCLASS()
@@ -59,6 +60,8 @@ public:
 	bool IsEquipped = false;
 	UPROPERTY(VisibleDefaultsOnly)
 	bool IsAttachtoHand;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float Damage;
 
 public:
 	void SetIsEquipped(bool Equip) { IsEquipped = Equip; }
@@ -72,8 +75,12 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=AttackMontage)
 	TArray<UAnimMontage*> AttackMontage;
 
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Effects)
+	UParticleSystem* HitEffects;
+
 protected:
-	
+	FOnHitDelegate OnHit;
 	
 
 };
