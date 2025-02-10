@@ -22,9 +22,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	TArray<AActor*> AlreadyHitActors;
+	static TSet<AActor*> GlobalAlreadyHitActors;
+	UPROPERTY()
 	TArray<AActor*> ActorsToIgnore;
+	UPROPERTY()
 	AActor* HitActor;
+	UPROPERTY()
 	UPrimitiveComponent* CollisionMeshComponent;
 	bool IsCollisionEnabled;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Defaults)

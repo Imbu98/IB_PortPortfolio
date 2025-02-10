@@ -8,8 +8,7 @@ AEnemy_Base::AEnemy_Base()
 
 	DamageSystemComponent=CreateDefaultSubobject<UDamageSystemComponent>("DamageSystemComponent");
 
-	Delegate = OnDamageResponse.AddUObject(this,&AEnemy_Base::DamageResponse);
-	OnDeath.AddUObject(this,&ThisClass::Death);
+	
 	
 
 }
@@ -25,7 +24,6 @@ void AEnemy_Base::BeginPlay()
 void AEnemy_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-	OnDamageResponse.Remove(Delegate);
 }
 
 void AEnemy_Base::Tick(float DeltaTime)
@@ -43,7 +41,7 @@ void AEnemy_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 }
 
-void AEnemy_Base::Death()
+void AEnemy_Base::OnDeath()
 {
 	// AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
 	// ACaveRuin_GameMode* GM_CaveRuin = Cast<ACaveRuin_GameMode>(GameMode);

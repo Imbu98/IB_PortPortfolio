@@ -2,18 +2,41 @@
 #include "../Item/BaseEquippable.h"
 #include "../Components/CombatComponent.h"
 #include "../Components/CollisionComponent.h"
+#include "ImbuPortfolio/Components/InventoryComponent.h"
 
 
 void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,const FAnimNotifyEventReference& EventReference) 
 {
 	if (MeshComp!=nullptr)
 	{
-		UCollisionComponent* CollisionComponent = GetValidWeaponCollisionRef(MeshComp);
-		if (CollisionComponent!=nullptr)
+		//UCollisionComponent* CollisionComponent = GetValidWeaponCollisionRef(MeshComp);
+
+		// if (CollisionComponent!=nullptr)
+		// {
+		// 	CollisionComponent->EnableCollision();
+		// }
+		
+		
+		UInventoryComponent* InventoryComponent =MeshComp->GetOwner()->FindComponentByClass<UInventoryComponent>();
+
+		if (InventoryComponent==nullptr)
 		{
-			CollisionComponent->EnableCollision();
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "InventoryComponent is Null");
+			return;
+		}
+		TArray<ABaseEquippable*> Equippables =InventoryComponent->EquippedWeapon;
+		for (ABaseEquippable* BaseEquippable : Equippables)
+		{
+			if (BaseEquippable==nullptr||BaseEquippable->CollisionComponent==nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "BaseEquippable or CollisionComponent is Null");
+				return;
+			}
+			BaseEquippable->CollisionComponent->EnableCollision();	
 		}
 		
+			
+	
 			
 		
 	}
@@ -24,13 +47,30 @@ void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSeq
 void UANS_CollisionTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference) 
 {
-	if (MeshComp!=nullptr)
+	// if (MeshComp!=nullptr)
+	// {
+	// 	UCollisionComponent* CollisionComponent = GetValidWeaponCollisionRef(MeshComp);
+	// 	if (CollisionComponent!=nullptr)
+	// 	{
+	// 		CollisionComponent->DisableCollision();
+	// 	}
+	// }
+
+	UInventoryComponent* InventoryComponent =MeshComp->GetOwner()->FindComponentByClass<UInventoryComponent>();
+
+	if (InventoryComponent==nullptr)
 	{
-		UCollisionComponent* CollisionComponent = GetValidWeaponCollisionRef(MeshComp);
-		if (CollisionComponent!=nullptr)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "InventoryComponent is Null");
+		return;
+	}
+	TArray<ABaseEquippable*> Equippables =InventoryComponent->EquippedWeapon;
+	for (ABaseEquippable* BaseEquippable : Equippables)
+	{
+		if (BaseEquippable==nullptr||BaseEquippable->CollisionComponent==nullptr)
 		{
-			CollisionComponent->DisableCollision();
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "BaseEquippable or CollisionComponent is Null");
 		}
+		BaseEquippable->CollisionComponent->DisableCollision();	
 	}
 	
 }

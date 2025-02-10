@@ -43,6 +43,7 @@ public:
 	float CurrentHealth;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float MaxHealth;
+	
 
 		
 };

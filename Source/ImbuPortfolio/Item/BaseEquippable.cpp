@@ -139,11 +139,13 @@ void ABaseEquippable::OnEquipped()
 	{
 		CollisionComponent->SetCollisionMesh(GetItemMesh());
 		CollisionComponent->AddActorsToIgnore(this->GetOwner());
+	}
+
 
 		//나중에 저장기능 생성 후 넣기
 		//SaveEquippedWeapon();
-	}
 }
+
 
 void ABaseEquippable::OnUnEquipped()
 {

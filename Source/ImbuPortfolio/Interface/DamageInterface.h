@@ -18,5 +18,12 @@ class IMBUPORTFOLIO_API IDamageInterface
 	public:
 	virtual bool TakeDamage(FDamageInfo& DamageInfo,AActor* Cursor) =0;
 	virtual float SetHealth(){return 100.0f;}
+	virtual void OnDeath(){};
+	virtual void Dodged(){};
+	virtual void DamageResponse(E_DamageResponse DamageResponse){};
+	virtual void OnBlocked(bool CanBeParried,AActor* DamageCursor){};
+	
+	
+	
 	
 };

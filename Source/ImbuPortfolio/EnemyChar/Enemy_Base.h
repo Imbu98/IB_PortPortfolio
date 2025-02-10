@@ -38,9 +38,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintCallable)
-	void Death();
+	virtual void OnDeath() override;
 	UFUNCTION(BlueprintCallable)
-	void DamageResponse(E_DamageResponse DamageResponse);
+	virtual void DamageResponse(E_DamageResponse DamageResponse) override;
 
 public:
 	virtual bool TakeDamage(FDamageInfo& DamageInfo, AActor* Cursor) override;

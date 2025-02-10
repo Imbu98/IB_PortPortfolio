@@ -47,8 +47,7 @@ AIBCharBase::AIBCharBase()
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
 	StateComponent=CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	DamageSystemComponent=CreateDefaultSubobject<UDamageSystemComponent>(TEXT("DamageSystemComponent"));
-
-	OnDamageResponse.AddUObject(this,&ThisClass::DamageResponse);
+	
 	
 
 }
@@ -269,10 +268,14 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 			ABaseEquippable* Weapon =  SpawnAndAttachWeapon(WeaponNumber,WeaponClass,Caller);
 			if (Weapon)
 			{
-				Weapon->OnEquipped();
+				
 				if (InventoryComponent)
 				{
 					InventoryComponent->EquippedWeaponInfo=Weapon->ItemInfo;
+					for (auto Equippables : InventoryComponent->EquippedWeapon )
+					{
+						Equippables->OnEquipped();
+					}
 				}
 			}
 		}

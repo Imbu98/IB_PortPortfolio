@@ -3,6 +3,8 @@
 #include "KismetTraceUtils.h"
 #include "Components/MeshComponent.h"
 
+TSet<AActor*> UCollisionComponent::GlobalAlreadyHitActors;
+
 UCollisionComponent::UCollisionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -39,13 +41,13 @@ void UCollisionComponent::EnableCollision()
 
 void UCollisionComponent::DisableCollision()
 {
-IsCollisionEnabled = false;	
+	IsCollisionEnabled = false;	
 }
 
 void UCollisionComponent::ClearHitActors()
 {
 	
-		AlreadyHitActors.Empty();
+	GlobalAlreadyHitActors.Empty();
 	
 }
 
@@ -73,13 +75,13 @@ void UCollisionComponent::CollisionTrace()
 		for (FHitResult& Result : OutHits)
 		{
 			LastHit = Result;
-			if (!AlreadyHitActors.Contains(Result.GetActor())==true)
-				{
-					HitActor= Result.GetActor();
-					AlreadyHitActors.Add(HitActor);
+			if (!GlobalAlreadyHitActors.Contains(Result.GetActor())==true)
+			{
+				HitActor= Result.GetActor();
+				GlobalAlreadyHitActors.Add(HitActor);
 				Onhit.Broadcast(LastHit);
 				
-				}
+			}
 		}
 		
 	}
@@ -87,5 +89,5 @@ void UCollisionComponent::CollisionTrace()
 
 void UCollisionComponent::AddActorsToIgnore(AActor* InActors)
 {
-	ActorsToIgnore.AddUnique(InActors);
+	ActorsToIgnore.Add(InActors);
 }

@@ -40,49 +40,62 @@ void UDamageSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 bool UDamageSystemComponent::TakeDamage(FDamageInfo& DamageInfo, AActor* DamageCursor)
 {
 	E_DamageDetermine DamageDetermine=CanBeDamaged(DamageInfo.ShouldDamageInvincible,DamageInfo.CanBeBlocked);
-	switch (DamageDetermine)
-	{
-	case E_DamageDetermine::BlockedDamage:
-		{
-			OnBlocked.Broadcast(DamageInfo.CanBeParried,DamageCursor);
-			return false;
-		}
-	case E_DamageDetermine::DoDamage:
-		{
-			CurrentHealth= CurrentHealth-DamageInfo.DamageAmount;
-			if (CurrentHealth<=0)
-			{
-				IsDead=true;
-				OnDeath.Broadcast();
-			}
-			else
-			{
-				if (DamageInfo.ShouldForceInterrupt||IsInterruptible)
-				{
-					if (OnDamageResponse.IsBound())
-					{
-						OnDamageResponse.Broadcast(DamageInfo.DamageResponse);
-					}
-					else
-					{
-						
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "DamageResponse Is not bound");
-					}
-					
-				}
-			}
-			return true;
-			
-		}
-	case E_DamageDetermine::NoDamage:
-		{
-			OnDodge.Broadcast();
-			return false;
-		}
-	default:
-		return false;
-	}
 	
+	if (this->GetOwner()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass())==true)
+	{
+		IDamageInterface* DamageInterface = Cast<IDamageInterface>(this->GetOwner());
+		
+	
+		switch (DamageDetermine)
+		{
+		case E_DamageDetermine::BlockedDamage:
+			{
+				if (DamageInterface==nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "DamageInterface Is Null");
+					return false;;
+				}
+			
+				DamageInterface->OnBlocked(DamageInfo.CanBeParried,DamageCursor);
+				return false;
+			
+			}
+		case E_DamageDetermine::DoDamage:
+			{
+				if (DamageInterface==nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "DamageInterface Is Null");
+					return false;;
+				}
+				
+				CurrentHealth= CurrentHealth-DamageInfo.DamageAmount;
+				if (CurrentHealth<=0)
+				{
+					IsDead=true;
+					DamageInterface->OnDeath();
+				}
+				else
+				{
+					DamageInterface->DamageResponse(DamageInfo.DamageResponse);
+				}
+				return true;
+			
+			}
+		case E_DamageDetermine::NoDamage:
+			{
+				if (DamageInterface==nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "DamageInterface Is Null");
+					return false;
+				}
+				DamageInterface->OnDeath();
+				return false;
+			}
+		default:
+			return false;
+		}
+	}
+	return false;
 }
 
 E_DamageDetermine UDamageSystemComponent::CanBeDamaged(bool ShouldDamageInvincible, bool CanBeBlocked)
