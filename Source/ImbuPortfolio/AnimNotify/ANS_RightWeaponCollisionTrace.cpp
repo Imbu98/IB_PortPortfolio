@@ -5,18 +5,20 @@
 #include "ImbuPortfolio/Components/InventoryComponent.h"
 
 
-void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,const FAnimNotifyEventReference& EventReference) 
+void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,const FAnimNotifyEventReference& EventReference)
 {
-	if (MeshComp!=nullptr)
+	// if (MeshComp!=nullptr)
+	// {
+	// 	//UCollisionComponent* CollisionComponent = GetValidWeaponCollisionRef(MeshComp);
+	//
+	// 	// if (CollisionComponent!=nullptr)
+	// 	// {
+	// 	// 	CollisionComponent->EnableCollision();
+	// 	// }
+	// }
+		
+	if (MeshComp != nullptr)
 	{
-		//UCollisionComponent* CollisionComponent = GetValidWeaponCollisionRef(MeshComp);
-
-		// if (CollisionComponent!=nullptr)
-		// {
-		// 	CollisionComponent->EnableCollision();
-		// }
-		
-		
 		UInventoryComponent* InventoryComponent =MeshComp->GetOwner()->FindComponentByClass<UInventoryComponent>();
 
 		if (InventoryComponent==nullptr)
@@ -24,24 +26,13 @@ void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSeq
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "InventoryComponent is Null");
 			return;
 		}
-		TArray<ABaseEquippable*> Equippables =InventoryComponent->EquippedWeapon;
-		for (ABaseEquippable* BaseEquippable : Equippables)
+		ABaseEquippable* Equippable =InventoryComponent->LeftWeapon;
+		if (Equippable==nullptr||Equippable->CollisionComponent==nullptr)
 		{
-			if (BaseEquippable==nullptr||BaseEquippable->CollisionComponent==nullptr)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "BaseEquippable or CollisionComponent is Null");
-				return;
-			}
-			BaseEquippable->CollisionComponent->EnableCollision();	
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "BaseEquippable or CollisionComponent is Null");
 		}
-		
-			
-	
-			
-		
+		Equippable->CollisionComponent->EnableCollision();	
 	}
-	
-	
 }
 
 void UANS_CollisionTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
@@ -63,16 +54,12 @@ void UANS_CollisionTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSeque
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "InventoryComponent is Null");
 		return;
 	}
-	TArray<ABaseEquippable*> Equippables =InventoryComponent->EquippedWeapon;
-	for (ABaseEquippable* BaseEquippable : Equippables)
-	{
-		if (BaseEquippable==nullptr||BaseEquippable->CollisionComponent==nullptr)
+	ABaseEquippable* Equippable =InventoryComponent->LeftWeapon;
+		if (Equippable==nullptr||Equippable->CollisionComponent==nullptr)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "BaseEquippable or CollisionComponent is Null");
 		}
-		BaseEquippable->CollisionComponent->DisableCollision();	
-	}
-	
+		Equippable->CollisionComponent->DisableCollision();	
 }
 
 UCollisionComponent* UANS_CollisionTrace::GetValidWeaponCollisionRef(USkeletalMeshComponent* MeshComponent) 
