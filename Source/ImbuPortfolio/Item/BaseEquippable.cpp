@@ -7,6 +7,7 @@
 #include "../Structure/DamageInfo.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Perception/AISense_Damage.h"
 
 
 ABaseEquippable::ABaseEquippable()
@@ -184,6 +185,7 @@ if (HitResult.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::Stat
 		FDamageInfo DamageInfo;
 		DamageInfo.DamageAmount=Damage;
 		DamageInterface->TakeDamage(DamageInfo,HitResult.GetActor());
+		UAISense_Damage::ReportDamageEvent(GetWorld(),HitResult.GetActor(),GetOwner(),Damage,HitResult.Location,HitResult.ImpactPoint);
 		if (HitEffects!=nullptr)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),HitEffects,HitResult.Location,FRotator::ZeroRotator,FVector::ZeroVector,true);

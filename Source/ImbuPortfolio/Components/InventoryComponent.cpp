@@ -61,6 +61,11 @@ void UInventoryComponent::UnEquip()
 	}
 	
 	EquippedWeapon.Empty();
+	AIBCharBase* IBChar = Cast<AIBCharBase>(GetOwner());
+	if (IBChar!=nullptr)
+	{
+		IBChar->UnEquip();
+	}
 	
 }
 

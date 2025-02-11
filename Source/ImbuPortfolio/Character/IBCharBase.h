@@ -43,7 +43,8 @@ protected:
 
 protected:
 	void SetupGamePlayTag();
-	
+
+
 
 public:
 	AIBCharBase();
@@ -52,6 +53,14 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ABP)
+	TSubclassOf<UAnimInstance> ABP_UnArmed;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ABP)
+	TSubclassOf<UAnimInstance> ABP_Axe;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ABP)
+	TSubclassOf<UAnimInstance> ABP_Sword;
 
 public:
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -70,6 +79,8 @@ public:
 	UInputAction* IA_IBChar_OpenInventory;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_Attack;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_Aiming;
 
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
@@ -83,6 +94,10 @@ public:
 	void OpenInventory();
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Attack();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void Aim_Start();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void Aim_Completed();
 
 	
 public:
@@ -100,6 +115,10 @@ public:
 	E_Weapon WeaponEnum;
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<ABaseEquippable> Equippable22;
+	UPROPERTY(EditAnywhere)
+	bool IsAiming=false;
+	UPROPERTY(EditAnywhere)
+	bool IsWeaponAttached=false;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
@@ -117,7 +136,7 @@ public:
 	UFUNCTION()
 	void ResetAttack();
 	UFUNCTION()
-	void DamageResponse(E_DamageResponse DamageResponse);
+	virtual void DamageResponse(E_DamageResponse DamageResponse) override;
 
 
 

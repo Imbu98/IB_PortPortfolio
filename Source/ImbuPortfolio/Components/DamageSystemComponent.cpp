@@ -22,7 +22,8 @@ void UDamageSystemComponent::BeginPlay()
 			}
 			else
 			{
-				CurrentHealth = DamageInterface->SetHealth();
+				MaxHealth=DamageInterface->SetHealth();
+				CurrentHealth=MaxHealth;
 			}
 		}
 	}

@@ -91,23 +91,26 @@ void UW_Slot::OnButtonClicked()
 
 void UW_Slot::ClearSlot()
 {
-	FItemStruct& InventoryItem = InventoryComponent->Items[Index];
-	if (InventoryItem.WeaponNumber != 0)
+	if (InventoryComponent!=nullptr)
 	{
+		FItemStruct& InventoryItem = InventoryComponent->Items[Index];
+		if (InventoryItem.WeaponNumber != 0)
+		{
 
-		if (InventoryItem.ItemQuantity > 1)
-		{
-			InventoryItem.ItemQuantity -= 1;
-		}
-		else
-		{
+			if (InventoryItem.ItemQuantity > 1)
+			{
+				InventoryItem.ItemQuantity -= 1;
+			}
+			else
+			{
 			
-			InventoryItem.ItemName = FText::FromString(TEXT(""));
-			InventoryItem.Stackable = false;
-			InventoryItem.ItemQuantity = 0;
-			InventoryItem.Thumnail = nullptr;
-			InventoryItem.Mesh = nullptr;
-			InventoryItem.WeaponNumber = 0;
+				InventoryItem.ItemName = FText::FromString(TEXT(""));
+				InventoryItem.Stackable = false;
+				InventoryItem.ItemQuantity = 0;
+				InventoryItem.Thumnail = nullptr;
+				InventoryItem.Mesh = nullptr;
+				InventoryItem.WeaponNumber = 0;
+			}
 		}
 	}
 }
