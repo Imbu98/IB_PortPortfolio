@@ -8,6 +8,8 @@ void ACaveRuin_GameMode::BeginPlay()
 	Super::BeginPlay();
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_Base::StaticClass(), GetEnemyChar);
+	
+	
 }
 
 void ACaveRuin_GameMode::RemoveEnemyChar(AActor* EnemyActor)
@@ -18,7 +20,11 @@ void ACaveRuin_GameMode::RemoveEnemyChar(AActor* EnemyActor)
 		EnemyActor->SetLifeSpan(7.0f);
 		if (GetEnemyChar.IsEmpty())
 		{
-			// 시작레벨 가능 포탈 생성
+			if (Portal)
+			{
+				Portal->OpenPortal();
+			}
+			
 		}				
 		
 	}

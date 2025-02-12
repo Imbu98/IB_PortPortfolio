@@ -1,10 +1,9 @@
 #include "BTT_MoveAlong.h"
-
+#include "AIController.h"
 #include "ImbuPortfolio/EnemyChar/Enemy_Base_AIController.h"
 #include "ImbuPortfolio/ETC/Spline.h"
 #include "ImbuPortfolio/Interface/AI_Interface.h"
-
-
+#include "Navigation/PathFollowingComponent.h"
 
 
 UBTT_MoveAlong::UBTT_MoveAlong()
@@ -48,9 +47,14 @@ EBTNodeResult::Type UBTT_MoveAlong::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 				}
 				else
 				{
-					Enemy_Base_AIController->MoveToLocation(AiMoveLocation);
-					Spline->IncrementPatrolRoute();
-					return EBTNodeResult::Succeeded;
+					EPathFollowingRequestResult::Type Result= Enemy_Base_AIController->MoveToLocation(AiMoveLocation);
+					if (Result==EPathFollowingRequestResult::AlreadyAtGoal)
+					{
+						Spline->IncrementPatrolRoute();
+						return EBTNodeResult::Succeeded;
+					}
+					
+					
 				}
 			}
 		}

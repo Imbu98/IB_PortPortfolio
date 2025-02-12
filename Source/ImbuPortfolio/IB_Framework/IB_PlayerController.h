@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "ImbuPortfolio/Widget/W_PlayerStateBar.h"
 #include "IB_PlayerController.generated.h"
 
 class UW_Inventory;
@@ -16,13 +17,21 @@ public:
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
 	UPROPERTY()
 	UUserWidget* Inventory;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UUserWidget> WBP_PlayerStateBar;
+	UPROPERTY()
+	UW_PlayerStateBar* PlayerStateBar;
 	
 	
 
 public:
+	UFUNCTION(BlueprintCallable)
 	void OpenInventory();
-	// Player Controller¿¡¼­ ¸¸µç À§Á¬ °¡Á®¿À±â
+	// Player Controllerï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	UFUNCTION(BlueprintCallable)
 	UW_Inventory* GetInventoryWidget();
+	UFUNCTION(BlueprintCallable)
+	void UpdatePlayerStateBar();
 	
 
 protected:

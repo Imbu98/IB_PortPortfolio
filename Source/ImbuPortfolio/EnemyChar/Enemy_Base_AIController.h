@@ -47,6 +47,8 @@ public:
 	virtual bool RunBehaviorTree(UBehaviorTree* BTAsset) override;
 
 	virtual void OnPossess(APawn* InPawn) override;
+
+	virtual void ActorsPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
 	
 };
 

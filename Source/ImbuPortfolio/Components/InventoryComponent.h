@@ -23,6 +23,10 @@ protected:
 public:
 	UPROPERTY(BlueprintReadWrite,Category="Weapon")
 	TArray<class ABaseEquippable*> EquippedWeapon;
+	UPROPERTY(BlueprintReadWrite,Category="Weapon")
+	ABaseEquippable* RightWeapon;
+	UPROPERTY(BlueprintReadWrite,Category="Weapon")
+	ABaseEquippable* LeftWeapon;
 	UPROPERTY()
 	TArray<FItemStruct> Items;
 	UPROPERTY()

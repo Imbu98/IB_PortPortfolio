@@ -18,3 +18,12 @@ enum class E_AiSense : uint8
 	Hearing,
 	Damage,
 };
+
+UENUM(BlueprintType)
+enum class E_MovementSpeed : uint8
+{
+	Idle,
+	Walking,
+	Jogging,
+	Sprinting,
+};

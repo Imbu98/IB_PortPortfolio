@@ -1,11 +1,11 @@
-#include "ANS_CollisionTrace.h"
+#include "ANS_RightWeaponCollisionTrace.h"
 #include "../Item/BaseEquippable.h"
 #include "../Components/CombatComponent.h"
 #include "../Components/CollisionComponent.h"
 #include "ImbuPortfolio/Components/InventoryComponent.h"
 
 
-void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,const FAnimNotifyEventReference& EventReference)
+void UANS_RightWeaponCollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration,const FAnimNotifyEventReference& EventReference)
 {
 	// if (MeshComp!=nullptr)
 	// {
@@ -26,7 +26,7 @@ void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSeq
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "InventoryComponent is Null");
 			return;
 		}
-		ABaseEquippable* Equippable =InventoryComponent->LeftWeapon;
+		ABaseEquippable* Equippable =InventoryComponent->RightWeapon;
 		if (Equippable==nullptr||Equippable->CollisionComponent==nullptr)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "BaseEquippable or CollisionComponent is Null");
@@ -35,7 +35,7 @@ void UANS_CollisionTrace::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSeq
 	}
 }
 
-void UANS_CollisionTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
+void UANS_RightWeaponCollisionTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
 	const FAnimNotifyEventReference& EventReference) 
 {
 	// if (MeshComp!=nullptr)
@@ -54,7 +54,7 @@ void UANS_CollisionTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSeque
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "InventoryComponent is Null");
 		return;
 	}
-	ABaseEquippable* Equippable =InventoryComponent->LeftWeapon;
+	ABaseEquippable* Equippable =InventoryComponent->RightWeapon;
 		if (Equippable==nullptr||Equippable->CollisionComponent==nullptr)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "BaseEquippable or CollisionComponent is Null");
@@ -62,7 +62,7 @@ void UANS_CollisionTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSeque
 		Equippable->CollisionComponent->DisableCollision();	
 }
 
-UCollisionComponent* UANS_CollisionTrace::GetValidWeaponCollisionRef(USkeletalMeshComponent* MeshComponent) 
+UCollisionComponent* UANS_RightWeaponCollisionTrace::GetValidWeaponCollisionRef(USkeletalMeshComponent* MeshComponent) 
 {
 	if (MeshComponent->GetOwner()==nullptr)
 	{

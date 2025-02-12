@@ -2,12 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "ANS_CollisionTrace.generated.h"
+#include "ANS_RightWeaponCollisionTrace.generated.h"
 
 class UCollisionComponent;
 
 UCLASS()
-class IMBUPORTFOLIO_API UANS_CollisionTrace : public UAnimNotifyState
+class IMBUPORTFOLIO_API UANS_RightWeaponCollisionTrace : public UAnimNotifyState
 {
 	GENERATED_BODY()
 

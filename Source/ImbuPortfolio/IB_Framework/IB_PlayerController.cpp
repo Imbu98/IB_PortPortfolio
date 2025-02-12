@@ -2,6 +2,7 @@
 #include "Blueprint\UserWidget.h"
 #include "Blueprint\WidgetBlueprintLibrary.h"
 #include "../Widget/W_Inventory.h"
+#include "ImbuPortfolio/Character/IBCharBase.h"
 #include "kismet/GameplayStatics.h"
 
 void AIB_PlayerController::BeginPlay()
@@ -10,7 +11,15 @@ void AIB_PlayerController::BeginPlay()
 	if (InventoryWidgetClass != nullptr)
 	{
 		Inventory = CreateWidget<UUserWidget>(this, InventoryWidgetClass);
-		
+	}
+	if (WBP_PlayerStateBar!=nullptr)
+	{
+		PlayerStateBar=CreateWidget<UW_PlayerStateBar>(this, WBP_PlayerStateBar);
+		if (PlayerStateBar!=nullptr)
+		{
+			PlayerStateBar->AddToViewport(0);
+			
+		}
 	}
 }
 
@@ -45,5 +54,11 @@ UW_Inventory* AIB_PlayerController::GetInventoryWidget()
 {
 
 	return Cast<UW_Inventory>(Inventory);
+}
+
+void AIB_PlayerController::UpdatePlayerStateBar()
+{
+	
+	PlayerStateBar->UpdatePlayerStateBar(GetCharacter());
 }
 

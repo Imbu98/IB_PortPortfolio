@@ -1,6 +1,7 @@
 ﻿#include "IBCharBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "IBCharAnimInstance.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -16,8 +17,9 @@
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
+#include "Slate/SGameLayerManager.h"
 
-UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusIdle,"Status.Idle","Tag Character In Idle")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusIdle, "Status.Idle", "Tag Character In Idle")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDie,"Status.Die","Tag Character In Die")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusAction,"Status.Action","Tag Character In Action")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attacking")
@@ -35,7 +37,7 @@ AIBCharBase::AIBCharBase()
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
-	CameraBoom->TargetArmLength = 400.0f;
+	CameraBoom->TargetArmLength = 600.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 	
 
@@ -60,6 +62,11 @@ void AIBCharBase::BeginPlay()
 	SetupGamePlayTag();
 
 	StateComponent->SetState(TAG_StatusIdle);
+
+	if (ABP_UnArmed!=nullptr)
+	{
+		GetMesh()->LinkAnimClassLayers(ABP_UnArmed);
+	}
 	
 	
 }
@@ -94,6 +101,8 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Interact, ETriggerEvent::Started, this, &ThisClass::Interact);
 		EnhancedInputComponent->BindAction(IA_IBChar_OpenInventory, ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 		EnhancedInputComponent->BindAction(IA_IBChar_Attack,ETriggerEvent::Started,this,&AIBCharBase::Attack);
+		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Triggered,this,&AIBCharBase::Aim_Start);
+		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Completed,this,&AIBCharBase::Aim_Completed);
 	}
 
 }
@@ -165,6 +174,38 @@ void AIBCharBase::Attack()
 	}
 	
 }
+
+void AIBCharBase::Aim_Start()
+{
+	if (IsWeaponAttached==true)
+	{
+		IsAiming=true;
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+		UIBCharAnimInstance* IBCharAnimInstance = Cast<UIBCharAnimInstance>( GetMesh()->GetAnimInstance());
+		if (IBCharAnimInstance!=nullptr)
+		{
+			IBCharAnimInstance->ReceiveIBIsAiming(IsAiming);
+		}
+	}
+	
+}
+
+void AIBCharBase::Aim_Completed()
+{
+	if (IsWeaponAttached==true)
+	{
+		IsAiming=false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		
+		UIBCharAnimInstance* IBCharAnimInstance = Cast<UIBCharAnimInstance>( GetMesh()->GetAnimInstance());
+		if (IBCharAnimInstance!=nullptr)
+		{
+			IBCharAnimInstance->ReceiveIBIsAiming(IsAiming);
+		}
+	}
+}
+
+
 
 void AIBCharBase::AttackEvent()
 {
@@ -249,8 +290,14 @@ void AIBCharBase::ResetAttack()
 
 void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 {
-	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"IBChar DamageResponse");
-	
+	AIB_PlayerController* IB_PlayerController= Cast<AIB_PlayerController>(GetController());
+	if (IB_PlayerController==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,TEXT( "DamageResponse:AIController is Remain"));
+		
+	}
+	IB_PlayerController->UpdatePlayerStateBar();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "Char:%f is Remain"),DamageSystemComponent->CurrentHealth));
 }
 
 
@@ -268,7 +315,7 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 			ABaseEquippable* Weapon =  SpawnAndAttachWeapon(WeaponNumber,WeaponClass,Caller);
 			if (Weapon)
 			{
-				
+				IsWeaponAttached=true;
 				if (InventoryComponent)
 				{
 					InventoryComponent->EquippedWeaponInfo=Weapon->ItemInfo;
@@ -276,14 +323,38 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 					{
 						Equippables->OnEquipped();
 					}
+					switch (InventoryComponent->EquippedWeaponInfo.WeaponType)
+					{
+					case E_Weapon::Axe:
+						{
+							if (ABP_Axe!=nullptr)
+							{
+								GetMesh()->LinkAnimClassLayers(ABP_Axe);
+							}
+						}break;
+					case E_Weapon::Sword:
+						{
+							if (ABP_Sword!=nullptr)
+							{
+								GetMesh()->LinkAnimClassLayers(ABP_Sword);
+							}
+						}break;
+						default:
+							break;
+					}
+					
 				}
 			}
 		}
 	}
+
+	
 }
 
 bool AIBCharBase::TakeDamage(FDamageInfo& DamageInfo, AActor* Cursor)
 {
+	
+	
 	return DamageSystemComponent->TakeDamage(DamageInfo, Cursor);
 	
 }
@@ -296,8 +367,11 @@ float AIBCharBase::SetHealth()
 void AIBCharBase::UnEquip()
 {
 
-	// 이제 장착 무기를 인벤토리에 넣어주는 것만 하면 된다 inventory component참고
-	// inventory component에서 함수 만들고 그 함수 실행시켜줘도 될듯
+	if (ABP_UnArmed!=nullptr)
+	{
+		GetMesh()->LinkAnimClassLayers(ABP_UnArmed);
+	}
+	IsWeaponAttached=false;
 }
 
 // weaponNumber에 따라 스폰후 attach
@@ -340,6 +414,9 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 				{
 					InventoryComponent->EquippedWeapon.Add(Axe_L);
 					InventoryComponent->EquippedWeapon.Add(Axe_R);
+					
+					InventoryComponent->LeftWeapon=Axe_L;
+					InventoryComponent->RightWeapon=Axe_R;
 				}
 				
 				AAxe_Weapon* Axe_Weapon = Cast<AAxe_Weapon>(Axe_L);

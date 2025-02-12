@@ -30,6 +30,42 @@ void AEnemy_Base_AIController::OnPossess(APawn* InPawn)
 	BlackboardComponent= this->Blackboard;
 }
 
+void AEnemy_Base_AIController::ActorsPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
+{
+	Super::ActorsPerceptionUpdated(UpdatedActors);
+	bool sensed;
+	FAIStimulus Stimulus;
+	
+
+	for (AActor* UpdatedActor : UpdatedActors)
+	{
+		
+			CanSenseActor(UpdatedActor,E_AiSense::Sight,sensed,Stimulus);
+			if (sensed==true)
+			{
+				HandleSensedSight(UpdatedActor);
+			}
+	}
+	for (AActor* UpdatedActor : UpdatedActors)
+	{
+		
+		CanSenseActor(UpdatedActor,E_AiSense::Hearing,sensed,Stimulus);
+		if (sensed==true)
+		{
+			HandleSensedSound(Stimulus.StimulusLocation);
+		}
+	}
+	for (AActor* UpdatedActor : UpdatedActors)
+	{
+		
+		CanSenseActor(UpdatedActor,E_AiSense::Damage,sensed,Stimulus);
+		if (sensed==true)
+		{
+			HandleSensedDamage(UpdatedActor);
+		}
+	}
+}
+
 
 void AEnemy_Base_AIController::SetStateAsPassive()
 {
@@ -47,6 +83,8 @@ void AEnemy_Base_AIController::SetStateAsAttacking(AActor* AttackTarget)
 	if (BlackboardComponent)
 	{
 		BlackboardComponent->SetValueAsObject(TEXT("AttackTargetKey"),EnemyAttackTarget);
+		int8 EnemyState = static_cast<int8>(E_EnemyState::Attacking);
+		BlackboardComponent->SetValueAsEnum(TEXT("EnemyStateKey"),EnemyState);
 	}
 }
 
@@ -103,7 +141,7 @@ void AEnemy_Base_AIController::HandleSensedDamage(AActor* Actor)
 	}
 }
 
-void AEnemy_Base_AIController::CanSenseActor(AActor* Actor, E_AiSense Sense,bool& Sensed,FAIStimulus& Stimuls)
+void AEnemy_Base_AIController::CanSenseActor(AActor* Actor, E_AiSense Sense,bool &Sensed,FAIStimulus &Stimuls)
 {
 	FActorPerceptionBlueprintInfo Info;
 	PerceptionComponent->GetActorsPerception(Actor,Info);

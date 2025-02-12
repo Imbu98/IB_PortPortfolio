@@ -19,7 +19,10 @@ APortal::APortal()
 void APortal::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	StaticMesh->SetVisibility(false, false);
+
+	StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void APortal::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -40,6 +43,9 @@ void APortal::PortalOpenLevel(FName Name)
 
 void APortal::OpenPortal()
 {
+	StaticMesh->SetVisibility(true, true);
+	StaticMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("A Portal opened somewhere"));
 }
 
 void APortal::Tick(float DeltaTime)
