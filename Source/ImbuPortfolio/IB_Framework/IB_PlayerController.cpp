@@ -3,6 +3,7 @@
 #include "Blueprint\WidgetBlueprintLibrary.h"
 #include "../Widget/W_Inventory.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Widget/W_MainMenu.h"
 #include "kismet/GameplayStatics.h"
 
 void AIB_PlayerController::BeginPlay()
@@ -21,6 +22,7 @@ void AIB_PlayerController::BeginPlay()
 			
 		}
 	}
+	
 }
 
 void AIB_PlayerController::OpenInventory()
@@ -61,4 +63,8 @@ void AIB_PlayerController::UpdatePlayerStateBar()
 	
 	PlayerStateBar->UpdatePlayerStateBar(GetCharacter());
 }
+
+
+
+
 

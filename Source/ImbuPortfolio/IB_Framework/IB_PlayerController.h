@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "ImbuPortfolio/Widget/W_BootScreen.h"
 #include "ImbuPortfolio/Widget/W_PlayerStateBar.h"
 #include "IB_PlayerController.generated.h"
 
@@ -23,6 +24,7 @@ public:
 	UW_PlayerStateBar* PlayerStateBar;
 	
 	
+	
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -32,6 +34,7 @@ public:
 	UW_Inventory* GetInventoryWidget();
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlayerStateBar();
+	
 	
 
 protected:
