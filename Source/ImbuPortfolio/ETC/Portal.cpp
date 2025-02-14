@@ -1,6 +1,9 @@
 #include "Portal.h"
 
+
 #include "Kismet/GameplayStatics.h"
+
+class UEnhancedInputLocalPlayerSubsystem;
 
 APortal::APortal()
 {
@@ -29,10 +32,10 @@ void APortal::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	if (LevelToLoad!=nullptr)
-	{
-		UGameplayStatics::OpenLevelBySoftObjectPtr(this, LevelToLoad, true);
-	}
+	
+		UGameplayStatics::OpenLevel(GetWorld(),LevelName);
+		
+	
 
 }
 

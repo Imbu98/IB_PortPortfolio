@@ -33,14 +33,5 @@ void UW_BootScreen::OnAnimationFinishedFunction()
 
 void UW_BootScreen::OpenMainMenuLevel()
 {
-	if (L_MainMenu==nullptr)
-	{
-		L_MainMenu.LoadSynchronous();
-		
-		
-	}
-	else
-	{
-		UGameplayStatics::OpenLevelBySoftObjectPtr(this,L_MainMenu);
-	}
+	UGameplayStatics::OpenLevel(GetWorld(),L_MainMenuName);
 }

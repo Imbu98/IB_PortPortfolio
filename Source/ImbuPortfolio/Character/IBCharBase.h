@@ -64,7 +64,9 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputMappingContext* IMC_Asset;
+	class UInputMappingContext* IMC_Default;
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputMappingContext* IMC_Cannon;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_Move;
 	UPROPERTY(EditAnywhere, Category = Input)
@@ -119,7 +121,21 @@ public:
 	bool IsAiming=false;
 	UPROPERTY(EditAnywhere)
 	bool IsWeaponAttached=false;
+	
+public:
+	UPROPERTY(EditAnywhere)
+	bool IsOnCannon=false;
+	UPROPERTY(EditAnywhere)
+	bool IsNearCannon=false;
+	UPROPERTY(EditAnywhere)
+	FVector DefaultCameraOffset;
+	UPROPERTY(EditAnywhere)
+	FVector NearCannonCameraOffset;
 
+public:
+	UFUNCTION()
+	void SwitchController();
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
 	float CharMaxHealth;
@@ -131,6 +147,10 @@ private:
 	void PerformAttack(float InAttackCount,FGameplayTag InAttackType=TAG_StatusIdle);
 	UFUNCTION()
 	bool CanPerformToggleCombat();
+	
+	
+
+	
 	
 public:
 	UFUNCTION()

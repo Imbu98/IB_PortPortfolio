@@ -26,7 +26,7 @@ public:
 	class UW_PopUp* PopUpMenu;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSoftObjectPtr<UWorld> L_Start;
+	FName L_StartName;
 public:
 	virtual void NativeConstruct() override;
 

@@ -73,7 +73,7 @@ UW_PopUp* UW_MainMenu::CreatePopup(const FText& PopUpMessage,const FText& LeftBu
 
 void UW_MainMenu::StartGame_Confirm()
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(),L_Start);
+	UGameplayStatics::OpenLevel(GetWorld(),L_StartName);
 }
 
 void UW_MainMenu::StartGame_Cancel()

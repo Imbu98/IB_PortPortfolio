@@ -22,6 +22,11 @@ public:
 	TSubclassOf<UUserWidget> WBP_PlayerStateBar;
 	UPROPERTY()
 	UW_PlayerStateBar* PlayerStateBar;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget")
+	class TSubclassOf<UUserWidget> WBP_Cannon;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget")
+	class UW_Cannon* CannonWidget;
 	
 	
 	
@@ -34,6 +39,11 @@ public:
 	UW_Inventory* GetInventoryWidget();
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlayerStateBar();
+
+	UFUNCTION(BlueprintCallable)
+	void VisibleCannonWidget();
+	UFUNCTION(BlueprintCallable)
+	void CollapsedCannonWidget();
 	
 	
 

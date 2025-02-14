@@ -302,15 +302,15 @@ E_LocomotionDirection UIBCharAnimInstance::IBCalculateLocomotionDirection(float 
 void UIBCharAnimInstance::IBUpdateRootYawOffset(float DeltaSecond)
 {
 	
-		float Angle=IBRootYawOffset +(IBDeltaActorYaw*-1.0f);
-		 IBSetRootYawOffset(Angle);
+		// float Angle=IBRootYawOffset +(IBDeltaActorYaw*-1.0f);
+		//  IBSetRootYawOffset(Angle);
 		
 	
 	
-		// IBSetRootYawOffset(0.0f);
-		// float Angle = UKismetMathLibrary::FloatSpringInterp(IBRootYawOffset,0.0f,IBRootYawOffsetSpringState,80.0f,1.0f,DeltaSecond,
-		// 	0.5f,0.5f);
-		// IBSetRootYawOffset(Angle);
+		IBSetRootYawOffset(0.0f);
+		float Angle = UKismetMathLibrary::FloatSpringInterp(IBRootYawOffset,0.0f,IBRootYawOffsetSpringState,80.0f,1.0f,DeltaSecond,
+			0.5f,0.5f);
+		IBSetRootYawOffset(Angle);
 	
 	
 }

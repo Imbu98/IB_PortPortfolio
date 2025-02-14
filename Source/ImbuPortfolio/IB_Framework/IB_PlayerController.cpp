@@ -2,7 +2,9 @@
 #include "Blueprint\UserWidget.h"
 #include "Blueprint\WidgetBlueprintLibrary.h"
 #include "../Widget/W_Inventory.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Widget/W_Cannon.h"
 #include "ImbuPortfolio/Widget/W_MainMenu.h"
 #include "kismet/GameplayStatics.h"
 
@@ -22,6 +24,13 @@ void AIB_PlayerController::BeginPlay()
 			
 		}
 	}
+	
+		if (WBP_Cannon)
+		{
+			CannonWidget= CreateWidget<UW_Cannon>(this,WBP_Cannon);
+		
+		}
+	
 	
 }
 
@@ -63,6 +72,31 @@ void AIB_PlayerController::UpdatePlayerStateBar()
 	
 	PlayerStateBar->UpdatePlayerStateBar(GetCharacter());
 }
+
+void AIB_PlayerController::VisibleCannonWidget()
+{
+	if (CannonWidget != nullptr && CannonWidget->IsInViewport()!=true)
+	{
+		CannonWidget->SetWidgetProperty();
+		CannonWidget->AddToViewport(0);
+		bShowMouseCursor=true;
+		
+		
+	}
+	
+}
+
+void AIB_PlayerController::CollapsedCannonWidget()
+{
+	if (CannonWidget != nullptr&&CannonWidget->IsInViewport()==true)
+	{
+		CannonWidget->RemoveFromParent();
+		bShowMouseCursor=false;
+		
+	}
+
+}
+
 
 
 

@@ -16,6 +16,7 @@
 #include "../Item/Axe_Weapon.h"
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
+#include "ImbuPortfolio/ETC/Cannon.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
 #include "Slate/SGameLayerManager.h"
 
@@ -67,6 +68,8 @@ void AIBCharBase::BeginPlay()
 	{
 		GetMesh()->LinkAnimClassLayers(ABP_UnArmed);
 	}
+
+	DefaultCameraOffset=GetCameraBoom()->TargetOffset;
 	
 	
 }
@@ -89,7 +92,7 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 		if (Subsystem)
 		{
-			Subsystem->AddMappingContext(IMC_Asset, 0);
+			Subsystem->AddMappingContext(IMC_Default, 0);
 		}
 	}
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
@@ -126,6 +129,10 @@ void AIBCharBase::Move(const FInputActionValue& Value)
 
 void AIBCharBase::Look(const FInputActionValue& Value)
 {
+	if (IsNearCannon)
+	{
+		return;
+	}
 	FVector2D LookAxisVector = Value.Get< FVector2D >();
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
@@ -279,6 +286,9 @@ bool AIBCharBase::CanPerformToggleCombat()
 
 	return !InActionOrDie && !IsFalling && CharacterInIdle;
 }
+
+
+
 
 void AIBCharBase::ResetAttack()
 {
@@ -438,6 +448,43 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 		}
 	}
 	return nullptr;
+}
+
+
+void AIBCharBase::SwitchController()
+{
+	ACannon* IBCannon = Cast<ACannon>(UGameplayStatics::GetActorOfClass(GetWorld(),ACannon::StaticClass()));
+	if (IBCannon==nullptr)
+	{
+		return;
+	}
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	{
+		if (PlayerController!=nullptr)
+		{
+			UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+			if (Subsystem!=nullptr)
+			{
+				if (IsOnCannon==false)
+				{
+					Subsystem->RemoveMappingContext(IMC_Default);
+					Subsystem->AddMappingContext(IMC_Cannon,1);
+					PlayerController->Possess(IBCannon);
+					IsOnCannon=true;
+				}
+				else if (IsOnCannon==true)
+				{
+					Subsystem->RemoveMappingContext(IMC_Cannon);
+					Subsystem->AddMappingContext(IMC_Default,0);
+					PlayerController->Possess(this);
+					IsOnCannon=false;
+				}
+			}
+		}
+		
+	}
+	
+	
 }
 
 void AIBCharBase::SetupGamePlayTag()

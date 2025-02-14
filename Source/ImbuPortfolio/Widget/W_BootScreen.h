@@ -24,7 +24,7 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Level")
-	TSoftObjectPtr<UWorld> L_MainMenu;
+	FName L_MainMenuName;
 
 	FTimerHandle TimerHandle;
 
