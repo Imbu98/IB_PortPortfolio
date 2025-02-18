@@ -33,6 +33,7 @@ void UW_Cannon::NativeConstruct()
 
 void UW_Cannon::OnPosses()
 {
+	
 	if (IBChar)
 	{
 		IBChar->SwitchController();
@@ -57,7 +58,7 @@ void UW_Cannon::SetWidgetProperty()
 
 	if (IBCannon!=nullptr)
 	{
-		if (IBCannon->IsOnCharging)
+		if (IBCannon->IsOnCharging ||IBChar->IsFlying)
 		{
 			PB_Power->SetVisibility(ESlateVisibility::Visible);
 			BTN_ControlTakeCannon->SetVisibility(ESlateVisibility::Collapsed);
@@ -73,6 +74,7 @@ void UW_Cannon::SetWidgetProperty()
 void UW_Cannon::UpdatePowerProgressBar()
 {
 	SetWidgetProperty();
+	
 		if (PB_Power!=nullptr)
 		{
 			PB_Power->SetPercent(IBCannon->CurrentCannonPower/IBCannon->MaxCannonPower);

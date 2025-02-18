@@ -123,10 +123,14 @@ public:
 	bool IsWeaponAttached=false;
 	
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cannon)
 	bool IsOnCannon=false;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cannon)
 	bool IsNearCannon=false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cannon)
+	bool IsFlying=false;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cannon)
+	TArray<UAnimMontage*> FlyingAnimMontages;
 	UPROPERTY(EditAnywhere)
 	FVector DefaultCameraOffset;
 	UPROPERTY(EditAnywhere)
@@ -135,6 +139,8 @@ public:
 public:
 	UFUNCTION()
 	void SwitchController();
+	UFUNCTION()
+	void PlayFlyingAnimation();
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)

@@ -46,4 +46,16 @@ public:
 		
 	}
 
+void Reset()
+	{
+		ItemName = FText::FromString(TEXT(""));
+		Stackable = false;
+		ItemQuantity = 0;
+		Thumnail = nullptr;
+		Mesh = nullptr;
+		WeaponNumber=0;
+		ItemType = E_ItemType::None;
+		WeaponType=E_Weapon::None;
+	}
+
 };

@@ -17,6 +17,7 @@
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/ETC/Cannon.h"
+#include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
 #include "Slate/SGameLayerManager.h"
 
@@ -70,6 +71,14 @@ void AIBCharBase::BeginPlay()
 	}
 
 	DefaultCameraOffset=GetCameraBoom()->TargetOffset;
+
+	UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
+	if (IBGameInstance!=nullptr)
+	{
+		Equip(IBGameInstance->IGI_EquippedWeapon.WeaponNumber,this);
+	}
+	
+	
 	
 	
 }
@@ -333,6 +342,9 @@ void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
 					{
 						Equippables->OnEquipped();
 					}
+					
+					InventoryComponent->OnInventoryUpdate.Broadcast();
+					
 					switch (InventoryComponent->EquippedWeaponInfo.WeaponType)
 					{
 					case E_Weapon::Axe:
@@ -427,6 +439,8 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 					
 					InventoryComponent->LeftWeapon=Axe_L;
 					InventoryComponent->RightWeapon=Axe_R;
+
+					
 				}
 				
 				AAxe_Weapon* Axe_Weapon = Cast<AAxe_Weapon>(Axe_L);
@@ -484,6 +498,21 @@ void AIBCharBase::SwitchController()
 		
 	}
 	
+	
+}
+
+void AIBCharBase::PlayFlyingAnimation()
+{
+	if (FlyingAnimMontages.IsEmpty()!=true&&IsFlying)
+	{
+		int32 RandMax = FlyingAnimMontages.Num()-1;
+		float RandomMontageIndex=FMath::RandRange(0,RandMax);
+		UAnimMontage* FlyingAnimMontage = FlyingAnimMontages[RandomMontageIndex];
+		if (FlyingAnimMontage!=nullptr)
+		{
+			PlayAnimMontage(FlyingAnimMontage);
+		}
+	}
 	
 }
 

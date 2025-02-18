@@ -40,10 +40,13 @@ ACannon::ACannon()
 	CannonBody= CreateDefaultSubobject<UStaticMeshComponent>("CannonBody");
 	CannonBody->SetupAttachment(Cart);
 
-	boardingTriggerBox = CreateDefaultSubobject<UBoxComponent>("BoardingTriggerBox");
-	boardingTriggerBox->SetupAttachment(DefaultSceneRoot);
-	boardingTriggerBox->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::OverlapCannonTrigger);
-	boardingTriggerBox->OnComponentEndOverlap.AddDynamic(this,&ThisClass::EndOverlapCannonTrigger);
+	CannonMuzzle=CreateDefaultSubobject<USceneComponent>("CannonMuzzle");
+	CannonMuzzle->SetupAttachment(CannonBody);
+
+	BoardingTriggerBox = CreateDefaultSubobject<UBoxComponent>("BoardingTriggerBox");
+	BoardingTriggerBox->SetupAttachment(DefaultSceneRoot);
+	BoardingTriggerBox->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::OverlapCannonTrigger);
+	BoardingTriggerBox->OnComponentEndOverlap.AddDynamic(this,&ThisClass::EndOverlapCannonTrigger);
 
 	
 	
@@ -69,8 +72,12 @@ void ACannon::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	GetIBPlayerController();
+
+	if (PlayerController==nullptr)
 	{
+		return;
+	}
 		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 		if (Subsystem)
 		{
@@ -83,7 +90,7 @@ void ACannon::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			EnhancedInputComponent->BindAction(IA_CannonShoot, ETriggerEvent::Triggered, this, &ThisClass::ChargeCannonPower);
 			EnhancedInputComponent->BindAction(IA_CannonShoot, ETriggerEvent::Completed, this, &ThisClass::ShootChar);
 		}
-	}
+	
 }
 
 
@@ -115,46 +122,75 @@ void ACannon::CannonCameraMove(const FInputActionValue& Value)
 
 void ACannon::ChargeCannonPower()
 {
-	APlayerController* PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
-	if (PlayerController)
-	{
-		AIB_PlayerController* IBPlayerController = Cast<AIB_PlayerController>(PlayerController);
-		if (IBPlayerController==nullptr)
-		{
-			return;
-		}
 		IsOnCharging=true;
 		CurrentCannonPower+=ChargePowerSpeed*GetWorld()->GetDeltaSeconds();
 		if (CurrentCannonPower >= MaxCannonPower)
 		{
 			CurrentCannonPower = MaxCannonPower;
 		}
-		if (IBPlayerController->CannonWidget!=nullptr)
-		{
-			IBPlayerController->CannonWidget->UpdatePowerProgressBar();
-		}
-		
-	}
-	
-	
+		UpdateChargeBar();
 	
 }
 
 void ACannon::ShootChar()
 {
-	CurrentCannonPower=0.0f;
-	IsOnCharging=false;
-	APlayerController* PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
-	if (PlayerController)
+	GetIBPlayerController();
+	
+	if (IBPlayerController==nullptr)
 	{
-		AIB_PlayerController* IBPlayerController = Cast<AIB_PlayerController>(PlayerController);
-		if (IBPlayerController==nullptr)
+		return;
+	}
+		
+		if (BoardingActor!=nullptr)
 		{
-			return;
+			AIBCharBase* IBChar = Cast<AIBCharBase>(BoardingActor);
+			if (IBChar!=nullptr&&CannonMuzzle!=nullptr)
+			{
+				FVector ForwardVector = CannonMuzzle->GetForwardVector()*(CurrentCannonPower);
+				//FVector UpVector = CannonMuzzle->GetUpVector()*(CurrentCannonPower);
+				FVector ShootingVector = ForwardVector*100.f;//+UpVector;
+				IBChar->SetActorLocation(CannonMuzzle->GetComponentLocation());
+				IBChar->LaunchCharacter(ShootingVector,true,true);
+				IBChar->SwitchController();
+				IBChar->IsNearCannon=false;
+				IBChar->IsFlying=true;
+				IBChar->PlayFlyingAnimation();
+				
+				
+				
+				CurrentCannonPower=0.0f;
+				IsOnCharging=false;
+				
+			}
 		}
+		UpdateChargeBar();
+	
+}
+
+void ACannon::UpdateChargeBar()
+{
+	GetIBPlayerController();
+
+	if (IBPlayerController)
+	{
 		if (IBPlayerController->CannonWidget!=nullptr)
 		{
 			IBPlayerController->CannonWidget->UpdatePowerProgressBar();
+		}
+	}
+	
+}
+
+void ACannon::GetIBPlayerController()
+{
+	PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
+	
+	if (PlayerController)
+	{
+		IBPlayerController = Cast<AIB_PlayerController>(PlayerController);
+		if (IBPlayerController==nullptr)
+		{
+			return;
 		}
 		
 	}
@@ -168,11 +204,12 @@ void ACannon::OverlapCannonTrigger(UPrimitiveComponent* OverlappedComponent, AAc
 	AIBCharBase* CharBase = Cast<AIBCharBase>(OtherActor);
 	if (CharBase)
 	{
-		AIB_PlayerController* IBPlayerController = Cast<AIB_PlayerController>(CharBase->GetController());
+		IBPlayerController = Cast<AIB_PlayerController>(CharBase->GetController());
 		if (IBPlayerController)
 		{
 			IBPlayerController->VisibleCannonWidget();
 			CharBase->IsNearCannon=true;
+			BoardingActor=OtherActor;
 		}
 	}
 }
@@ -183,12 +220,13 @@ void ACannon::EndOverlapCannonTrigger(UPrimitiveComponent* OverlappedComponent, 
 	AIBCharBase* CharBase = Cast<AIBCharBase>(OtherActor);
 	if (CharBase)
 	{
-		AIB_PlayerController* IBPlayerController = Cast<AIB_PlayerController>(CharBase->GetController());
+		IBPlayerController = Cast<AIB_PlayerController>(CharBase->GetController());
 		if (IBPlayerController)
 		{
 			IBPlayerController->CollapsedCannonWidget();
 			CharBase->GetCameraBoom()->TargetOffset=CharBase->DefaultCameraOffset;
 			CharBase->IsNearCannon=false;
+			BoardingActor=nullptr;
 			
 		}
 	}

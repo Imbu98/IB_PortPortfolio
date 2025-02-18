@@ -6,7 +6,7 @@
 #include "../Item/ItemStructure.h"
 #include "InventoryComponent.generated.h"
 
-class UW_Inventory;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class IMBUPORTFOLIO_API UInventoryComponent : public UActorComponent, public IAction_Interface
@@ -32,7 +32,7 @@ public:
 	UPROPERTY()
 	FItemStruct Item;
 	UPROPERTY()
-	UW_Inventory* PlayerInventory;
+	class UW_Inventory* PlayerInventory;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
 	float RetrieveWeaponIndex=0; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
 
@@ -40,12 +40,18 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FItemStruct EquippedWeaponInfo;
 
+
 public:
 	UFUNCTION()
 	void UnEquip();
 	UFUNCTION()
 	void ItemToInventory(ABaseEquippable* RootedItem);
-	
+	UFUNCTION()
+	void SaveInventory();
+	UFUNCTION()
+	void LoadInventory();
+
+	FOnInventoryChanged OnInventoryUpdate;
 
 public:	
 	virtual void ChangeWeapon(ABaseEquippable* MainWeapon) override;

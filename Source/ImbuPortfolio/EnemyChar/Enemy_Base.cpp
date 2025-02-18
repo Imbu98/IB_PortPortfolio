@@ -1,11 +1,15 @@
 #include "Enemy_Base.h"
 
+#include "AIController.h"
+#include "Enemy_Base_AIController.h"
 #include "MovieSceneTracksComponentTypes.h"
 #include "../DefineDelegate.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ImbuPortfolio/BehaviorTree/BTT_EnemyAttack.h"
 #include "ImbuPortfolio/Enum/E_Enemy.h"
 #include "ImbuPortfolio/GameMode/CaveRuin_GameMode.h"
+#include "ImbuPortfolio/Interface/GameMode_Interface.h"
 #include "kismet/GameplayStatics.h"
 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_EnemyStatusIdle, "Enemy.Status.Idle", "Tag Enemy In Idle")
@@ -72,13 +76,41 @@ void AEnemy_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AEnemy_Base::OnDeath()
 {
-	// AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
-	// ACaveRuin_GameMode* GM_CaveRuin = Cast<ACaveRuin_GameMode>(GameMode);
-	// GM_CaveRuin->RemoveEnemyChar(this);
+	 AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
+	if (GameMode!=nullptr)
+	{
+		if (GameMode->GetClass()->ImplementsInterface(UGameMode_Interface::StaticClass()))
+		{
+			IGameMode_Interface* GameMode_Interface = Cast<IGameMode_Interface>(GameMode);
+			if (GameMode_Interface==nullptr)
+			{
+				GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("[EnemyBase::OnDeath] : GameMode_Interface Is Nullptr"));
+				return;
+			}
+			GameMode_Interface->RemoveEnemyChar(this);
+		}
+	}
 
 	if (DeathMontage)
 	{
 		PlayAnimMontage(DeathMontage);
+	}
+	if (EnemyHealthBar)
+	{
+		EnemyHealthBar->UpdateHealthBar(this);
+	}
+	AAIController* AIController=Cast<AAIController>(GetController());
+	if (AIController)
+	{
+		AEnemy_Base_AIController* Enemy_AIController = Cast<AEnemy_Base_AIController>(AIController);
+		if (Enemy_AIController!=nullptr)
+		{
+			Enemy_AIController->GetBrainComponent()->StopLogic(TEXT("Dead"));
+			Enemy_AIController->ClearFocus(EAIFocusPriority::LastFocusPriority);
+			GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+			
+		}
 	}
 }
 

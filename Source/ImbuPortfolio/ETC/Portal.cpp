@@ -39,7 +39,7 @@ void APortal::NotifyActorBeginOverlap(AActor* OtherActor)
 
 }
 
-void APortal::PortalOpenLevel(FName Name)
+void APortal::PortalOpenLevel()
 {
 	
 }

@@ -77,11 +77,10 @@ void AIB_PlayerController::VisibleCannonWidget()
 {
 	if (CannonWidget != nullptr && CannonWidget->IsInViewport()!=true)
 	{
-		CannonWidget->SetWidgetProperty();
-		CannonWidget->AddToViewport(0);
-		bShowMouseCursor=true;
 		
-		
+			CannonWidget->SetWidgetProperty();
+			CannonWidget->AddToViewport(0);
+			bShowMouseCursor=true;
 	}
 	
 }
@@ -90,9 +89,9 @@ void AIB_PlayerController::CollapsedCannonWidget()
 {
 	if (CannonWidget != nullptr&&CannonWidget->IsInViewport()==true)
 	{
-		CannonWidget->RemoveFromParent();
-		bShowMouseCursor=false;
 		
+			CannonWidget->RemoveFromParent();
+			bShowMouseCursor=false;
 	}
 
 }

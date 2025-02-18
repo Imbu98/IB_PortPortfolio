@@ -37,9 +37,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	class UStaticMeshComponent* CannonBody;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	class UStaticMeshComponent* Cart;
+	UStaticMeshComponent* Cart;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
-	class UBoxComponent* boardingTriggerBox;
+	USceneComponent* CannonMuzzle;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	class UBoxComponent* BoardingTriggerBox;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite )
@@ -50,6 +52,20 @@ public:
 	float ChargePowerSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite )
 	bool IsOnCharging=false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite )
+	AActor* BoardingActor=nullptr;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Controller")
+	class APlayerController* PlayerController;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Controller")
+	class AIB_PlayerController* IBPlayerController;
+	
+	
+public:
+	UFUNCTION()
+	void GetIBPlayerController();
+	
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category="CannonProperty" )
@@ -80,6 +96,8 @@ public:
 	void ChargeCannonPower();
 	UFUNCTION()
 	void ShootChar();
+UFUNCTION()
+	void UpdateChargeBar();
 	UFUNCTION()
 	void OverlapCannonTrigger(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

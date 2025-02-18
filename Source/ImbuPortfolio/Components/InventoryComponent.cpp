@@ -3,6 +3,7 @@
 #include "../Item/BaseEquippable.h"
 #include "../IB_Framework/IB_PlayerController.h"
 #include "../Widget/W_Inventory.h"
+#include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet\KismetArrayLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
@@ -18,6 +19,8 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LoadInventory();
+	
 	Items.SetNum(10);
 
 	// InventoryWidget�� LoadInventory�� �� �� �ʿ��� InventoryComponent�� �־��ش�
@@ -25,7 +28,7 @@ void UInventoryComponent::BeginPlay()
 	PlayerInventory = PlayerController->GetInventoryWidget();
 	PlayerInventory->LoadInventory(this);
 
-
+	OnInventoryUpdate.AddDynamic(this, &UInventoryComponent::SaveInventory);
 	
 }
 
@@ -61,6 +64,10 @@ void UInventoryComponent::UnEquip()
 	}
 	
 	EquippedWeapon.Empty();
+	EquippedWeaponInfo.Reset();
+
+	OnInventoryUpdate.Broadcast();
+	
 	AIBCharBase* IBChar = Cast<AIBCharBase>(GetOwner());
 	if (IBChar!=nullptr)
 	{
@@ -156,7 +163,42 @@ void UInventoryComponent::ItemToInventory(ABaseEquippable* RootedItem)
 				}
 
 			}
-				
 		}
+		OnInventoryUpdate.Broadcast();
+	}
+}
+
+void UInventoryComponent::SaveInventory()
+{
+	UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>( GetWorld()->GetGameInstance());
+	if (IBGameInstance!=nullptr)
+	{
+		if (IBGameInstance->IBSaveGame==nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("[UInventoryComponent::SaveInventory] : IBSaveGame Is Nullptr"));
+			return;
+		}
+		IBGameInstance->IGI_InventoryItem = Items;
+		IBGameInstance->IGI_EquippedWeapon=EquippedWeaponInfo;
+		
+		IBGameInstance->SaveGame();
+		
+	}
+}
+
+void UInventoryComponent::LoadInventory()
+{
+	UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>( GetWorld()->GetGameInstance());
+	if (IBGameInstance!=nullptr)
+	{
+		if (IBGameInstance->IBSaveGame==nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("[UInventoryComponent::SaveInventory] : IBSaveGame Is Nullptr"));
+			return;
+		}
+		
+		Items=IBGameInstance->IGI_InventoryItem;
+		EquippedWeaponInfo=IBGameInstance->IGI_EquippedWeapon;
+		
 	}
 }

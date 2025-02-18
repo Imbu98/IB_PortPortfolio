@@ -19,8 +19,6 @@ public:
 	UStaticMeshComponent* StaticMesh;
 
 public:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Levels")
-	TSoftObjectPtr<UWorld> LevelToLoad;
 	UPROPERTY(EditAnywhere,Category="Levels")
 	FName LevelName;
 	
@@ -31,7 +29,7 @@ public:
 	UFUNCTION()
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	UFUNCTION()
-	void PortalOpenLevel(FName Name);
+	void PortalOpenLevel();
 
 	void OpenPortal();
 

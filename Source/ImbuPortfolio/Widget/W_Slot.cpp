@@ -87,6 +87,7 @@ void UW_Slot::OnButtonClicked()
 	
 	ClearSlot();
 	W_Inventory->LoadInventory(InventoryComponent);
+	InventoryComponent->OnInventoryUpdate.Broadcast();
 }
 
 void UW_Slot::ClearSlot()
