@@ -3,7 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "../IB_Framework/IB_PlayerController.h"
 #include "../Components/InventoryComponent.h"
-#include "../Item/ItemStructure.h"
+#include "../Structure/ItemStructure.h"
 #include "../Character/IBCharBase.h"
 #include "W_Inventory.h"
 #include "Components/Image.h"
@@ -69,7 +69,7 @@ void UW_Slot::OnButtonClicked()
 		return;
 	}
 	
-	InventoryComponent = PlayerCharacter->InventoryComponent;
+	InventoryComponent = PlayerCharacter->InventoryComponents;
 	
 	if (InventoryComponent==nullptr)
 	{
@@ -81,7 +81,8 @@ void UW_Slot::OnButtonClicked()
 
 	if (Item.ItemType==E_ItemType::Weapon)
 	{
-		PlayerCharacter->Equip(InventoryComponent->Items[Index].WeaponNumber, PlayerCharacter);
+		PlayerCharacter->Equip(Item, PlayerCharacter);
+		// rarity 넘겨줘야함
 
 	}
 	
@@ -111,6 +112,9 @@ void UW_Slot::ClearSlot()
 				InventoryItem.Thumnail = nullptr;
 				InventoryItem.Mesh = nullptr;
 				InventoryItem.WeaponNumber = 0;
+				InventoryItem.ItemType=E_ItemType::None;
+				InventoryItem.WeaponType=E_Weapon::None;
+				InventoryItem.ItemRarity=E_ItemRarity::None;
 			}
 		}
 	}

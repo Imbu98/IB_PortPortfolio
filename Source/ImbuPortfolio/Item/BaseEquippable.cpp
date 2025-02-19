@@ -1,4 +1,6 @@
 #include "BaseEquippable.h"
+
+#include "Axe_Weapon.h"
 #include "GameFramework/Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Components\SkeletalMeshComponent.h"
@@ -7,6 +9,7 @@
 #include "../Structure/DamageInfo.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Perception/AISense_Damage.h"
 
 
@@ -17,8 +20,8 @@ ABaseEquippable::ABaseEquippable()
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	SetRootComponent(DefaultSceneRoot);
 
-	/*ItemStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemStaticMesh"));
-	SetRootComponent(ItemStaticMesh);*/
+	ItemStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemStaticMesh"));
+	ItemStaticMesh->SetupAttachment(DefaultSceneRoot);
 
 	ItemSKeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMesh"));
 	ItemSKeletalMesh->SetupAttachment(DefaultSceneRoot);
@@ -26,21 +29,22 @@ ABaseEquippable::ABaseEquippable()
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 
+	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::NearItem);
+
+	
+
 	CollisionComponent = CreateDefaultSubobject<UCollisionComponent>(TEXT("CollisionComponent"));
 
-	OnHit.AddDynamic(this,&ThisClass::OnHitActor);
 	
+	CollisionComponent->Onhit.AddDynamic(this,&ThisClass::OnHitActor);
 
 }
 
 void ABaseEquippable::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (CollisionComponent!=nullptr)
-	{
-		CollisionComponent->Onhit.AddDynamic(this,&ThisClass::OnHitActor);
-	}
+	
+	
 	
 }
 
@@ -48,16 +52,16 @@ void ABaseEquippable::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	FName ItemRowName = Item.RowName;
+	FName ItemRowName = DT_Item.RowName;
 	
-	if (Item.DataTable==nullptr)
+	if (DT_Item.DataTable==nullptr)
 	{
 		
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DataTable Is Null"));
 		return;
 		
 	}
-	FItemStruct* ItemStruct = Item.DataTable->FindRow<FItemStruct>(ItemRowName,FString(""));
+	FItemStruct* ItemStruct = DT_Item.DataTable->FindRow<FItemStruct>(ItemRowName,FString(""));
 	
 	if (ItemStruct==nullptr)
 	{
@@ -65,37 +69,35 @@ void ABaseEquippable::OnConstruction(const FTransform& Transform)
 		return;
 		
 	}
-
-	switch (ItemStruct->WeaponType)
+	if (ItemStruct->ItemType==E_ItemType::Weapon)
 	{
-	case E_Weapon::Axe:
+		switch (ItemStruct->WeaponType)
 		{
-			if (AxeAsset!=nullptr)
+		case E_Weapon::Axe:
 			{
-				ItemSKeletalMesh->SetSkeletalMesh(AxeAsset);
-			}
-		}break;
-	case E_Weapon::Sword:
-		{
-			if (SwordAsset!=nullptr)
+				if (AxeAsset!=nullptr)
+				{
+					ItemSKeletalMesh->SetSkeletalMesh(AxeAsset);
+				}
+			}break;
+		case E_Weapon::Sword:
 			{
-				ItemSKeletalMesh->SetSkeletalMesh(SwordAsset);
-			}
-		}break;
-	default:
-		break;
+				if (SwordAsset!=nullptr)
+				{
+					ItemSKeletalMesh->SetSkeletalMesh(SwordAsset);
+				}
+			}break;
+		default:
+			break;
+		}
 	}
-	
 	ItemInfo.ItemName = ItemStruct->ItemName;
 	ItemInfo.Stackable = ItemStruct->Stackable;
 	ItemInfo.ItemQuantity = ItemStruct->ItemQuantity;
-	ItemInfo.Thumnail = ItemStruct->Thumnail;
 	ItemInfo.Mesh = ItemStruct->Mesh;
 	ItemInfo.WeaponNumber = ItemStruct->WeaponNumber;
 	ItemInfo.ItemType=ItemStruct->ItemType;
 	ItemInfo.WeaponType=ItemStruct->WeaponType;
-
-	
 	
 }
 
@@ -141,10 +143,6 @@ void ABaseEquippable::OnEquipped()
 		CollisionComponent->SetCollisionMesh(GetItemMesh());
 		CollisionComponent->AddActorsToIgnore(this->GetOwner());
 	}
-
-
-		//나중에 저장기능 생성 후 넣기
-		//SaveEquippedWeapon();
 }
 
 
@@ -166,37 +164,82 @@ void ABaseEquippable::SaveEquippedWeapon(ABaseEquippable* Weapon)
 
 void ABaseEquippable::OnHitActor(FHitResult HitResult)
 {
-	// AIBCharBase* IBCharBase = Cast<AIBCharBase>( this->GetOwner());
-	// if (IBCharBase == nullptr)
-	// {
-	// 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("IBChar Is Null"));
-	// 	return;
-	// }
-if (HitResult.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass())==true)
-{
-	IDamageInterface* DamageInterface=Cast<IDamageInterface>(HitResult.GetActor());
-	if (DamageInterface==nullptr)
+	if (HitResult.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass())==true)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DamageInterface Is Null"));
+		IDamageInterface* DamageInterface=Cast<IDamageInterface>(HitResult.GetActor());
+		if (DamageInterface==nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DamageInterface Is Null"));
+			return;
+		}
+		else
+		{
+			FDamageInfo DamageInfo;
+			DamageInfo.DamageAmount=Damage;
+			DamageInterface->TakeDamage(DamageInfo,HitResult.GetActor());
+			UAISense_Damage::ReportDamageEvent(GetWorld(),HitResult.GetActor(),GetOwner(),Damage,HitResult.Location,HitResult.ImpactPoint);
+			if (HitEffects!=nullptr)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),HitEffects,HitResult.Location,FRotator::ZeroRotator,FVector::ZeroVector,true);
+			
+			}
+		}
+	}
+}
+
+void ABaseEquippable::InitializeRandomAttributes()
+{
+	FName ItemProbability = DT_ItemProbability.RowName;
+	
+	if (DT_ItemProbability.DataTable==nullptr)
+	{
+		
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DataTable Is Null"));
 		return;
+		
+	}
+	FStructure_SetProbabilityItem* SetItemProbability = DT_ItemProbability.DataTable->FindRow<FStructure_SetProbabilityItem>(ItemProbability,FString(""));
+	if (SetItemProbability == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Struct SetItemProbability Is Null"));
+		return;
+	}
+	// 아이템 확률
+	//float WeaponProbability = SetItemProbability->ItemType_WeaponProbability*SetItemProbability->IncreasingProbability;
+	//float ArmorProbability = SetItemProbability->ItemType_ArmorProbability*SetItemProbability->IncreasingProbability;
+	//float PotionProbability= SetItemProbability->ItemType_WeaponProbability*SetItemProbability->IncreasingProbability;
+	//((SetItemProbability->ItemType_ArmorProbability*SetItemProbability->IncreasingProbability)-(SetItemProbability->ItemType_ArmorProbability))/2;
+	
+	float MaxProbability = SetItemProbability->ItemType_ArmorProbability+SetItemProbability->ItemType_WeaponProbability+SetItemProbability->ItemType_PotionProbability;
+	float SetItemTypeProbability = UKismetMathLibrary::RandomFloatInRange(0,MaxProbability);
+	
+	if (SetItemTypeProbability<=SetItemProbability->ItemType_WeaponProbability)
+	{
+		ItemInfo.ItemType=E_ItemType::Weapon;
+	}
+	else if (SetItemTypeProbability<=SetItemProbability->ItemType_WeaponProbability+SetItemProbability->ItemType_WeaponProbability)
+	{
+		ItemInfo.ItemType=E_ItemType::Armor;
 	}
 	else
 	{
-		FDamageInfo DamageInfo;
-		DamageInfo.DamageAmount=Damage;
-		DamageInterface->TakeDamage(DamageInfo,HitResult.GetActor());
-		UAISense_Damage::ReportDamageEvent(GetWorld(),HitResult.GetActor(),GetOwner(),Damage,HitResult.Location,HitResult.ImpactPoint);
-		if (HitEffects!=nullptr)
+		ItemInfo.ItemType=E_ItemType::Potion;
+	}
+	
+}
+
+void ABaseEquippable::NearItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor==UGameplayStatics::GetPlayerCharacter(GetWorld(),0))
+	{
+		
+		if (ItemOverlayMaterial&&ItemStaticMesh)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),HitEffects,HitResult.Location,FRotator::ZeroRotator,FVector::ZeroVector,true);
-			
+			ItemStaticMesh->SetOverlayMaterial(ItemOverlayMaterial);
 		}
 		
 	}
-}
-	
-	
-	
 }
 
 

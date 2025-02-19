@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "../Interface/Action_Interface.h"
-#include "../Item/ItemStructure.h"
+#include "../Structure/ItemStructure.h"
 #include "InventoryComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
@@ -27,15 +27,21 @@ public:
 	ABaseEquippable* RightWeapon;
 	UPROPERTY(BlueprintReadWrite,Category="Weapon")
 	ABaseEquippable* LeftWeapon;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
+	float RetrieveWeaponIndex=0; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int64 InventorySize=12; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
+
 	UPROPERTY()
 	TArray<FItemStruct> Items;
 	UPROPERTY()
 	FItemStruct Item;
 	UPROPERTY()
+	E_ItemRarity ItemRarity;
+	UPROPERTY()
 	class UW_Inventory* PlayerInventory;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
-	float RetrieveWeaponIndex=0; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
-
+	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FItemStruct EquippedWeaponInfo;

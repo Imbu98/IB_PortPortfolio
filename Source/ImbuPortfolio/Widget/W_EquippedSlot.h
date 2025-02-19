@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "../Item/ItemStructure.h"
+#include "../Structure/ItemStructure.h"
 #include "W_EquippedSlot.generated.h"
 
 class UInventoryComponent;

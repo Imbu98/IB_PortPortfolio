@@ -88,6 +88,7 @@ void AEnemy_Base::OnDeath()
 				return;
 			}
 			GameMode_Interface->RemoveEnemyChar(this);
+			
 		}
 	}
 

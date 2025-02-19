@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "ImbuPortfolio/Item/ItemStructure.h"
+#include "ImbuPortfolio/Structure/ItemStructure.h"
 #include "../Item/BaseEquippable.h"
 #include "IBSaveGame.generated.h"
 

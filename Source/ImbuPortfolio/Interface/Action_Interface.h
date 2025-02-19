@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
 #include "../Item/BaseEquippable.h"
+#include "../Structure/ItemStructure.h"
 #include "Action_Interface.generated.h"
 
 UINTERFACE(MinimalAPI)
@@ -16,7 +17,7 @@ class IMBUPORTFOLIO_API IAction_Interface
 	GENERATED_BODY()
 
 public:
-	virtual void Equip(int32 WeaponNumber, AActor* Caller) { }
+	virtual void Equip(FItemStruct InventoryItemStruct, AActor* Caller) { }
 
 
 	virtual void ChangeWeapon(ABaseEquippable* MainWeapon) { }

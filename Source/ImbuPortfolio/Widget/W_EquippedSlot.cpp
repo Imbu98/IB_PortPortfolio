@@ -43,7 +43,7 @@ void UW_EquippedSlot::ButtonOnClicked()
 	
 	UCombatComponent* CombatComponent =PlayerCharacter->CombatComponent;
 	
-	InventoryComponent = PlayerCharacter->InventoryComponent;
+	InventoryComponent = PlayerCharacter->InventoryComponents;
 
 
 	// 이 아래로는 나중에 방어구 등을 추가하면 따로 함수를 만들어 무기와 방어구 해제를 한번에 관리하기 
@@ -78,6 +78,9 @@ void UW_EquippedSlot::ClearSlot()
 		InventoryComponent->EquippedWeaponInfo.Thumnail = nullptr;
 		InventoryComponent->EquippedWeaponInfo.Mesh = nullptr;
 		InventoryComponent->EquippedWeaponInfo.WeaponNumber = 0;
+		InventoryComponent->EquippedWeaponInfo.ItemType=E_ItemType::None;
+		InventoryComponent->EquippedWeaponInfo.WeaponType=E_Weapon::None;
+		InventoryComponent->EquippedWeaponInfo.ItemRarity=E_ItemRarity::None;
 	}
 }
 

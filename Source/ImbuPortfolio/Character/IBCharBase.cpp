@@ -48,8 +48,11 @@ AIBCharBase::AIBCharBase()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+
+	InventoryComponents = CreateDefaultSubobject<UInventoryComponent>(TEXT("InventoryComponent"));
+	
 	StateComponent=CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
+	
 	DamageSystemComponent=CreateDefaultSubobject<UDamageSystemComponent>(TEXT("DamageSystemComponent"));
 	
 	
@@ -75,7 +78,7 @@ void AIBCharBase::BeginPlay()
 	UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
 	if (IBGameInstance!=nullptr)
 	{
-		Equip(IBGameInstance->IGI_EquippedWeapon.WeaponNumber,this);
+		Equip(IBGameInstance->IGI_EquippedWeapon,this);
 	}
 	
 	
@@ -156,7 +159,11 @@ void AIBCharBase::Dodge()
 
 void AIBCharBase::Interact()
 {
-	InventoryComponent->Interaction();
+	if (InventoryComponents)
+	{
+		InventoryComponents->Interaction();
+	}
+	
 }
 
 void AIBCharBase::OpenInventory()
@@ -320,32 +327,32 @@ void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 }
 
 
-void AIBCharBase::Equip(int32 WeaponNumber, AActor* Caller)
+void AIBCharBase::Equip(FItemStruct InventoryItemStruct, AActor* Caller)
 {
 	
-	if (CombatComponent&& WeaponNumber!=0&&InventoryComponent)
+	if (CombatComponent&&InventoryComponents)
 	{
 		
-		InventoryComponent->UnEquip();
+		InventoryComponents->UnEquip();
 		
-		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[WeaponNumber];
+		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[InventoryItemStruct.WeaponNumber];
 		if (WeaponClass != nullptr)
 		{
-			ABaseEquippable* Weapon =  SpawnAndAttachWeapon(WeaponNumber,WeaponClass,Caller);
+			ABaseEquippable* Weapon =  SpawnAndAttachWeapon(InventoryItemStruct.WeaponNumber,WeaponClass,Caller,InventoryItemStruct.ItemRarity);
 			if (Weapon)
 			{
 				IsWeaponAttached=true;
-				if (InventoryComponent)
+				if (InventoryComponents)
 				{
-					InventoryComponent->EquippedWeaponInfo=Weapon->ItemInfo;
-					for (auto Equippables : InventoryComponent->EquippedWeapon )
+					InventoryComponents->EquippedWeaponInfo=Weapon->ItemInfo;
+					for (auto Equippables : InventoryComponents->EquippedWeapon )
 					{
 						Equippables->OnEquipped();
 					}
 					
-					InventoryComponent->OnInventoryUpdate.Broadcast();
+					InventoryComponents->OnInventoryUpdate.Broadcast();
 					
-					switch (InventoryComponent->EquippedWeaponInfo.WeaponType)
+					switch (InventoryComponents->EquippedWeaponInfo.WeaponType)
 					{
 					case E_Weapon::Axe:
 						{
@@ -397,7 +404,7 @@ void AIBCharBase::UnEquip()
 }
 
 // weaponNumber에 따라 스폰후 attach
-ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller)
+ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller,E_ItemRarity ItemRarity)
 {
 	// Parameter for Spawn
 	APawn* Pawn = Cast<APawn>(Caller);
@@ -425,20 +432,33 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 				ABaseEquippable* Axe_L = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
 				if (Axe_L)
 				{
-					Axe_L->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandL_Axe"));
+					AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_L);
+					if (Axe!=nullptr)
+					{
+						Axe->InitializeItem(ItemRarity);
+						Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandL_Axe"));	
+					}
+					
+
+					
 				}
 				ABaseEquippable* Axe_R = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
 				if (Axe_R)
 				{
-					Axe_R->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));
+					AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_R);
+					if (Axe!=nullptr)
+					{
+						Axe->InitializeItem(ItemRarity);
+						Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));	
+					}
 				}
-				if (InventoryComponent!=nullptr)
+				if (InventoryComponents!=nullptr)
 				{
-					InventoryComponent->EquippedWeapon.Add(Axe_L);
-					InventoryComponent->EquippedWeapon.Add(Axe_R);
+					InventoryComponents->EquippedWeapon.Add(Axe_L);
+					InventoryComponents->EquippedWeapon.Add(Axe_R);
 					
-					InventoryComponent->LeftWeapon=Axe_L;
-					InventoryComponent->RightWeapon=Axe_R;
+					InventoryComponents->LeftWeapon=Axe_L;
+					InventoryComponents->RightWeapon=Axe_R;
 
 					
 				}

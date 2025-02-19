@@ -16,9 +16,24 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemInfo)
-	class UTexture2D* AxeThumnail;
+	class UTexture2D* AxeThumbnail;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemInfo)
 	class UStaticMesh* AxeStaticMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemInfo)
+	FDataTableRowHandle AxeDataTableRow;
+
+public:
+	TMap<E_ItemRarity, FName> RarityToRowMap = {
+		{E_ItemRarity::Common, FName("Axe_Common")},
+		{E_ItemRarity::Rare, FName("Axe_Rare")},
+		{E_ItemRarity::Epic, FName("Axe_Epic")},
+		{E_ItemRarity::Legendary, FName("Axe_Legendary")}
+	};
+
+public:
+	void InitializeItem(E_ItemRarity ItemRarity);
+	
+	
 
 
 
