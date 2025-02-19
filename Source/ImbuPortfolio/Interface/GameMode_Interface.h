@@ -15,5 +15,6 @@ class IMBUPORTFOLIO_API IGameMode_Interface
 	GENERATED_BODY()
 
 public:
-	virtual void RemoveEnemyChar(AActor* EnemyActor){};
+	
+	 virtual void RemoveEnemyChar(AActor* EnemyActor){};
 };

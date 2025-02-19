@@ -21,7 +21,7 @@ void UInventoryComponent::BeginPlay()
 
 	LoadInventory();
 	
-	Items.SetNum(10);
+	Items.SetNum(InventorySize);
 
 	// InventoryWidget�� LoadInventory�� �� �� �ʿ��� InventoryComponent�� �־��ش�
 	AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
@@ -56,11 +56,9 @@ void UInventoryComponent::UnEquip()
 		}
 	}
 	
-	ABaseEquippable* RetrieveWeapon = EquippedWeapon[RetrieveWeaponIndex];
-	
-	if (RetrieveWeapon!=nullptr)
+	if (EquippedWeapon[RetrieveWeaponIndex]!=nullptr)
 	{
-		ItemToInventory(RetrieveWeapon);
+		ItemToInventory(EquippedWeapon[RetrieveWeaponIndex]);
 	}
 	
 	EquippedWeapon.Empty();
@@ -91,7 +89,6 @@ void UInventoryComponent::ChangeWeapon(ABaseEquippable* MainWeapon)
 
 void UInventoryComponent::Interaction()
 {
-	// ���Ǿ� Ʈ���̽� ����
 	FHitResult OutHit;
 	TArray<AActor*> ActorsToIgnore;
 	float InteractRadius = 100.0f;
@@ -104,8 +101,7 @@ void UInventoryComponent::Interaction()
 			ActorsToIgnore.Add(Actor);
 		}
 	}
-
-	// ���Ǿ� ��ġ ���
+	
 	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(GetOwner());
 	FVector VCharacterLocation = PlayerCharacter->GetActorLocation();
 	FVector VLocation = VCharacterLocation - FVector(0.f, 0.f, 50.f);
@@ -115,7 +111,7 @@ void UInventoryComponent::Interaction()
 		ETraceTypeQuery::TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
 
-	// ���� �κ��丮�� �ֱ�
+	
 	if (Hit)
 	{
 		ABaseEquippable* Weapon = Cast<ABaseEquippable>(OutHit.GetActor());
@@ -158,7 +154,6 @@ void UInventoryComponent::ItemToInventory(ABaseEquippable* RootedItem)
 				if (InventoryItem.ItemQuantity == 0)
 				{
 					InventoryItem = RootedItem->ItemInfo;
-						
 					break;
 				}
 

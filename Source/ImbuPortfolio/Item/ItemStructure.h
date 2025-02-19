@@ -18,6 +18,10 @@ struct FItemStruct : public FTableRowBase
 	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FGuid UniqueId;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int64 ItemID;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FText ItemName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool Stackable;
@@ -33,6 +37,8 @@ public:
 	E_ItemType ItemType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	E_Weapon WeaponType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	E_ItemRarity ItemRarity;
 
 	FItemStruct():ItemName(FText::FromString(TEXT("")))
 	, Stackable(false)
@@ -42,6 +48,7 @@ public:
 	,WeaponNumber(0)
 	,ItemType(E_ItemType::None)
 	,WeaponType(E_Weapon::None)
+	,ItemRarity(E_ItemRarity::None)
 	{
 		
 	}
@@ -56,6 +63,7 @@ void Reset()
 		WeaponNumber=0;
 		ItemType = E_ItemType::None;
 		WeaponType=E_Weapon::None;
+		ItemRarity=E_ItemRarity::None;
 	}
 
 };

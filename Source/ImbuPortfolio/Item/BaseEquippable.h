@@ -22,8 +22,8 @@ protected:
 public:
 	UPROPERTY(EditAnywhere)
 	USceneComponent* DefaultSceneRoot;
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMeshComponent* ItemStaticMesh;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMeshComponent* ItemStaticMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* ItemSKeletalMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -45,6 +45,8 @@ public:
 	UFUNCTION(BluePrintCallable, Category = ItemMesh)
 	void AttachActor(FName SocketName);
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemMesh)
+	UMaterialInterface* ItemOverlayMaterial;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemMesh)
 	TObjectPtr<USkeletalMesh> AxeAsset;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemMesh)
 	TObjectPtr<USkeletalMesh> SwordAsset;
@@ -62,6 +64,8 @@ public:
 	bool IsAttachtoHand;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float Damage;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float Weight;
 
 public:
 	void SetIsEquipped(bool Equip) { IsEquipped = Equip; }
@@ -70,6 +74,10 @@ public:
 	void SaveEquippedWeapon(ABaseEquippable* Weapon);
 	UFUNCTION()
 	void OnHitActor(FHitResult HitResult);
+	UFUNCTION()
+	void SpawnRandomItem();
+	UFUNCTION()
+	void NearItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=AttackMontage)
@@ -84,3 +92,5 @@ protected:
 	
 
 };
+
+

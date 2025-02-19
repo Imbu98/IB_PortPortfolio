@@ -22,7 +22,6 @@ void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 			UW_Slot* ItemSlot = Cast<UW_Slot>(ItemSlotWidget);
 			if (ItemSlot)
 			{
-				// Item, ArrayIndex, Inventorycomponent �ʱ�ȭ ���ֱ�
 				ItemSlot->Index = ArrayIndex;
 				ItemSlot->InventoryComponent = Inventory;
 				ItemSlot->Item = Inventory->Items[ArrayIndex];

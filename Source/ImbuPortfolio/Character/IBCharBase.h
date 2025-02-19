@@ -32,7 +32,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UCombatComponent* CombatComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
-	class UInventoryComponent* InventoryComponent;
+	class UInventoryComponent* InventoryComponents;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UStateComponent* StateComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
@@ -115,6 +115,8 @@ public:
 	float InteractRadius=20.f;
 	UPROPERTY()
 	E_Weapon WeaponEnum;
+	UPROPERTY()
+	FItemStruct ItemStruct;
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<ABaseEquippable> Equippable22;
 	UPROPERTY(EditAnywhere)
@@ -170,10 +172,10 @@ public:
 	UFUNCTION()
 	void UnEquip();
 	UFUNCTION()
-	ABaseEquippable* SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller) ;
+	ABaseEquippable* SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller,E_ItemRarity ItemRarity) ;
 
 public:
-	virtual void Equip(int32 WeaponNumber, AActor* Caller) override;
+	virtual void Equip(FItemStruct InventoryItemStruct, AActor* Caller) override;
 	virtual bool TakeDamage(FDamageInfo& DamageInfo,AActor* Cursor) override;
 	virtual float SetHealth() override;
 
