@@ -327,6 +327,7 @@ void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 }
 
 
+// 방어구도 컴뱃컴포넌트에 넣어서 스폰할 때 쓰기
 void AIBCharBase::Equip(FItemStruct InventoryItemStruct, AActor* Caller)
 {
 	

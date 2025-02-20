@@ -114,16 +114,16 @@ void UInventoryComponent::Interaction()
 	
 	if (Hit)
 	{
-		ABaseEquippable* Weapon = Cast<ABaseEquippable>(OutHit.GetActor());
+		ABaseEquippable* RootedItem = Cast<ABaseEquippable>(OutHit.GetActor());
 
-		if (Weapon!=nullptr)
+		if (RootedItem!=nullptr)
 		{
-			ItemToInventory(Weapon);
+			ItemToInventory(RootedItem);
 		
 			AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 			PlayerInventory = PlayerController->GetInventoryWidget();
 			PlayerInventory->LoadInventory(this);
-			Weapon->Destroy();
+			RootedItem->Destroy();
 		}
 			
 	}

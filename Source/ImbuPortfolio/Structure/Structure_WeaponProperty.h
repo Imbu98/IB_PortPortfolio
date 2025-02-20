@@ -1,6 +1,7 @@
 ﻿#pragma once
+
 #include "CoreMinimal.h"
-#include "../item/EItems.h"
+#include "../Source/ImbuPortfolio/Item/EItems.h"
 #include "Engine/DataTable.h"
 #include "Structure_WeaponProperty.generated.h"
 

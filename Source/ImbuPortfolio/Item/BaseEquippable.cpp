@@ -6,8 +6,10 @@
 #include "Components\SkeletalMeshComponent.h"
 #include "../Components/CombatComponent.h"
 #include "Components/BoxComponent.h"
+#include "NiagaraComponent.h"
 #include "../Structure/DamageInfo.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Structure/Struct_ItemProperty.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AISense_Damage.h"
@@ -26,10 +28,16 @@ ABaseEquippable::ABaseEquippable()
 	ItemSKeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ItemSkeletalMesh"));
 	ItemSKeletalMesh->SetupAttachment(DefaultSceneRoot);
 
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraComponent->SetupAttachment(ItemSKeletalMesh);
+
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 
 	CapsuleComponent->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::NearItem);
+
+	
+	
 
 	
 
@@ -44,61 +52,11 @@ void ABaseEquippable::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
-	
 }
 
 void ABaseEquippable::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-
-	FName ItemRowName = DT_Item.RowName;
-	
-	if (DT_Item.DataTable==nullptr)
-	{
-		
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DataTable Is Null"));
-		return;
-		
-	}
-	FItemStruct* ItemStruct = DT_Item.DataTable->FindRow<FItemStruct>(ItemRowName,FString(""));
-	
-	if (ItemStruct==nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ItemStruct Is Null"));
-		return;
-		
-	}
-	if (ItemStruct->ItemType==E_ItemType::Weapon)
-	{
-		switch (ItemStruct->WeaponType)
-		{
-		case E_Weapon::Axe:
-			{
-				if (AxeAsset!=nullptr)
-				{
-					ItemSKeletalMesh->SetSkeletalMesh(AxeAsset);
-				}
-			}break;
-		case E_Weapon::Sword:
-			{
-				if (SwordAsset!=nullptr)
-				{
-					ItemSKeletalMesh->SetSkeletalMesh(SwordAsset);
-				}
-			}break;
-		default:
-			break;
-		}
-	}
-	ItemInfo.ItemName = ItemStruct->ItemName;
-	ItemInfo.Stackable = ItemStruct->Stackable;
-	ItemInfo.ItemQuantity = ItemStruct->ItemQuantity;
-	ItemInfo.Mesh = ItemStruct->Mesh;
-	ItemInfo.WeaponNumber = ItemStruct->WeaponNumber;
-	ItemInfo.ItemType=ItemStruct->ItemType;
-	ItemInfo.WeaponType=ItemStruct->WeaponType;
-	
 }
 
 
@@ -187,49 +145,289 @@ void ABaseEquippable::OnHitActor(FHitResult HitResult)
 	}
 }
 
-void ABaseEquippable::InitializeRandomAttributes()
+void ABaseEquippable::SelectItemType()
 {
-	FName ItemProbability = DT_ItemProbability.RowName;
+	if (!DT_ItemTypeProbability||!DT_WeaponTypeProbability||!DT_ArmorTypeProbability||!DT_RarityProbability||!DT_PotionSizeProbability)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,TEXT("AbaseEquippable:SelectItemType"));
+		return;
+	}
+
+	// choose item type
+	float ItemTypeTotalProbability =0.0f;
+	TArray<FStructure_ItemTypeProbability*> ItemTypeProbabilities;
+	DT_ItemTypeProbability->GetAllRows<FStructure_ItemTypeProbability>(TEXT(""),ItemTypeProbabilities);
+	for (FStructure_ItemTypeProbability* Row : ItemTypeProbabilities)
+	{
+		ItemTypeTotalProbability+=Row->ItemTypeProbability;
+	}
+	float ItemTypeRandomValue= FMath::FRandRange(0,ItemTypeTotalProbability);
+	float ItemTypeAccumulatedProbability =0.0f;
+	for (FStructure_ItemTypeProbability* Row : ItemTypeProbabilities)
+	{
+		ItemTypeAccumulatedProbability+=Row->ItemTypeProbability;
+		if (ItemTypeRandomValue <= ItemTypeAccumulatedProbability)
+		{
+			ItemInfo.ItemType=Row->ItemType;
+			break;
+		}
+	}
+
+	// choose weapon type
+	if (ItemInfo.ItemType==E_ItemType::Weapon)
+	{
+		float WeaponTypeTotalProbability =0.0f;
+		TArray<FStructure_WeaponTypeProbability*> WeaponTypeProbabilities;
+		DT_WeaponTypeProbability->GetAllRows<FStructure_WeaponTypeProbability>(TEXT(""),WeaponTypeProbabilities);
+		for (FStructure_WeaponTypeProbability* Row : WeaponTypeProbabilities)
+		{
+			WeaponTypeTotalProbability+=Row->WeaponTypeProbability;
+		}
+		float WeaponTypeRandomValue= FMath::FRandRange(0,WeaponTypeTotalProbability);
+		float WeaponTypeAccumulatedProbability =0.0f;
+		for (FStructure_WeaponTypeProbability* Row : WeaponTypeProbabilities)
+		{
+			WeaponTypeAccumulatedProbability+=Row->WeaponTypeProbability;
+			if (WeaponTypeRandomValue <= WeaponTypeAccumulatedProbability)
+			{
+				ItemInfo.WeaponType=Row->WeaponType;
+				break;
+			}
+		}
+	}
+	// choose Armor type
+	else if (ItemInfo.ItemType==E_ItemType::Armor)
+	{
+		float ArmorTypeTotalProbability =0.0f;
+		TArray<FStructure_ArmorTypeProbability*> ArmorTypeProbabilities;
+		DT_ArmorTypeProbability->GetAllRows<FStructure_ArmorTypeProbability>(TEXT(""),ArmorTypeProbabilities);
+		for (FStructure_ArmorTypeProbability* Row : ArmorTypeProbabilities)
+		{
+			ArmorTypeTotalProbability+=Row->ArmorTypeProbability;
+		}
+		float ArmorTypeRandomValue= FMath::FRandRange(0,ArmorTypeTotalProbability);
+		float ArmorTypeAccumulatedProbability =0.0f;
+		for (FStructure_ArmorTypeProbability* Row : ArmorTypeProbabilities)
+		{
+			ArmorTypeAccumulatedProbability+=Row->ArmorTypeProbability;
+			if (ArmorTypeRandomValue <= ArmorTypeAccumulatedProbability)
+			{
+				ItemInfo.ArmorType=Row->ArmorType;
+				break;
+			}
+		}
+	}
+	// choose potion size
+	else if (ItemInfo.ItemType==E_ItemType::Potion)
+	{
+		float PotionSizeTotalProbability =0.0f;
+		TArray<FStructure_PotionSizeProbability*> PotionSizeProbabilities;
+		DT_PotionSizeProbability->GetAllRows<FStructure_PotionSizeProbability>(TEXT(""),PotionSizeProbabilities);
+		for (FStructure_PotionSizeProbability* Row : PotionSizeProbabilities)
+		{
+			PotionSizeTotalProbability+=Row->PotionSizeProbability;
+		}
+		float PotionSizeRandomValue= FMath::FRandRange(0,PotionSizeTotalProbability);
+		float PotionSizeAccumulatedProbability =0.0f;
+		for (FStructure_PotionSizeProbability* Row : PotionSizeProbabilities)
+		{
+			PotionSizeAccumulatedProbability+=Row->PotionSizeProbability;
+			if (PotionSizeRandomValue <= PotionSizeAccumulatedProbability)
+			{
+				ItemInfo.PotionSize=Row->PotionSize;
+				break;
+			}
+		}
+	}
+
+	// choose rarity
+	if (ItemInfo.ItemType==E_ItemType::Armor || ItemInfo.ItemType==E_ItemType::Weapon)
+	{
+		float RarityTotalProbability =0.0f;
+		TArray<FStructure_RarityProbability*> RarirtyProbabilities;
+		DT_RarityProbability->GetAllRows<FStructure_RarityProbability>(TEXT(""),RarirtyProbabilities);
+		for (FStructure_RarityProbability* Row : RarirtyProbabilities)
+		{
+			RarityTotalProbability+=Row->RarityProbability;
+		}
+		float RarityRandomValue= FMath::FRandRange(0,RarityTotalProbability);
+		float RarityAccumulatedProbability =0.0f;
+		for (FStructure_RarityProbability* Row : RarirtyProbabilities)
+		{
+			RarityAccumulatedProbability+=Row->RarityProbability;
+			if (RarityRandomValue <= RarityAccumulatedProbability)
+			{
+				ItemInfo.ItemRarity=Row->Rarity;
+				break;
+			}
+		}
+	}
 	
-	if (DT_ItemProbability.DataTable==nullptr)
+	
+	
+	
+}
+
+void ABaseEquippable::SetAppearance()
+{
+	
+	FName ItemRowName = DT_ItemProperty.RowName;
+	
+	if (DT_ItemProperty.DataTable==nullptr)
 	{
 		
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DataTable Is Null"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::OnConstruction] : DT.Item is null"));
 		return;
 		
 	}
-	FStructure_SetProbabilityItem* SetItemProbability = DT_ItemProbability.DataTable->FindRow<FStructure_SetProbabilityItem>(ItemProbability,FString(""));
-	if (SetItemProbability == nullptr)
+	FStruct_ItemProperty* ItemProperty = DT_ItemProperty.DataTable->FindRow<FStruct_ItemProperty>(ItemRowName,FString(""));
+	
+	if (ItemProperty==nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Struct SetItemProbability Is Null"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("ItemStruct Is Null"));
 		return;
+		
 	}
-	// 아이템 확률
-	//float WeaponProbability = SetItemProbability->ItemType_WeaponProbability*SetItemProbability->IncreasingProbability;
-	//float ArmorProbability = SetItemProbability->ItemType_ArmorProbability*SetItemProbability->IncreasingProbability;
-	//float PotionProbability= SetItemProbability->ItemType_WeaponProbability*SetItemProbability->IncreasingProbability;
-	//((SetItemProbability->ItemType_ArmorProbability*SetItemProbability->IncreasingProbability)-(SetItemProbability->ItemType_ArmorProbability))/2;
-	
-	float MaxProbability = SetItemProbability->ItemType_ArmorProbability+SetItemProbability->ItemType_WeaponProbability+SetItemProbability->ItemType_PotionProbability;
-	float SetItemTypeProbability = UKismetMathLibrary::RandomFloatInRange(0,MaxProbability);
-	
-	if (SetItemTypeProbability<=SetItemProbability->ItemType_WeaponProbability)
+
+
+	// Set Weapon Appearance
+	if (ItemInfo.ItemType==E_ItemType::Weapon)
 	{
-		ItemInfo.ItemType=E_ItemType::Weapon;
+		switch (ItemInfo.WeaponType)
+		{
+		case E_Weapon::Axe:
+			{
+				if (DT_Item==nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::SetAppearance] : DT_Item is null"));
+					return;
+				}
+				FItemStruct* ItemStruct= DT_Item->FindRow<FItemStruct>(TEXT("Axe"),TEXT(""));
+				if (ItemStruct==nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::SetAppearance] : Axe Raw is null"));
+					return;
+				}
+				ItemInfo.WeaponNumber=ItemStruct->WeaponNumber;
+				ItemInfo.Stackable = ItemStruct->Stackable;
+				ItemInfo.ItemQuantity=ItemStruct->ItemQuantity;
+				
+				ItemSKeletalMesh->SetSkeletalMesh(ItemProperty->AxeSkeletalMesh);
+				// switch by axe rarity
+				switch (ItemInfo.ItemRarity)
+				{
+				case E_ItemRarity::Common:
+					{
+						ItemInfo.Thumnail = ItemProperty->Common_Axe_Texture;
+						ItemDropEffect=ItemProperty->Common_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Rare:
+					{
+						ItemInfo.Thumnail = ItemProperty->Rare_Axe_Texture;
+						ItemDropEffect=ItemProperty->Rare_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Epic:
+					{
+						ItemInfo.Thumnail = ItemProperty->Epic_Axe_Texture;
+						ItemDropEffect=ItemProperty->Epic_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Legendary:
+					{
+						ItemInfo.Thumnail = ItemProperty->Legendary_Axe_Texture;
+						ItemDropEffect=ItemProperty->Legendary_Drop_Effect;
+						break;
+					}
+				default:
+					break;
+				}
+				
+			}break;
+		case E_Weapon::Sword:
+			{
+				if (DT_Item==nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::SetAppearance] : DT_Item is null"));
+					return;
+				}
+				FItemStruct* ItemStruct= DT_Item->FindRow<FItemStruct>(TEXT("Sword"),TEXT(""));
+				if (ItemStruct==nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::SetAppearance] : Sword Raw is null"));
+					return;
+				}
+				ItemInfo.WeaponNumber=ItemStruct->WeaponNumber;
+				ItemInfo.Stackable = ItemStruct->Stackable;
+				ItemInfo.ItemQuantity=ItemStruct->ItemQuantity;
+				
+				ItemSKeletalMesh->SetSkeletalMesh(ItemProperty->SwordSkeletalMesh);
+				// switch by sword rarity
+				switch (ItemInfo.ItemRarity)
+				{
+				case E_ItemRarity::Common:
+					{
+						ItemInfo.Thumnail = ItemProperty->Common_Sword_Texture;
+						break;
+					}
+				case E_ItemRarity::Rare:
+					{
+						ItemInfo.Thumnail = ItemProperty->Rare_Sword_Texture;
+						break;
+					}
+				case E_ItemRarity::Epic:
+					{
+						ItemInfo.Thumnail = ItemProperty->Epic_Sword_Texture;
+						break;
+					}
+				case E_ItemRarity::Legendary:
+					{
+						ItemInfo.Thumnail = ItemProperty->Legendary_Sword_Texture;
+						break;
+					}
+				default:
+					break;
+				}
+			
+			}break;
+		default:
+			break;
+		}
 	}
-	else if (SetItemTypeProbability<=SetItemProbability->ItemType_WeaponProbability+SetItemProbability->ItemType_WeaponProbability)
+	if (ItemDropEffect)
 	{
-		ItemInfo.ItemType=E_ItemType::Armor;
-	}
-	else
-	{
-		ItemInfo.ItemType=E_ItemType::Potion;
+		NiagaraComponent->SetAsset(ItemDropEffect);
+		NiagaraComponent->Activate(true);
 	}
 	
 }
 
+void ABaseEquippable::ItemImpulse()
+{
+	if (ItemSKeletalMesh!=nullptr)
+	{
+
+		
+		ItemSKeletalMesh->SetSimulatePhysics(true);
+		ItemSKeletalMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		FVector RandomImpulseVector = FVector(FMath::RandRange(0.f,30.f),FMath::RandRange(0.f,30.f),FMath::RandRange(0.f,30.f));
+		FVector Location = GetActorLocation();
+		ItemSKeletalMesh->AddImpulseAtLocation(RandomImpulseVector,Location);
+	}
+	if (ItemStaticMesh!=nullptr)
+	{
+		ItemStaticMesh->SetSimulatePhysics(true);
+		ItemStaticMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		FVector RandomImpulseVector = FVector(FMath::RandRange(0.f,30.f),FMath::RandRange(0.f,30.f),FMath::RandRange(0.f,30.f));
+		FVector Location = GetActorLocation();
+		ItemStaticMesh->AddImpulseAtLocation(RandomImpulseVector,Location);
+	}
+}
+
+
 void ABaseEquippable::NearItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                               UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor==UGameplayStatics::GetPlayerCharacter(GetWorld(),0))
 	{

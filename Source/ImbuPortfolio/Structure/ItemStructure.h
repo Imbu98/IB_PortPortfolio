@@ -37,8 +37,13 @@ public:
 	E_ItemType ItemType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	E_Weapon WeaponType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Info")
+	E_Armor ArmorType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	E_ItemRarity ItemRarity;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	E_PotionSize PotionSize;
+	
 
 	FItemStruct():ItemName(FText::FromString(TEXT("")))
 	, Stackable(false)
@@ -48,7 +53,9 @@ public:
 	,WeaponNumber(0)
 	,ItemType(E_ItemType::None)
 	,WeaponType(E_Weapon::None)
+	,ArmorType(E_Armor::None)
 	,ItemRarity(E_ItemRarity::None)
+	,PotionSize(E_PotionSize::None)
 	{
 		
 	}
