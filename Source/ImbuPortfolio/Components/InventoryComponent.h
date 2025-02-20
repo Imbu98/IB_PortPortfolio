@@ -31,7 +31,7 @@ public:
 	float RetrieveWeaponIndex=0; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int64 InventorySize=12; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
+	int64 InventorySize=12; // 인벤토리 슬롯 개수
 
 	UPROPERTY()
 	TArray<FItemStruct> Items;
@@ -46,6 +46,10 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FItemStruct EquippedWeaponInfo;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float InventoryGoldAmount;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float InventoryWeightAmount;
 
 public:
 	UFUNCTION()
@@ -56,6 +60,8 @@ public:
 	void SaveInventory();
 	UFUNCTION()
 	void LoadInventory();
+	UFUNCTION()
+	void GetGold(float Gold);
 
 	FOnInventoryChanged OnInventoryUpdate;
 

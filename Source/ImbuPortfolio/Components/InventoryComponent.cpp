@@ -108,22 +108,22 @@ void UInventoryComponent::Interaction()
 
 	
 	bool Hit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), VLocation, VLocation, InteractRadius,
-		ETraceTypeQuery::TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
+		 UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
 	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
 
 	
 	if (Hit)
 	{
-		ABaseEquippable* Weapon = Cast<ABaseEquippable>(OutHit.GetActor());
+		ABaseEquippable* RootedItem = Cast<ABaseEquippable>(OutHit.GetActor());
 
-		if (Weapon!=nullptr)
+		if (RootedItem!=nullptr)
 		{
-			ItemToInventory(Weapon);
+			ItemToInventory(RootedItem);
 		
 			AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 			PlayerInventory = PlayerController->GetInventoryWidget();
 			PlayerInventory->LoadInventory(this);
-			Weapon->Destroy();
+			RootedItem->Destroy();
 		}
 			
 	}
@@ -175,6 +175,7 @@ void UInventoryComponent::SaveInventory()
 		}
 		IBGameInstance->IGI_InventoryItem = Items;
 		IBGameInstance->IGI_EquippedWeapon=EquippedWeaponInfo;
+		IBGameInstance->IGI_InventoryGold=InventoryGoldAmount;
 		
 		IBGameInstance->SaveGame();
 		
@@ -194,6 +195,15 @@ void UInventoryComponent::LoadInventory()
 		
 		Items=IBGameInstance->IGI_InventoryItem;
 		EquippedWeaponInfo=IBGameInstance->IGI_EquippedWeapon;
+		InventoryGoldAmount=IBGameInstance->IGI_InventoryGold;
 		
 	}
+}
+
+void UInventoryComponent::GetGold(float Gold)
+{
+	InventoryGoldAmount+=Gold;
+	PlayerInventory->LoadInventory(this);
+	OnInventoryUpdate.Broadcast();
+	
 }

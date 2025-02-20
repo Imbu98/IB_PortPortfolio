@@ -81,6 +81,7 @@ void UW_EquippedSlot::ClearSlot()
 		InventoryComponent->EquippedWeaponInfo.ItemType=E_ItemType::None;
 		InventoryComponent->EquippedWeaponInfo.WeaponType=E_Weapon::None;
 		InventoryComponent->EquippedWeaponInfo.ItemRarity=E_ItemRarity::None;
+		InventoryComponent->EquippedWeaponInfo.Weight=0;
 	}
 }
 

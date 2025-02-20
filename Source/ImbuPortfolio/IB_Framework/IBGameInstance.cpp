@@ -65,6 +65,7 @@ void UIBGameInstance::SaveItems()
 	{
 		IBSaveGame->SavedInventoryInfo = IGI_InventoryItem;
 		IBSaveGame->SavedEquippedWeapon=IGI_EquippedWeapon;
+		IBSaveGame->SavedInventoryGold=IGI_InventoryGold;
 		
 		UGameplayStatics::SaveGameToSlot(IBSaveGame, "Save1", 0);
 	}
@@ -77,6 +78,7 @@ void UIBGameInstance::LoadItems()
 	{
 		IGI_InventoryItem = IBSaveGame->SavedInventoryInfo;
 		IGI_EquippedWeapon=IBSaveGame->SavedEquippedWeapon;
+		IGI_InventoryGold=IBSaveGame->SavedInventoryGold;
 		
 	}
 }

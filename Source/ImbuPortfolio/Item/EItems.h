@@ -1,14 +1,6 @@
 #pragma once
 
 UENUM(BlueprintType)
-enum class E_Weapon:uint8
-{
-	None=0,
-	Axe=1,
-	Sword=2,
-};
-
-UENUM(BlueprintType)
 enum class E_ItemType:uint8
 {
 	None=0,
@@ -19,6 +11,23 @@ enum class E_ItemType:uint8
 };
 
 UENUM(BlueprintType)
+enum class E_Weapon:uint8
+{
+	None=0,
+	Axe=1,
+	Sword=2,
+};
+
+UENUM(BlueprintType)
+enum class E_Armor : uint8
+{
+	Top UMETA(DisplayName = "Top"),
+	Bottom UMETA(DisplayName = "Bottom"),
+	Middle UMETA(DisplayName = "Middle"),
+	None UMETA(DisplayName = "None")
+};
+
+UENUM(BlueprintType)
 enum class E_ItemRarity:uint8
 {
 	None=0,
@@ -26,6 +35,15 @@ enum class E_ItemRarity:uint8
 	Rare=2,
 	Epic=3,
 	Legendary=4,
+};
+
+UENUM(BlueprintType)
+enum class E_PotionSize:uint8
+{
+	None=0,
+	S=1,
+	M=2,
+	L=3,
 };
 
 UENUM(BlueprintType)

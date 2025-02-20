@@ -5,11 +5,13 @@
 #include "MovieSceneTracksComponentTypes.h"
 #include "../DefineDelegate.h"
 #include "Components/CapsuleComponent.h"
+#include "EntitySystem/MovieSceneEntitySystemRunner.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ImbuPortfolio/BehaviorTree/BTT_EnemyAttack.h"
 #include "ImbuPortfolio/Enum/E_Enemy.h"
 #include "ImbuPortfolio/GameMode/CaveRuin_GameMode.h"
 #include "ImbuPortfolio/Interface/GameMode_Interface.h"
+#include "ImbuPortfolio/Item/BaseEquippable.h"
 #include "kismet/GameplayStatics.h"
 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_EnemyStatusIdle, "Enemy.Status.Idle", "Tag Enemy In Idle")
@@ -87,10 +89,15 @@ void AEnemy_Base::OnDeath()
 				GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("[EnemyBase::OnDeath] : GameMode_Interface Is Nullptr"));
 				return;
 			}
+			float RewardGold=0.0f;
+			RewardGold = FMath::RandRange(Reward_GoldMax,Reward_GoldMin);
+			GameMode_Interface->SaveReward_Gold(RewardGold);
 			GameMode_Interface->RemoveEnemyChar(this);
+			
 			
 		}
 	}
+	
 
 	if (DeathMontage)
 	{
@@ -100,6 +107,27 @@ void AEnemy_Base::OnDeath()
 	{
 		EnemyHealthBar->UpdateHealthBar(this);
 	}
+
+	// Drop item
+	FTransform SpawnTransfrom = GetActorTransform();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::MultiplyWithRoot;
+	
+	for (int32 i=0;i<NumberOfDropItem;i++)
+	{
+		ABaseEquippable* SpawnedItem = GetWorld()->SpawnActor<ABaseEquippable>(SpawnItem,SpawnTransfrom,SpawnParams);
+		if (SpawnedItem!=nullptr)
+		{
+			SpawnedItem->SelectItemType();
+			SpawnedItem->SetAppearance();
+			SpawnedItem->ItemImpulse();
+			
+		}
+		
+	}
+	
+	
 	AAIController* AIController=Cast<AAIController>(GetController());
 	if (AIController)
 	{

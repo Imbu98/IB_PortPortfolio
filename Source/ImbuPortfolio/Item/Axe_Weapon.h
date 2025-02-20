@@ -19,8 +19,7 @@ public:
 	class UTexture2D* AxeThumbnail;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemInfo)
 	class UStaticMesh* AxeStaticMesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ItemInfo)
-	FDataTableRowHandle AxeDataTableRow;
+	
 
 public:
 	TMap<E_ItemRarity, FName> RarityToRowMap = {

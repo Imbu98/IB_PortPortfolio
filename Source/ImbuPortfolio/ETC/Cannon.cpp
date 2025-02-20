@@ -8,6 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Components/InventoryComponent.h"
 #include "ImbuPortfolio/IB_Framework/IB_PlayerController.h"
 #include "ImbuPortfolio/Widget/W_Cannon.h"
 #include "Kismet/GameplayStatics.h"
@@ -146,9 +147,11 @@ void ACannon::ShootChar()
 			AIBCharBase* IBChar = Cast<AIBCharBase>(BoardingActor);
 			if (IBChar!=nullptr&&CannonMuzzle!=nullptr)
 			{
+				float ApplyWeight = IBChar->InventoryComponents->InventoryWeightAmount;
+				
 				FVector ForwardVector = CannonMuzzle->GetForwardVector()*(CurrentCannonPower);
 				//FVector UpVector = CannonMuzzle->GetUpVector()*(CurrentCannonPower);
-				FVector ShootingVector = ForwardVector*100.f;//+UpVector;
+				FVector ShootingVector = (ForwardVector*100.f)/(ApplyWeight/50.f);
 				IBChar->SetActorLocation(CannonMuzzle->GetComponentLocation());
 				IBChar->LaunchCharacter(ShootingVector,true,true);
 				IBChar->SwitchController();

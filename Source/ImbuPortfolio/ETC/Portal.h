@@ -17,6 +17,10 @@ public:
 	USceneComponent* Root;
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* StaticMesh;
+	UPROPERTY(EditAnywhere)
+	UMaterialInstance* StartLevelPortalMaterial;
+	UPROPERTY(EditAnywhere)
+	UMaterialInstance* BossLevelPortalMaterial;
 
 public:
 	UPROPERTY(EditAnywhere,Category="Levels")
@@ -29,9 +33,7 @@ public:
 	UFUNCTION()
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	UFUNCTION()
-	void PortalOpenLevel();
-
-	void OpenPortal();
+	void OpenPortal(FName OpenLevelName);
 
 
 };

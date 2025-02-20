@@ -31,7 +31,7 @@ void ACaveRuin_GameMode::RemoveEnemyChar(AActor* EnemyActor)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("StageCleared"));
 			if (Portal)
 			{
-				Portal->OpenPortal();
+				
 			}
 			
 		}				

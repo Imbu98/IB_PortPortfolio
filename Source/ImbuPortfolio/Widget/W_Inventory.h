@@ -19,6 +19,12 @@ public:
 	TObjectPtr<class UImage> InventoryImage;
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	TObjectPtr<class UWrapBox> InventoryWrapBox;
+
+	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
+	TObjectPtr<class UTextBlock> T_GoldAmount;
+	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
+	TObjectPtr<class UTextBlock> T_WeightAmount;
+	
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	TObjectPtr<class UW_EquippedSlot> EquippedArmor_Head;
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))

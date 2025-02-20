@@ -34,6 +34,8 @@ public:
 	TArray<FItemStruct> IGI_InventoryItem;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FItemStruct IGI_EquippedWeapon;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float IGI_InventoryGold;
 
 	FCriticalSection SaveLoadLock;
 	

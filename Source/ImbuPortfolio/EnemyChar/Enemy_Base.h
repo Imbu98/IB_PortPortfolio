@@ -11,7 +11,9 @@
 #include "ImbuPortfolio/ETC/Spline.h"
 #include "ImbuPortfolio/Interface/AI_Interface.h"
 #include "ImbuPortfolio/Interface/DamageInterface.h"
+#include "ImbuPortfolio/Item/BaseEquippable.h"
 #include "ImbuPortfolio/Widget/W_EnemyHealthBar.h"
+
 #include "Enemy_Base.generated.h"
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_EnemyStatusIdle)
@@ -30,7 +32,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Components")
 	UDamageSystemComponent* DamageSystemComponent;
@@ -43,6 +44,15 @@ protected:
 	TSubclassOf<UUserWidget> WBP_HealthBar;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Health)
 	UW_EnemyHealthBar* EnemyHealthBar;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Reward)
+	TSubclassOf<ABaseEquippable> SpawnItem;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Reward)
+	int32 NumberOfDropItem;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Reward)
+	float Reward_GoldMax;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Reward)
+	float Reward_GoldMin;
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character")

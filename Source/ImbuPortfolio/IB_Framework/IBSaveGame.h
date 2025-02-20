@@ -16,6 +16,9 @@ public:
 	TArray<FItemStruct> SavedInventoryInfo;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	FItemStruct SavedEquippedWeapon;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
+	float SavedInventoryGold;
+	
 	
 	
 };

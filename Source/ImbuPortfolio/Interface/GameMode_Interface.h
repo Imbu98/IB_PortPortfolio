@@ -17,4 +17,6 @@ class IMBUPORTFOLIO_API IGameMode_Interface
 public:
 	
 	 virtual void RemoveEnemyChar(AActor* EnemyActor){};
+	virtual void SaveReward_Gold(float EnemyReward_Gold){};
+	virtual float GetSaveReward_Gold(){	return 0.0f;}
 };

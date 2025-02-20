@@ -20,7 +20,7 @@ void UW_PopUp::NativePreConstruct()
 	
 	if (WBP_ButtonCancel && WBP_ButtonCancel->T_BtnText)
 	{
-		WBP_ButtonOK->T_BtnText->SetText(Text_CancelBtn);
+		WBP_ButtonCancel->T_BtnText->SetText(Text_CancelBtn);
 	}
 
 	

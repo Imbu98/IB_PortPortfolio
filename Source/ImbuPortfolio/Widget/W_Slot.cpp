@@ -115,6 +115,7 @@ void UW_Slot::ClearSlot()
 				InventoryItem.ItemType=E_ItemType::None;
 				InventoryItem.WeaponType=E_Weapon::None;
 				InventoryItem.ItemRarity=E_ItemRarity::None;
+				InventoryItem.Weight=0;
 			}
 		}
 	}

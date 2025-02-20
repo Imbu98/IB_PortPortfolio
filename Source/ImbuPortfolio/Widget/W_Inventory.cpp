@@ -1,13 +1,15 @@
 #include "W_Inventory.h"
 #include "Components\WrapBox.h"
 #include "Components/Image.h"
-#include "Engine.h"
+#include "Components/TextBlock.h"
 #include "W_EquippedSlot.h"
 #include "../Components/InventoryComponent.h"
 #include "W_Slot.h"
+#include "Kismet/KismetTextLibrary.h"
 
 void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 {
+	Inventory->InventoryWeightAmount=0;
 	if (InventoryWrapBox==nullptr)
 	{
 		return;
@@ -25,12 +27,13 @@ void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 				ItemSlot->Index = ArrayIndex;
 				ItemSlot->InventoryComponent = Inventory;
 				ItemSlot->Item = Inventory->Items[ArrayIndex];
-				
+
+				Inventory->InventoryWeightAmount+=Inventory->Items[ArrayIndex].Weight;
 				
 				InventoryWrapBox->AddChild(ItemSlot);
 			}
-			
 		}
+		
 	}
 		// Equipped Weapon Texture Update
 		if (EquippedWeapon1!=nullptr&&EquippedWeapon2!=nullptr&&Inventory!=nullptr)
@@ -39,9 +42,25 @@ void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 			EquippedWeapon1->SetEquippedItemThumnail();
 			EquippedWeapon2->EquippedItemInfo=Inventory->EquippedWeaponInfo;
 			EquippedWeapon2->SetEquippedItemThumnail();
-			
+
+			// add equippedweapon weight
+			Inventory->InventoryWeightAmount+=EquippedWeapon1->EquippedItemInfo.Weight;
 		}
-		// add armor and make function all of this 
+		// add armor and make function all of this
+
+
+		//
+	if (T_GoldAmount)
+	{
+		FText GoldAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryGoldAmount,HalfToEven);
+		T_GoldAmount->SetText(GoldAmountText);
+	}
+	if (T_WeightAmount)
+	{
+		FText TextAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryWeightAmount,HalfToEven);
+		T_WeightAmount->SetText(TextAmountText);
+	}
+	
 
 }
 
