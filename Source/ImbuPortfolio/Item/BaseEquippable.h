@@ -12,6 +12,8 @@
 #include "ImbuPortfolio/Structure/Probability/Structure_WeaponTypeProbability.h"
 #include "BaseEquippable.generated.h"
 
+
+
 UCLASS()
 class IMBUPORTFOLIO_API ABaseEquippable : public AActor
 {
@@ -62,6 +64,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equippable)
 	FDataTableRowHandle AxeDataTableRow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equippable)
+	FDataTableRowHandle HelmetDataTableRow;
 	
 	
 
@@ -93,6 +98,8 @@ public:
 	float Damage;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float Weight;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float Defense;
 
 public:
 	void SetIsEquipped(bool Equip) { IsEquipped = Equip; }
@@ -107,6 +114,8 @@ public:
 	void SetAppearance();
 	UFUNCTION()
 	void SetAxeWeight();
+	UFUNCTION()
+	void SetHelmetWeight();
 	UFUNCTION()
 	void ItemImpulse();
 	UFUNCTION()

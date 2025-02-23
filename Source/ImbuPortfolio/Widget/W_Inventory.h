@@ -10,6 +10,9 @@ UCLASS()
 class IMBUPORTFOLIO_API UW_Inventory : public UUserWidget
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void NativeConstruct() override;
 	
 public:
 	void LoadInventory(UInventoryComponent* Inventory);
@@ -42,6 +45,11 @@ public:
 	TSubclassOf<class UUserWidget> EquippedItemSlotWidgetClass;
 
 public:
+	UFUNCTION()
+	void UnEquipWeapon();
+	UFUNCTION()
+	void UnEquipHelmet();
 	
 	
 };
+

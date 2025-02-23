@@ -19,12 +19,16 @@
 #include "ImbuPortfolio/ETC/Cannon.h"
 #include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
+#include "ImbuPortfolio/Item/Helmet_Armor.h"
 #include "Slate/SGameLayerManager.h"
 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusIdle, "Status.Idle", "Tag Character In Idle")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDie,"Status.Die","Tag Character In Die")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusAction,"Status.Action","Tag Character In Action")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attacking")
+
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponAxeThrow,"Weapon.Axe.Throw","Tag Axe Skill1")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponSwordSlash,"Weapon.Sword.Slash","Tag Sword Skill1")
 
 
 
@@ -54,6 +58,15 @@ AIBCharBase::AIBCharBase()
 	StateComponent=CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	
 	DamageSystemComponent=CreateDefaultSubobject<UDamageSystemComponent>(TEXT("DamageSystemComponent"));
+
+	
+	FGameplayTagContainer AxeTags;
+	
+	// Sword 무기의 태그들
+	FGameplayTagContainer SwordTags;
+	
+
+	
 	
 	
 
@@ -118,6 +131,8 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Attack,ETriggerEvent::Started,this,&AIBCharBase::Attack);
 		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Triggered,this,&AIBCharBase::Aim_Start);
 		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Completed,this,&AIBCharBase::Aim_Completed);
+		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
+		
 	}
 
 }
@@ -228,6 +243,21 @@ void AIBCharBase::Aim_Completed()
 	}
 }
 
+void AIBCharBase::Skill1()
+{
+	if (ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
+	{
+		if (AxeSkill1Montage)
+		{
+			PlayAnimMontage(AxeSkill1Montage);
+		}
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("You cannot throw an axe!"));
+	}
+}
 
 
 void AIBCharBase::AttackEvent()
@@ -333,51 +363,84 @@ void AIBCharBase::Equip(FItemStruct InventoryItemStruct, AActor* Caller)
 	
 	if (CombatComponent&&InventoryComponents)
 	{
-		
-		InventoryComponents->UnEquip();
-		
-		TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[InventoryItemStruct.WeaponNumber];
-		if (WeaponClass != nullptr)
+		if (InventoryItemStruct.ItemType==E_ItemType::Weapon)
 		{
-			ABaseEquippable* Weapon =  SpawnAndAttachWeapon(InventoryItemStruct.WeaponNumber,WeaponClass,Caller,InventoryItemStruct.ItemRarity);
-			if (Weapon)
+			
+			
+			InventoryComponents->UnEquipWeapon();
+			TSubclassOf<ABaseEquippable> WeaponClass = CombatComponent->WeaponArray[InventoryItemStruct.WeaponNumber];
+			if (WeaponClass != nullptr)
 			{
-				IsWeaponAttached=true;
-				if (InventoryComponents)
+				ABaseEquippable* Weapon =  SpawnAndAttachWeapon(InventoryItemStruct,WeaponClass,Caller,InventoryItemStruct.ItemRarity);
+				if (Weapon)
 				{
-					InventoryComponents->EquippedWeaponInfo=Weapon->ItemInfo;
-					for (auto Equippables : InventoryComponents->EquippedWeapon )
+					IsWeaponAttached=true;
+					if (InventoryComponents)
 					{
-						Equippables->OnEquipped();
-					}
-					
-					InventoryComponents->OnInventoryUpdate.Broadcast();
-					
-					switch (InventoryComponents->EquippedWeaponInfo.WeaponType)
-					{
-					case E_Weapon::Axe:
+						InventoryComponents->EquippedWeaponInfo=Weapon->ItemInfo;
+						for (auto Equippables : InventoryComponents->EquippedWeapon )
 						{
-							if (ABP_Axe!=nullptr)
-							{
-								GetMesh()->LinkAnimClassLayers(ABP_Axe);
-							}
-						}break;
-					case E_Weapon::Sword:
+							Equippables->OnEquipped();
+						}
+					
+						InventoryComponents->OnInventoryUpdate.Broadcast();
+					
+						switch (InventoryComponents->EquippedWeaponInfo.WeaponType)
 						{
-							if (ABP_Sword!=nullptr)
+						case E_Weapon::Axe:
 							{
-								GetMesh()->LinkAnimClassLayers(ABP_Sword);
-							}
-						}break;
+								if (InventoryComponents->EquippedWeaponInfo.ItemRarity==E_ItemRarity::Legendary)
+								{
+									ActiveWeaponTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw")));
+								}
+								if (ABP_Axe!=nullptr)
+								{
+									GetMesh()->LinkAnimClassLayers(ABP_Axe);
+								}
+							}break;
+						case E_Weapon::Sword:
+							{
+								if (InventoryComponents->EquippedWeaponInfo.ItemRarity==E_ItemRarity::Legendary)
+								{
+									ActiveWeaponTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Sword.Slash")));
+								}
+								if (ABP_Sword!=nullptr)
+								{
+									GetMesh()->LinkAnimClassLayers(ABP_Sword);
+								}
+							}break;
 						default:
 							break;
+						}
 					}
+				}
+			}
+		}
+		else if (InventoryItemStruct.ItemType==E_ItemType::Armor)
+		{
+			if (CombatComponent->ArmorArray.IsEmpty())
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,TEXT("ArmorArray Is Null"));
+				return;
+			}
+			InventoryComponents->UnEquipHelmet();
+			TSubclassOf<ABaseEquippable> ArmorClass = CombatComponent->ArmorArray[InventoryItemStruct.WeaponNumber];
+			if (ArmorClass != nullptr)
+			{
+				ABaseEquippable* Armor =  SpawnAndAttachWeapon(InventoryItemStruct,ArmorClass,Caller,InventoryItemStruct.ItemRarity);
+				if (Armor)
+				{
+					if (InventoryComponents)
+					{
+						InventoryComponents->EquippedHelmetInfo=Armor->ItemInfo;
+						
+						InventoryComponents->OnInventoryUpdate.Broadcast();
 					
+					}
 				}
 			}
 		}
 	}
-
 	
 }
 
@@ -396,16 +459,21 @@ float AIBCharBase::SetHealth()
 
 void AIBCharBase::UnEquip()
 {
-
+	if (InventoryComponents->EquippedWeaponInfo.WeaponType==E_Weapon::Axe)
+	{
+		ActiveWeaponTags.Reset();
+	}
 	if (ABP_UnArmed!=nullptr)
 	{
 		GetMesh()->LinkAnimClassLayers(ABP_UnArmed);
+		
+		
 	}
 	IsWeaponAttached=false;
 }
 
 // weaponNumber에 따라 스폰후 attach
-ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller,E_ItemRarity ItemRarity)
+ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(FItemStruct InventoryItemStruct,TSubclassOf<ABaseEquippable> EquippableClass,AActor* Caller,E_ItemRarity ItemRarity)
 {
 	// Parameter for Spawn
 	APawn* Pawn = Cast<APawn>(Caller);
@@ -418,71 +486,108 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassO
 		ActorSpawnParameters.Owner = Caller;
 		ActorSpawnParameters.Instigator = Pawn;
 
-		WeaponEnum = static_cast<E_Weapon>(WeaponNumber);
-		
-		switch (WeaponEnum)
+		if (InventoryItemStruct.ItemType==E_ItemType::Weapon)
 		{
-		case E_Weapon::None:
+			WeaponEnum = static_cast<E_Weapon>(InventoryItemStruct.WeaponNumber);
+		
+			switch (WeaponEnum)
 			{
-				return nullptr;
-				break;
-			}
-			// Weapon Axe
-		case E_Weapon::Axe:
-			{
-				ABaseEquippable* Axe_L = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
-				if (Axe_L)
+			case E_Weapon::None:
 				{
-					AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_L);
-					if (Axe!=nullptr)
+					return nullptr;
+					break;
+				}
+				// Weapon Axe
+			case E_Weapon::Axe:
+				{
+					ABaseEquippable* Axe_L = GetWorld()->SpawnActor<ABaseEquippable>(EquippableClass, SpawnTransform, ActorSpawnParameters);
+					if (Axe_L)
 					{
-						Axe->InitializeItem(ItemRarity);
-						Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandL_Axe"));	
+						AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_L);
+						if (Axe!=nullptr)
+						{
+							Axe->InitializeItem(ItemRarity);
+							Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandL_Axe"));	
+						}
 					}
-					
-
-					
-				}
-				ABaseEquippable* Axe_R = GetWorld()->SpawnActor<ABaseEquippable>(WeaponClass, SpawnTransform, ActorSpawnParameters);
-				if (Axe_R)
-				{
-					AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_R);
-					if (Axe!=nullptr)
+					ABaseEquippable* Axe_R = GetWorld()->SpawnActor<ABaseEquippable>(EquippableClass, SpawnTransform, ActorSpawnParameters);
+					if (Axe_R)
 					{
-						Axe->InitializeItem(ItemRarity);
-						Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));	
+						AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_R);
+						if (Axe!=nullptr)
+						{
+							Axe->InitializeItem(ItemRarity);
+							Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));	
+						}
 					}
-				}
-				if (InventoryComponents!=nullptr)
-				{
-					InventoryComponents->EquippedWeapon.Add(Axe_L);
-					InventoryComponents->EquippedWeapon.Add(Axe_R);
+					if (InventoryComponents!=nullptr)
+					{
+						InventoryComponents->EquippedWeapon.Add(Axe_L);
+						InventoryComponents->EquippedWeapon.Add(Axe_R);
 					
-					InventoryComponents->LeftWeapon=Axe_L;
-					InventoryComponents->RightWeapon=Axe_R;
-
-					
-				}
+						InventoryComponents->LeftWeapon=Axe_L;
+						InventoryComponents->RightWeapon=Axe_R;
+					}
 				
-				AAxe_Weapon* Axe_Weapon = Cast<AAxe_Weapon>(Axe_L);
-				if (Axe_Weapon!=nullptr)
-				{
-					return Axe_Weapon;
+					AAxe_Weapon* Axe_Weapon = Cast<AAxe_Weapon>(Axe_L);
+					if (Axe_Weapon!=nullptr)
+					{
+						return Axe_Weapon;
+					}
+					break;
 				}
-				break;
-			}
-			// Weapon Sword
-		case E_Weapon::Sword:
-			{
+				// Weapon Sword
+			case E_Weapon::Sword:
+				{
+					return nullptr;
+					break;
+				}
+			default:
 				return nullptr;
 				break;
 			}
-		default:
-			return nullptr;
-			break;
 		}
+		if (InventoryItemStruct.ItemType==E_ItemType::Armor)
+		{
+			E_Armor ArmorEnum = static_cast<E_Armor>(InventoryItemStruct.WeaponNumber);
+		
+			switch (ArmorEnum)
+			{
+			case E_Armor::None:
+				{
+					return nullptr;
+				}
+			case E_Armor::Top:
+				{
+					ABaseEquippable* Helmet = GetWorld()->SpawnActor<ABaseEquippable>(EquippableClass, SpawnTransform, ActorSpawnParameters);
+					if (Helmet)
+					{
+						AHelmet_Armor* Helmet_Armor = Cast<AHelmet_Armor>(Helmet);
+						if (Helmet_Armor!=nullptr)
+						{
+							Helmet_Armor->InitializeItem(ItemRarity);
+
+							// 나중에 메쉬구하면 attach할 때 사용
+							//Helmet_Armor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandL_Axe"));	
+						}
+						if (InventoryComponents!=nullptr)
+						{
+							InventoryComponents->EquippedHelmet=Helmet;
+							
+						}
+						AHelmet_Armor* ArmorHelmet = Cast<AHelmet_Armor>(Helmet);
+						return ArmorHelmet;
+					}
+				}
+			default:
+				break;
+			}
+		}
+		
 	}
+	
 	return nullptr;
+		
 }
 
 

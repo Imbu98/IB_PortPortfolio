@@ -5,6 +5,7 @@
 #include "Animation/WidgetAnimation.h"
 #include "Components/Button.h"
 #include "Components/WidgetSwitcher.h"
+#include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "kismet/GameplayStatics.h"
 
 void UW_MainMenu::NativeConstruct()
@@ -19,6 +20,11 @@ void UW_MainMenu::NativeConstruct()
 	if (BTN_StartNewGame)
 	{
 		BTN_StartNewGame->OnClicked.AddDynamic(this, &ThisClass::OnClickStartButton);
+	}
+
+	if (BTN_StartLoadGame)
+	{
+		BTN_StartLoadGame->OnClicked.AddDynamic(this, &ThisClass::OnClickLoadGameButton);
 	}
 }
 
@@ -47,6 +53,11 @@ void UW_MainMenu::OnClickStartButton()
 	
 }
 
+void UW_MainMenu::OnClickLoadGameButton()
+{
+	UGameplayStatics::OpenLevel(GetWorld(),L_StartName);
+}
+
 UW_PopUp* UW_MainMenu::CreatePopup(const FText& PopUpMessage,const FText& LeftButtonText,const FText& RightButtonText)
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -73,7 +84,21 @@ UW_PopUp* UW_MainMenu::CreatePopup(const FText& PopUpMessage,const FText& LeftBu
 
 void UW_MainMenu::StartGame_Confirm()
 {
-	UGameplayStatics::OpenLevel(GetWorld(),L_StartName);
+	if (UGameplayStatics::DoesSaveGameExist(TEXT("Save1"),0))
+	{
+		UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>(GetWorld()->GetGameInstance());
+		if (IBGameInstance)
+		{
+			IBGameInstance->IBSaveGame=nullptr;
+		}
+		UGameplayStatics::DeleteGameInSlot("Save1", 0);
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+		{
+			UGameplayStatics::OpenLevel(GetWorld(), L_StartName);
+		}, 3.0f, false);
+	}
+	
 }
 
 void UW_MainMenu::StartGame_Cancel()
