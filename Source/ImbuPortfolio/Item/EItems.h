@@ -21,10 +21,12 @@ enum class E_Weapon:uint8
 UENUM(BlueprintType)
 enum class E_Armor : uint8
 {
-	Top UMETA(DisplayName = "Top"),
-	Bottom UMETA(DisplayName = "Bottom"),
-	Middle UMETA(DisplayName = "Middle"),
-	None UMETA(DisplayName = "None")
+	None=0 UMETA(DisplayName = "None"),
+	Top=1 UMETA(DisplayName = "Top"),
+	Middle=2 UMETA(DisplayName = "Middle"),
+	Bottom=3 UMETA(DisplayName = "Bottom"),
+	
+	
 };
 
 UENUM(BlueprintType)

@@ -79,11 +79,9 @@ void UW_Slot::OnButtonClicked()
 	
 	W_Inventory = InventoryComponent->PlayerInventory;
 
-	if (Item.ItemType==E_ItemType::Weapon)
+	if (Item.ItemType==E_ItemType::Weapon||Item.ItemType==E_ItemType::Armor)
 	{
 		PlayerCharacter->Equip(Item, PlayerCharacter);
-		// rarity 넘겨줘야함
-
 	}
 	
 	ClearSlot();

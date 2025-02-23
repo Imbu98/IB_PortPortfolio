@@ -9,6 +9,7 @@
 #include "NiagaraComponent.h"
 #include "../Structure/DamageInfo.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Structure/Structure_ArmorProperty.h"
 #include "ImbuPortfolio/Structure/Structure_WeaponProperty.h"
 #include "ImbuPortfolio/Structure/Struct_ItemProperty.h"
 #include "Kismet/GameplayStatics.h"
@@ -396,9 +397,72 @@ void ABaseEquippable::SetAppearance()
 			break;
 		}
 	}
-	else if (ItemInfo.ItemType==E_ItemType::Potion)
+	// Set armor Appearance
+	else if (ItemInfo.ItemType==E_ItemType::Armor)
 	{
+		if (DT_Item==nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::SetAppearance] : DT_Item is null"));
+			return;
+		}
+		FItemStruct* ItemStruct= DT_Item->FindRow<FItemStruct>(TEXT("Helmet"),TEXT(""));
+		if (ItemStruct==nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::SetAppearance] : Sword Raw is null"));
+			return;
+		}
+		ItemInfo.WeaponNumber=ItemStruct->WeaponNumber;
+		ItemInfo.Stackable = ItemStruct->Stackable;
+		ItemInfo.ItemQuantity=ItemStruct->ItemQuantity;
+		switch (ItemInfo.ArmorType)
+		{
+		case E_Armor::Top:
+			{
+				ItemSKeletalMesh->SetSkeletalMesh(ItemProperty->HelemetSkeletalMesh);
 		
+				// switch by Helmet rarity
+				switch (ItemInfo.ItemRarity)
+				{
+				case E_ItemRarity::Common:
+					{
+						ItemInfo.Thumnail = ItemProperty->Common_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Common_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Rare:
+					{
+						ItemInfo.Thumnail = ItemProperty->Rare_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Rare_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Epic:
+					{
+						ItemInfo.Thumnail = ItemProperty->Epic_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Epic_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Legendary:
+					{
+						ItemInfo.Thumnail = ItemProperty->Legendary_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Legendary_Drop_Effect;
+						break;
+					}
+				default:
+					break;
+				}
+				case E_Armor::Middle:
+					{
+				
+					}
+			}
+		default:
+			break;
+		}
+	
+		
+		//스폰시에 스켈레탈 메쉬 구하면 활성화하기
+		
+			
 	}
 	
 	if (ItemDropEffect)
@@ -459,6 +523,59 @@ void ABaseEquippable::SetAxeWeight()
 		return;
 	}
 	ItemInfo.Weight=Str_WeaponProperty->Weight;
+
+}
+
+void ABaseEquippable::SetHelmetWeight()
+{
+	FName RowName;
+	if (HelmetDataTableRow.DataTable!=nullptr)
+	{
+		
+		switch (ItemInfo.ItemRarity)
+		{
+		case E_ItemRarity::None:
+			{
+				RowName =TEXT("");
+				break;
+			}
+		case E_ItemRarity::Common:
+			{
+				RowName =TEXT("Helmet_Common");
+				break;
+			}
+		case E_ItemRarity::Rare:
+			{
+				RowName =TEXT("Helmet_Rare");
+				break;
+			}
+		case E_ItemRarity::Epic:
+			{
+				RowName =TEXT("Helmet_Epic");
+				break;
+			}
+		case E_ItemRarity::Legendary:
+			{
+				RowName =TEXT("Helmet_Legendary");
+				break;
+			}
+		}
+	}
+	FStructure_ArmorProperty* Str_ArmorProperty = HelmetDataTableRow.DataTable->FindRow<FStructure_ArmorProperty>(RowName,FString(""));
+
+	if (Str_ArmorProperty==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ BaseEquippable::SetHelmetWeight] : Str_ArmorProperty Is Nullptr"));
+		return;
+	}
+	
+	FItemStruct* ItemStruct= DT_Item->FindRow<FItemStruct>(TEXT("Axe"),TEXT(""));
+	if (ItemStruct==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("[ABaseEquippable::SetAppearance] : Axe Raw is null"));
+		return;
+	}
+	ItemInfo.Weight=Str_ArmorProperty->Weight;
 
 }
 

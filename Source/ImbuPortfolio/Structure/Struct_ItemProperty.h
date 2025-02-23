@@ -52,6 +52,17 @@ public:
 	TObjectPtr<UNiagaraSystem> Epic_Drop_Effect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UNiagaraSystem> Legendary_Drop_Effect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<USkeletalMesh> HelemetSkeletalMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTexture2D> Common_Helmet_Texture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTexture2D> Rare_Helmet_Texture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTexture2D> Epic_Helmet_Texture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UTexture2D> Legendary_Helmet_Texture;
 	
 	
 };

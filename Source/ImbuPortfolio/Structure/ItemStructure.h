@@ -73,6 +73,7 @@ void Reset()
 		WeaponNumber=0;
 		ItemType = E_ItemType::None;
 		WeaponType=E_Weapon::None;
+		ArmorType=E_Armor::None;
 		ItemRarity=E_ItemRarity::None;
 		PotionSize=E_PotionSize::None;
 		Weight=0;
