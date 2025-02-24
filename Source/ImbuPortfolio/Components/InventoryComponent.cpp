@@ -87,34 +87,12 @@ void UInventoryComponent::ChangeWeapon(ABaseEquippable* MainWeapon)
 	}
 }
 
-void UInventoryComponent::Interaction()
+void UInventoryComponent::InteractionItem(AActor* Actor)
 {
-	FHitResult OutHit;
-	TArray<AActor*> ActorsToIgnore;
-	float InteractRadius = 100.0f;
-
-	// 장착한 아이템은 인터렉션 되지 않게
-	if (!EquippedWeapon.IsEmpty())
+	
+	if (Actor)
 	{
-		for (AActor* Actor : EquippedWeapon)
-		{
-			ActorsToIgnore.Add(Actor);
-		}
-	}
-	
-	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(GetOwner());
-	FVector VCharacterLocation = PlayerCharacter->GetActorLocation();
-	FVector VLocation = VCharacterLocation - FVector(0.f, 0.f, 50.f);
-
-	
-	bool Hit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), VLocation, VLocation, InteractRadius,
-		 UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
-
-	
-	if (Hit)
-	{
-		ABaseEquippable* RootedItem = Cast<ABaseEquippable>(OutHit.GetActor());
+		ABaseEquippable* RootedItem = Cast<ABaseEquippable>(Actor);
 
 		if (RootedItem!=nullptr)
 		{

@@ -67,6 +67,7 @@ public:
 
 public:	
 	virtual void ChangeWeapon(ABaseEquippable* MainWeapon) override;
-	virtual void Interaction() override;
+	UFUNCTION()
+	void InteractionItem(AActor* Actor);
 		
 };

@@ -3,6 +3,7 @@
 
 #include "ImbuPortfolio/Character/IBCharBase.h"
 #include "ImbuPortfolio/Components/InventoryComponent.h"
+#include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "ImbuPortfolio/Interface/GameMode_Interface.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -48,6 +49,11 @@ void APortal::NotifyActorBeginOverlap(AActor* OtherActor)
 					return;
 				}
 				IBChar->InventoryComponents->GetGold(GameMode_Interface->GetSaveReward_Gold());
+				UIBGameInstance* IGI=Cast<UIBGameInstance>(GetGameInstance());
+				if (IGI!=nullptr)
+				{
+					IGI->SaveGame();
+				}
 			}
 		}
 	}

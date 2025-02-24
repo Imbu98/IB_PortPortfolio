@@ -12,6 +12,7 @@
 
 class UInputAction;
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusInteracting)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusIdle)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDie)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
@@ -112,7 +113,7 @@ public:
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractRadius=20.f;
+	float InteractRadius=100.f;
 	UPROPERTY()
 	E_Weapon WeaponEnum;
 	UPROPERTY()

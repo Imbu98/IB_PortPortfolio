@@ -19,12 +19,15 @@
 #include "ImbuPortfolio/ETC/Cannon.h"
 #include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
+#include "ImbuPortfolio/NPC/IB_NPC.h"
 #include "Slate/SGameLayerManager.h"
 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusIdle, "Status.Idle", "Tag Character In Idle")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDie,"Status.Die","Tag Character In Die")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusAction,"Status.Action","Tag Character In Action")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attacking")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusInteracting,"Status.Interaction","Tag When Interaction")
+
 
 
 
@@ -124,6 +127,10 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AIBCharBase::Move(const FInputActionValue& Value)
 {
+	if (StateComponent->CurrentState==TAG_StatusInteracting)
+	{
+		return;
+	}
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
@@ -159,10 +166,63 @@ void AIBCharBase::Dodge()
 
 void AIBCharBase::Interact()
 {
-	if (InventoryComponents)
+	FHitResult OutHit;
+	TArray<AActor*> ActorsToIgnore;
+
+	ActorsToIgnore.Add(this);
+	// 장착한 아이템은 인터렉션 되지 않게
+	if (!InventoryComponents->EquippedWeapon.IsEmpty())
 	{
-		InventoryComponents->Interaction();
+		for (auto EquippedWeapon : InventoryComponents->EquippedWeapon)
+		{
+			ActorsToIgnore.Add(EquippedWeapon);
+		}
 	}
+	
+	
+	FVector VCharacterLocation = this->GetActorLocation();
+	FVector VLocation = VCharacterLocation - FVector(0.f, 0.f, 50.f);
+
+	
+	bool Hit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), VLocation, VLocation, InteractRadius,
+		 UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
+	if (Hit)
+	{
+		AActor* HitActor = OutHit.GetActor();
+		if (HitActor==nullptr)
+		{
+			return;
+		}
+		if (ACharacter* HitCharacter = Cast<ACharacter>(HitActor))
+		{
+			if (HitCharacter==nullptr)
+			{
+				return;
+			}
+			if (HitCharacter->GetClass()->ImplementsInterface(UAction_Interface::StaticClass()))
+			{
+				IAction_Interface* InteractionInterface = Cast<IAction_Interface>(HitCharacter);
+				if (InteractionInterface)
+				{
+					InteractionInterface->Interaction();
+				}
+			}
+		}
+		else if (ABaseEquippable* Item= Cast<ABaseEquippable>(HitActor))
+		{
+			if (InventoryComponents)
+			{
+					for (AActor* Actor : InventoryComponents->EquippedWeapon)
+					{
+						ActorsToIgnore.Add(Actor);
+					}
+				
+				InventoryComponents->InteractionItem(OutHit.GetActor());
+			}
+		}
+	}
+	
 	
 }
 
@@ -204,6 +264,7 @@ void AIBCharBase::Aim_Start()
 	{
 		IsAiming=true;
 		GetCharacterMovement()->bOrientRotationToMovement = false;
+		
 		UIBCharAnimInstance* IBCharAnimInstance = Cast<UIBCharAnimInstance>( GetMesh()->GetAnimInstance());
 		if (IBCharAnimInstance!=nullptr)
 		{

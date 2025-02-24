@@ -28,6 +28,8 @@ public:
 	float BossLevelProbability;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Reward)
 	float RewardGold=0;
+	UPROPERTY()
+	class UIBGameInstance* IBGameInstance;
 
 public:
 	UFUNCTION(BlueprintCallable)
