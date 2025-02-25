@@ -10,6 +10,6 @@ public class ImbuPortfolio : ModuleRules
 
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","UMG","GameplayTags" ,"AIModule","Niagara"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","UMG","GameplayTags" ,"AIModule","Niagara","TargetSystem"});
 	}
 }

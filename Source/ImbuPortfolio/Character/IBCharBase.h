@@ -7,6 +7,8 @@
 #include "GameplayTagContainer.h"
 #include "NativeGameplayTags.h"
 #include "ImbuPortfolio/Interface/DamageInterface.h"
+#include "TargetSystemComponent.h"
+#include "ImbuPortfolio/Item/Axe_Weapon.h"
 #include "IBCharBase.generated.h"
 
 
@@ -17,6 +19,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusIdle)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDie)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionDodge)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionBlock)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponAxeThrow)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponSwordSlash)
 
@@ -40,6 +44,8 @@ public:
 	class UStateComponent* StateComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UDamageSystemComponent* DamageSystemComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
+	class UTargetSystemComponent* TargetSystemComponent;
 
 protected:
 	FGameplayTagContainer GameplayContatiner;
@@ -87,6 +93,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_Aiming;
 	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_Blocking;
+	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_SKill1;
 
 	UFUNCTION(BlueprintCallable,Category="Input")
@@ -106,6 +114,10 @@ public:
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Aim_Completed();
 	UFUNCTION(BlueprintCallable,Category="Input")
+	void Blocking();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void EndBlocking();
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void Skill1();
 
 	
@@ -116,6 +128,15 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
 	UAnimMontage* AM_Dodge;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_Blocking;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_ParryAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_Stagger;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_HitReaction;
+
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -126,10 +147,22 @@ public:
 	FItemStruct ItemStruct;
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<ABaseEquippable> Equippable22;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,Category=combat)
 	bool IsAiming=false;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,Category=combat)
 	bool IsWeaponAttached=false;
+	UPROPERTY(EditAnywhere,Category=combat)
+	bool IsWithinParry;
+	UPROPERTY(EditAnywhere,Category=combat)
+	bool IsReactingToBlock;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float ParryAttackDamage;
+	UPROPERTY(EditAnywhere,Category=combat)
+	UParticleSystem* ParryEffect;
+	UPROPERTY(EditAnywhere,Category=combat)
+	TArray<AActor*> EnemyActors;
+	UPROPERTY(EditAnywhere,Category=combat)
+	TArray<FVector> EnemyActorLocation;
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cannon)
@@ -144,6 +177,10 @@ public:
 	FVector DefaultCameraOffset;
 	UPROPERTY(EditAnywhere)
 	FVector NearCannonCameraOffset;
+	UPROPERTY(EditAnywhere)
+	int32 CurrentTargetIndex;
+
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
 	FGameplayTagContainer ActiveWeaponTags;
@@ -156,6 +193,21 @@ public:
 	void SwitchController();
 	UFUNCTION()
 	void PlayFlyingAnimation();
+	
+	void PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate);
+	UFUNCTION()
+	void CallOnBlockingEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void CallOnParryEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void ParryAttack(AActor* AttackTarget);
+	
+	UPROPERTY()
+	AAxe_Weapon* Axe;
+	
+	FOnMontageEnded OnBlockingEnded;
+	FOnMontageEnded OnParryEnded;
+	
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
@@ -178,6 +230,8 @@ public:
 	void ResetAttack();
 	UFUNCTION()
 	virtual void DamageResponse(E_DamageResponse DamageResponse) override;
+	UFUNCTION()
+	virtual void OnBlocked(bool CanBeParried, AActor* DamageCursor) override;
 
 
 
@@ -193,3 +247,5 @@ public:
 	virtual float SetHealth() override;
 
 };
+
+

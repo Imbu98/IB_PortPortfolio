@@ -47,7 +47,10 @@ public:
 	float Weight;
 	
 
-	FItemStruct():ItemName(FText::FromString(TEXT("")))
+	FItemStruct():
+	UniqueId(0,0,0,0)
+	,ItemID(0)
+	,ItemName(FText::FromString(TEXT("")))
 	, Stackable(false)
 	, ItemQuantity(0)
 	,Thumnail(nullptr)
@@ -65,6 +68,8 @@ public:
 
 void Reset()
 	{
+		UniqueId=FGuid(0,0,0,0);
+		ItemID=0;
 		ItemName = FText::FromString(TEXT(""));
 		Stackable = false;
 		ItemQuantity = 0;

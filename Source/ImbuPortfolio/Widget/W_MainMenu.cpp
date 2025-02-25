@@ -89,9 +89,10 @@ void UW_MainMenu::StartGame_Confirm()
 		UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>(GetWorld()->GetGameInstance());
 		if (IBGameInstance)
 		{
-			IBGameInstance->IBSaveGame=nullptr;
+			IBGameInstance->IsNewGame=true;
+			UGameplayStatics::DeleteGameInSlot("Save1", 0);
 		}
-		UGameplayStatics::DeleteGameInSlot("Save1", 0);
+		
 		FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
 		{

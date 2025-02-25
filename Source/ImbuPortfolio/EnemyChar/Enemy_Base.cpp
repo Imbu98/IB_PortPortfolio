@@ -145,9 +145,25 @@ void AEnemy_Base::OnDeath()
 
 void AEnemy_Base::DamageResponse(E_DamageResponse DamageResponse)
 {
-	if (DamageResponseMontage)
+	switch (DamageResponse)
 	{
-		PlayAnimMontage(DamageResponseMontage);
+		case E_DamageResponse::None:
+			{
+				
+			}break;
+		case E_DamageResponse::Stagger:
+			{
+				PlayAnimMontage(AM_Stagger);
+			}break;
+		case E_DamageResponse::HitReaction:
+			{
+			PlayAnimMontage(AM_HitReaction);
+			}break;
+	default:
+			{
+				
+			}break;
+			
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "EnemyHp:%f is Remain"),DamageSystemComponent->CurrentHealth));
 	EnemyHealthBar->UpdateHealthBar(this);

@@ -61,3 +61,28 @@ void AAxe_Weapon::InitializeItem(E_ItemRarity ItemRarity)
 	
 }
 
+void AAxe_Weapon::MoveTo(FVector NewTargetLocation, FOnAxeMoveComplete OnCompleteCallback)
+{
+	TargetLocation = NewTargetLocation;
+	OnComplete = OnCompleteCallback;
+	GetWorldTimerManager().SetTimer(MoveTimer, this, &ThisClass::MoveStep, 0.01f, true);
+}
+
+void AAxe_Weapon::MoveStep()
+{
+	FVector CurrentLocation = GetActorLocation();
+	FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
+	FVector NewLocation = CurrentLocation + Direction * Speed * 0.01f;
+
+	SetActorLocation(NewLocation);
+
+	if (FVector::Dist(NewLocation, TargetLocation) < 10.0f)
+	{
+		GetWorldTimerManager().ClearTimer(MoveTimer);
+		if (OnComplete.IsBound())
+		{
+			OnComplete.Execute();
+		}
+	}
+}
+

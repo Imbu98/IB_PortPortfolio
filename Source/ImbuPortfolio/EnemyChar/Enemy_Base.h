@@ -102,11 +102,14 @@ protected:
 	FOnMontageEnded EnemyAttackEnded;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
-	TObjectPtr<UAnimMontage> DamageResponseMontage;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
 	TObjectPtr<UAnimMontage> DeathMontage;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
+	TObjectPtr<UAnimMontage> AM_HitReaction;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
+	TObjectPtr<UAnimMontage> AM_Stagger;
+	
 	UPROPERTY()
 	UBTT_EnemyAttack* EnemyAttackTask;
 

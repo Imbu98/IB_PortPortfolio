@@ -4,6 +4,8 @@
 #include "BaseEquippable.h"
 #include "Axe_Weapon.generated.h"
 
+DECLARE_DELEGATE(FOnAxeMoveComplete);
+
 UCLASS()
 class IMBUPORTFOLIO_API AAxe_Weapon : public ABaseEquippable
 {
@@ -31,6 +33,19 @@ public:
 
 public:
 	void InitializeItem(E_ItemRarity ItemRarity);
+
+	void MoveTo(FVector TargetLocation, FOnAxeMoveComplete OnCompleteCallback);
+
+	UPROPERTY()
+	FVector TargetLocation;
+	UPROPERTY()
+	float Speed = 800.0f;
+	
+	FOnAxeMoveComplete OnComplete;
+
+	FTimerHandle MoveTimer;
+
+	void MoveStep();
 	
 	
 

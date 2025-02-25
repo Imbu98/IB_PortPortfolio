@@ -21,7 +21,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-protected:
+public:
 	bool IsInvincible;
 	bool IsDead;
 	bool IsInterruptible=true;
