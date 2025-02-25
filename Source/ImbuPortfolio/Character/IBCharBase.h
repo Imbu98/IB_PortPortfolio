@@ -17,6 +17,8 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusIdle)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDie)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponAxeThrow)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponSwordSlash)
 
 
 UCLASS()
@@ -84,6 +86,8 @@ public:
 	UInputAction* IA_IBChar_Attack;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_Aiming;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_SKill1;
 
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
@@ -101,6 +105,8 @@ public:
 	void Aim_Start();
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Aim_Completed();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void Skill1();
 
 	
 public:
@@ -138,7 +144,13 @@ public:
 	FVector DefaultCameraOffset;
 	UPROPERTY(EditAnywhere)
 	FVector NearCannonCameraOffset;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
+	FGameplayTagContainer ActiveWeaponTags;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
+	UAnimMontage* AxeSkill1Montage;
+	
 public:
 	UFUNCTION()
 	void SwitchController();
@@ -173,7 +185,7 @@ public:
 	UFUNCTION()
 	void UnEquip();
 	UFUNCTION()
-	ABaseEquippable* SpawnAndAttachWeapon(int32 WeaponNumber,TSubclassOf<ABaseEquippable> WeaponClass,AActor* Caller,E_ItemRarity ItemRarity) ;
+	ABaseEquippable* SpawnAndAttachWeapon(FItemStruct InventoryItemStruct,TSubclassOf<ABaseEquippable> EquippableClass,AActor* Caller,E_ItemRarity ItemRarity) ;
 
 public:
 	virtual void Equip(FItemStruct InventoryItemStruct, AActor* Caller) override;

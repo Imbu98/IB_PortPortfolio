@@ -33,6 +33,8 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Weapon)
 	TArray<TSubclassOf<ABaseEquippable>> WeaponArray;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Armor)
+	TArray<TSubclassOf<ABaseEquippable>> ArmorArray;
 
 public:
 	ABaseEquippable* GetMainWeapon() { return MainWeapon; }

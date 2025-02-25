@@ -35,6 +35,9 @@ public:
 	void OnClickExit();
 	UFUNCTION()
 	void OnClickStartButton();
+	UFUNCTION()
+	void OnClickLoadGameButton();
+	
 
 	
 	

@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Weapon")
 	float RetrieveWeaponIndex=0; // 장착해제후 다시 인벤토리로 들여보낼 무기 인덱스
 
+	UPROPERTY(BlueprintReadWrite,Category="Armor")
+	ABaseEquippable* EquippedHelmet;
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int64 InventorySize=12; // 인벤토리 슬롯 개수
 
@@ -45,6 +48,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	FItemStruct EquippedWeaponInfo;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	FItemStruct EquippedHelmetInfo;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float InventoryGoldAmount;
@@ -62,6 +67,14 @@ public:
 	void LoadInventory();
 	UFUNCTION()
 	void GetGold(float Gold);
+	UFUNCTION()
+	void UnEquipWeapon();
+	UFUNCTION()
+	void UnEquipHelmet();
+	UFUNCTION()
+	void UnEquipMiddle();
+	UFUNCTION()
+	void UnEquipBottmo();
 
 	FOnInventoryChanged OnInventoryUpdate;
 

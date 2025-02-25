@@ -41,37 +41,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UInventoryComponent::UnEquip()
 {
-	if (EquippedWeapon.IsEmpty())
-	{
-		return;
-	}
-	
-	TArray<ABaseEquippable*> WeaponsToDestroy = EquippedWeapon;
-	
-	for (ABaseEquippable* Equipable : WeaponsToDestroy)
-	{
-		if (Equipable)
-		{
-			Equipable->Destroy();
-		}
-	}
-	
-	if (EquippedWeapon[RetrieveWeaponIndex]!=nullptr)
-	{
-		ItemToInventory(EquippedWeapon[RetrieveWeaponIndex]);
-	}
-	
-	EquippedWeapon.Empty();
-	EquippedWeaponInfo.Reset();
-
-	OnInventoryUpdate.Broadcast();
-	
-	AIBCharBase* IBChar = Cast<AIBCharBase>(GetOwner());
-	if (IBChar!=nullptr)
-	{
-		IBChar->UnEquip();
-	}
-	
+	UnEquipWeapon();
 }
 
 
@@ -184,4 +154,67 @@ void UInventoryComponent::GetGold(float Gold)
 	PlayerInventory->LoadInventory(this);
 	OnInventoryUpdate.Broadcast();
 	
+}
+
+void UInventoryComponent::UnEquipWeapon()
+{
+	if (EquippedWeapon.IsEmpty())
+	{
+		return;
+	}
+	
+	TArray<ABaseEquippable*> WeaponsToDestroy = EquippedWeapon;
+	
+	for (ABaseEquippable* Equipable : WeaponsToDestroy)
+	{
+		if (Equipable)
+		{
+			Equipable->Destroy();
+		}
+	}
+	
+	if (EquippedWeapon[RetrieveWeaponIndex]!=nullptr)
+	{
+		ItemToInventory(EquippedWeapon[RetrieveWeaponIndex]);
+	}
+	AIBCharBase* IBChar = Cast<AIBCharBase>(GetOwner());
+	if (IBChar!=nullptr)
+	{
+		IBChar->UnEquip();
+	}
+	
+	EquippedWeapon.Empty();
+	EquippedWeaponInfo.Reset();
+
+	OnInventoryUpdate.Broadcast();
+	
+	
+}
+
+void UInventoryComponent::UnEquipHelmet()
+{
+	if (!EquippedHelmet)
+	{
+		return;
+	}
+	
+	if (EquippedHelmet)
+	{
+		EquippedHelmet->Destroy();
+		ItemToInventory(EquippedHelmet);
+	}
+	
+	EquippedHelmet=nullptr;
+	EquippedHelmetInfo.Reset();
+
+	OnInventoryUpdate.Broadcast();
+	
+}
+
+void UInventoryComponent::UnEquipMiddle()
+{
+}
+
+void UInventoryComponent::UnEquipBottmo()
+{
 }
