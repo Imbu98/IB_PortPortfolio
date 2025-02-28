@@ -6,9 +6,11 @@
 #include "../Structure/ItemStructure.h"
 #include "../Character/IBCharBase.h"
 #include "W_Inventory.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "Components\Button.h"
 #include "Components/TextBlock.h"
+#include "Kismet/KismetInputLibrary.h"
 #include "Widgets\Images\SImage.h"
 
 
@@ -38,7 +40,7 @@ void UW_Slot::NativePreConstruct()
 			}
 			
 		}
-		
+	
 	
 }
 
@@ -51,7 +53,6 @@ void UW_Slot::NativeConstruct()
 	{
 		
 		ItemSlot->OnClicked.RemoveDynamic(this, &UW_Slot::OnButtonClicked);
-
 		
 		ItemSlot->OnClicked.AddDynamic(this, &UW_Slot::OnButtonClicked);
 	}
@@ -117,4 +118,20 @@ void UW_Slot::ClearSlot()
 			}
 		}
 	}
+}
+
+FEventReply UW_Slot::OnMouseButtonDown(FGeometry const& MyGeometry, FPointerEvent const& MouseEvent)
+{
+	if (MouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	{
+		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Yellow,"Clicked");
+		return UWidgetBlueprintLibrary::Handled();
+	}
+	else if (MouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Right Mouse Button Down"));
+		return UWidgetBlueprintLibrary::Handled();
+	}
+
+	return Super::OnMouseButtonDown(MyGeometry, MouseEvent);
 }

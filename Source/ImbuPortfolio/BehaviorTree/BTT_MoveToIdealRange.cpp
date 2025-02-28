@@ -11,6 +11,8 @@ UBTT_MoveToIdealRange::UBTT_MoveToIdealRange()
 
 EBTNodeResult::Type UBTT_MoveToIdealRange::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	OwnerCompRef=&OwnerComp;
+	
 	AAIController* AIController = Cast<AAIController>(OwnerComp.GetOwner());
 	if (AIController==nullptr)
 	{
@@ -32,14 +34,27 @@ EBTNodeResult::Type UBTT_MoveToIdealRange::ExecuteTask(UBehaviorTreeComponent& O
 	{
 		AActor* AttackTarget = Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject("AttackTargetKey"));
 		float IdealRange = AIController->GetBlackboardComponent()->GetValueAsFloat("IdealRangeKey");
-		FVector TargetLocation = AttackTarget->GetActorLocation();
-		EPathFollowingRequestResult::Type Result= Enemy_Base_AIController->MoveToActor(AttackTarget,IdealRange);
-		
-		if (Result==EPathFollowingRequestResult::AlreadyAtGoal||Result==EPathFollowingRequestResult::Failed)
+		if (AttackTarget==nullptr)
 		{
-			return EBTNodeResult::Succeeded;
+			return EBTNodeResult::Failed;
+		}
+		FAIRequestID MoveRequestID = AIController->MoveToActor(AttackTarget, IdealRange, false);
+
+		// 이동 완료 이벤트 바인딩
+		//AIController->ReceiveMoveCompleted.BindUObject(&ThisClass::OnMoveCompleted);
+
+		return EBTNodeResult::InProgress;
+	}
+}
+
+	void UBTT_MoveToIdealRange::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+	{
+		if (Result.IsSuccess())
+		{
+			FinishLatentTask(*OwnerCompRef, EBTNodeResult::Succeeded);
+		}
+		else
+		{
+			FinishLatentTask(*OwnerCompRef, EBTNodeResult::Failed);
 		}
 	}
-	return EBTNodeResult::Failed;
-	
-}

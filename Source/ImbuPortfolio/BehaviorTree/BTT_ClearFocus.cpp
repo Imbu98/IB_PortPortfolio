@@ -11,7 +11,7 @@ EBTNodeResult::Type UBTT_ClearFocus::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 	AAIController* AIController= Cast<AAIController>(OwnerComp.GetOwner());
 	if (AIController)
 	{
-		AIController->ClearFocus(EAIFocusPriority::Default);
+		AIController->ClearFocus(EAIFocusPriority::Gameplay);
 		
 		return EBTNodeResult::Succeeded;
 	}

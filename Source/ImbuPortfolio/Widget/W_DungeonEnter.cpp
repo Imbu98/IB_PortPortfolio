@@ -2,6 +2,8 @@
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -28,9 +30,11 @@ void UW_DungeonEnter::NativeConstruct()
 	
 	BTN_EnterTempleDragon->OnClicked.Clear();
 	BTN_EnterCaveRuin->OnClicked.Clear();
+	BTN_Close->OnClicked.Clear();
 	
 	BTN_EnterTempleDragon->OnClicked.AddDynamic(this,&ThisClass::EnterTempleDragon);
 	BTN_EnterCaveRuin->OnClicked.AddDynamic(this,&ThisClass::EnterCaveRuin);
+	BTN_Close->OnClicked.AddDynamic(this,&ThisClass::CloseWidget);
 }
 
 void UW_DungeonEnter::EnterTempleDragon()
@@ -61,6 +65,18 @@ void UW_DungeonEnter::EnterCaveRuin()
 	{
 		UGameplayStatics::OpenLevel(GetWorld(),TEXT("L_CaveRuins"));	
 		IBGameInstance->IGI_DungeonTicket-=1;
+	}
+	
+}
+
+void UW_DungeonEnter::CloseWidget()
+{
+	AIBCharBase* IBChar =Cast<AIBCharBase>( GetOwningPlayer()->GetCharacter());
+	if (IBChar!=nullptr)
+	{
+		IBChar->StateComponent->SetState(TAG_StatusIdle);
+		GetOwningPlayer()->bShowMouseCursor=false;
+		RemoveFromParent();
 	}
 	
 }

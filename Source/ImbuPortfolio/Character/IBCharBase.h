@@ -9,6 +9,7 @@
 #include "ImbuPortfolio/Interface/DamageInterface.h"
 #include "TargetSystemComponent.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
+#include "MotionWarpingComponent.h"
 #include "IBCharBase.generated.h"
 
 
@@ -46,6 +47,10 @@ public:
 	class UDamageSystemComponent* DamageSystemComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UTargetSystemComponent* TargetSystemComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
+	class UMotionWarpingComponent* MotionWarpingComponent;
+	
+	
 
 protected:
 	FGameplayTagContainer GameplayContatiner;
@@ -96,6 +101,8 @@ public:
 	UInputAction* IA_IBChar_Blocking;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_SKill1;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_AngerState;
 
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
@@ -119,7 +126,10 @@ public:
 	void EndBlocking();
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Skill1();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void AngerState();
 
+	
 	
 public:
 	FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -136,11 +146,13 @@ public:
 	UAnimMontage* AM_Stagger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
 	UAnimMontage* AM_HitReaction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_BeginAngerSate;
 
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractRadius=100.f;
+	float InteractRadius=300.f;
 	UPROPERTY()
 	E_Weapon WeaponEnum;
 	UPROPERTY()
@@ -163,6 +175,36 @@ public:
 	TArray<AActor*> EnemyActors;
 	UPROPERTY(EditAnywhere,Category=combat)
 	TArray<FVector> EnemyActorLocation;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float DodgeDistance;
+	
+	UPROPERTY(EditAnywhere,Category=combat)
+	float MaxAngerAmount;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float CurrentAngerAmount;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float AttackRate=1.0f;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float OriginalMaxWalkSpeed;
+	UPROPERTY(EditAnywhere,Category=combat)
+	bool IsInAngerState;
+	UPROPERTY(EditAnywhere,Category=combat)
+	UMaterial* AngerStateOverlayMaterial;
+	
+	UPROPERTY(EditAnywhere,Category=Equip)
+	UMaterialInstanceDynamic* LeftWeaponDynamicMaterial;
+	UPROPERTY(EditAnywhere,Category=Equip)
+	UMaterialInstanceDynamic* RightWeaponDynamicMaterial;
+	UPROPERTY(EditAnywhere,Category=Equip)
+	class UTimelineComponent* Timeline; 
+	UPROPERTY(EditAnywhere,Category=Equip)
+	UCurveFloat* FloatCurve;
+
+	
+
+	UFUNCTION()
+	void TimelineUpdate(float Value);
+	
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cannon)
@@ -201,6 +243,16 @@ public:
 	void CallOnParryEnded(UAnimMontage* Montage, bool bInterrupted);
 	UFUNCTION()
 	void ParryAttack(AActor* AttackTarget);
+	UFUNCTION()
+	void HitCameraShake();
+	UFUNCTION()
+	void IncreaseAngerGauge(float Amount);
+	UFUNCTION()
+	void SetAngerStatus();
+	UFUNCTION()
+	void ResetStatus();
+	UFUNCTION()
+	void UpdatePlayerStatebar();
 	
 	UPROPERTY()
 	AAxe_Weapon* Axe;
@@ -232,6 +284,8 @@ public:
 	virtual void DamageResponse(E_DamageResponse DamageResponse) override;
 	UFUNCTION()
 	virtual void OnBlocked(bool CanBeParried, AActor* DamageCursor) override;
+	UFUNCTION()
+	virtual void Dodged() override;
 
 
 

@@ -43,5 +43,8 @@ public:
 	void OnButtonClicked();
 	UFUNCTION()
 	void ClearSlot();
+
+	
+	FEventReply OnMouseButtonDown(FGeometry const& MyGeometry, FPointerEvent const& MouseEvent);
 	
 };

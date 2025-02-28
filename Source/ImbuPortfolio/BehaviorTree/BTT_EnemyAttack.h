@@ -13,8 +13,16 @@ public:
 
 public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	
 
 public:
 	UPROPERTY(EditAnywhere)
-	UBehaviorTreeComponent* OwnerCompRef; 
+	UBehaviorTreeComponent* OwnerCompRef;
+UPROPERTY(EditAnywhere)
+	FBlackboardKeySelector DistanceToTargetRange;
+	UPROPERTY(EditAnywhere)
+	FBlackboardKeySelector AttackTarget;
+	
+	UPROPERTY(EditAnywhere)
+	bool IsAttacking;
 };

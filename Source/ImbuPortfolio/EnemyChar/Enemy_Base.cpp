@@ -6,8 +6,11 @@
 #include "../DefineDelegate.h"
 #include "Components/CapsuleComponent.h"
 #include "EntitySystem/MovieSceneEntitySystemRunner.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "ImbuPortfolio/BehaviorTree/BTT_EnemyAttack.h"
+#include "ImbuPortfolio/BehaviorTree/BTT_EnemyBossAttack.h"
+#include "ImbuPortfolio/Character/IBCharBase.h"
 #include "ImbuPortfolio/Enum/E_Enemy.h"
 #include "ImbuPortfolio/GameMode/CaveRuin_GameMode.h"
 #include "ImbuPortfolio/Interface/GameMode_Interface.h"
@@ -31,8 +34,7 @@ AEnemy_Base::AEnemy_Base()
 	
 	EnemyAttackEnded.BindUObject(this,&ThisClass::OnEnemyAttackEnded);
 
-	Widget=CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget"));
-	Widget->SetupAttachment(GetMesh());
+	
 
 	
 
@@ -49,6 +51,10 @@ void AEnemy_Base::BeginPlay()
 		EnemyHealthBar=CreateWidget<UW_EnemyHealthBar>(GetWorld(),WBP_HealthBar);
 		if (EnemyHealthBar!=nullptr)
 		{
+			if (Widget==nullptr)
+			{
+				return;
+			}
 			Widget->SetWidget(EnemyHealthBar);
 			EnemyHealthBar->SetVisibility(ESlateVisibility::Visible);
 		}
@@ -78,6 +84,7 @@ void AEnemy_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AEnemy_Base::OnDeath()
 {
+	// PlayerGoldReward
 	 AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
 	if (GameMode!=nullptr)
 	{
@@ -93,12 +100,10 @@ void AEnemy_Base::OnDeath()
 			RewardGold = FMath::RandRange(Reward_GoldMax,Reward_GoldMin);
 			GameMode_Interface->SaveReward_Gold(RewardGold);
 			GameMode_Interface->RemoveEnemyChar(this);
-			
-			
 		}
 	}
 	
-
+	// Death Animation
 	if (DeathMontage)
 	{
 		PlayAnimMontage(DeathMontage);
@@ -124,22 +129,38 @@ void AEnemy_Base::OnDeath()
 			SpawnedItem->ItemImpulse();
 			
 		}
+		if (SpawnedItem->ItemInfo.ItemRarity==E_ItemRarity::Legendary)
+		{
+			if (SpawnEffectSystem)
+			{
+				FVector SpawnLocation = GetActorLocation(); // 현재 액터 위치
+				FRotator SpawnRotation = GetActorRotation();
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SpawnEffectSystem, SpawnLocation, SpawnRotation, true);
+			}
+		}
 		
 	}
 	
-	
+	// stop Ai Logic
 	AAIController* AIController=Cast<AAIController>(GetController());
 	if (AIController)
 	{
 		AEnemy_Base_AIController* Enemy_AIController = Cast<AEnemy_Base_AIController>(AIController);
 		if (Enemy_AIController!=nullptr)
 		{
-			Enemy_AIController->GetBrainComponent()->StopLogic(TEXT("Dead"));
-			Enemy_AIController->ClearFocus(EAIFocusPriority::LastFocusPriority);
 			GetMesh()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
+			Enemy_AIController->GetBrainComponent()->StopLogic(TEXT("Dead"));
+			Enemy_AIController->ClearFocus(EAIFocusPriority::LastFocusPriority);
+			
 			
 		}
+	}
+	// Increase Player AngerGague
+	AIBCharBase* IBChar = Cast<AIBCharBase>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	if (IBChar!=nullptr)
+	{
+		IBChar->IncreaseAngerGauge(AngerPoint);
 	}
 }
 
@@ -166,7 +187,11 @@ void AEnemy_Base::DamageResponse(E_DamageResponse DamageResponse)
 			
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "EnemyHp:%f is Remain"),DamageSystemComponent->CurrentHealth));
-	EnemyHealthBar->UpdateHealthBar(this);
+	if (EnemyHealthBar)
+	{
+		EnemyHealthBar->UpdateHealthBar(this);
+	}
+	
 }
 
 bool AEnemy_Base::TakeDamage(FDamageInfo& DamageInfo, AActor* Cursor)

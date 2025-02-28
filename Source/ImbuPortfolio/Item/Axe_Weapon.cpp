@@ -1,6 +1,5 @@
 #include "Axe_Weapon.h"
 
-#include "IDetailTreeNode.h"
 #include "../Structure/Structure_WeaponProperty.h"
 #include "Components\StaticMeshComponent.h"
 

@@ -17,6 +17,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,meta=(BindWidget))
 	UButton* BTN_EnterCaveRuin;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,meta=(BindWidget))
+	UButton* BTN_Close;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,meta=(BindWidget))
 	class UTextBlock* T_DungeonClearCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,meta=(BindWidget))
 	class UTextBlock* T_EnterTicket;
@@ -25,4 +27,6 @@ protected:
 	void EnterTempleDragon();
 	UFUNCTION()
 	void EnterCaveRuin();
+	UFUNCTION()
+	void CloseWidget();
 };

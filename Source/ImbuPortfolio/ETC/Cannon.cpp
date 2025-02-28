@@ -151,7 +151,7 @@ void ACannon::ShootChar()
 				
 				FVector ForwardVector = CannonMuzzle->GetForwardVector()*(CurrentCannonPower);
 				//FVector UpVector = CannonMuzzle->GetUpVector()*(CurrentCannonPower);
-				FVector ShootingVector = (ForwardVector*100.f)/(ApplyWeight/50.f);
+				FVector ShootingVector = (ForwardVector*100.f);//(ApplyWeight/50.f);
 				IBChar->SetActorLocation(CannonMuzzle->GetComponentLocation());
 				IBChar->LaunchCharacter(ShootingVector,true,true);
 				IBChar->SwitchController();

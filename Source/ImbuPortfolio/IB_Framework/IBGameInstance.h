@@ -41,7 +41,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 IGI_DungeonCurrentClearCount;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int32 IGI_DungeonMaxClearCount=10;
+	int32 IGI_DungeonMaxClearCount=2;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 IGI_DungeonTicket;
 

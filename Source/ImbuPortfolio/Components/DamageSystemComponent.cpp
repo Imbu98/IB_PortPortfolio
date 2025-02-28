@@ -89,7 +89,7 @@ bool UDamageSystemComponent::TakeDamage(FDamageInfo& DamageInfo, AActor* DamageC
 					GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "DamageInterface Is Null");
 					return false;
 				}
-				DamageInterface->OnDeath();
+				DamageInterface->Dodged();
 				return false;
 			}
 		default:
