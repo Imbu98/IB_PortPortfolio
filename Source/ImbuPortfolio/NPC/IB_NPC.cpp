@@ -30,29 +30,6 @@ void AIB_NPC::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void AIB_NPC::Interaction()
-{
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(),0);
-	if (PC==nullptr)
-	{
-		return;
-	}
-	AIBCharBase* IBChar = Cast<AIBCharBase>(PC->GetPawn());
-	if (IBChar)
-	{
-		IBChar->StateComponent->SetState(TAG_StatusInteracting);
-	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "NPCInteraction");
-	if (WBP_DungeonEnter)
-	{
-		DungeonEnterWidget=CreateWidget<UW_DungeonEnter>(PC,WBP_DungeonEnter);
-		if (DungeonEnterWidget)
-		{
-			DungeonEnterWidget->AddToViewport(0);
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
-		}
-	}
-}
 
 
 

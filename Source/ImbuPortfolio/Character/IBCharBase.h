@@ -8,7 +8,6 @@
 #include "NativeGameplayTags.h"
 #include "ImbuPortfolio/Interface/DamageInterface.h"
 #include "TargetSystemComponent.h"
-#include "ImbuPortfolio/Item/Axe_Weapon.h"
 #include "MotionWarpingComponent.h"
 #include "IBCharBase.generated.h"
 
@@ -20,13 +19,12 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusIdle)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDie)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
-<<<<<<< .merge_file_a18820
-=======
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionDodge)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionBlock)
->>>>>>> .merge_file_a20104
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionSkill1)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponAxeThrow)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponSwordSlash)
+
 
 
 UCLASS()
@@ -101,15 +99,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_Aiming;
 	UPROPERTY(EditAnywhere, Category = Input)
-<<<<<<< .merge_file_a18820
-	UInputAction* IA_IBChar_SKill1;
-=======
 	UInputAction* IA_IBChar_Blocking;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_SKill1;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_AngerState;
->>>>>>> .merge_file_a20104
 
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
@@ -128,17 +122,15 @@ public:
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Aim_Completed();
 	UFUNCTION(BlueprintCallable,Category="Input")
-<<<<<<< .merge_file_a18820
-	void Skill1();
-=======
 	void Blocking();
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void EndBlocking();
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Skill1();
 	UFUNCTION(BlueprintCallable,Category="Input")
+	void Skill1End();
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void AngerState();
->>>>>>> .merge_file_a20104
 
 	
 	
@@ -183,9 +175,9 @@ public:
 	UPROPERTY(EditAnywhere,Category=combat)
 	UParticleSystem* ParryEffect;
 	UPROPERTY(EditAnywhere,Category=combat)
-	TArray<AActor*> EnemyActors;
+	AActor* EnemyActor;
 	UPROPERTY(EditAnywhere,Category=combat)
-	TArray<FVector> EnemyActorLocation;
+	FVector EnemyActorLocation;
 	UPROPERTY(EditAnywhere,Category=combat)
 	float DodgeDistance;
 	
@@ -230,19 +222,18 @@ public:
 	FVector DefaultCameraOffset;
 	UPROPERTY(EditAnywhere)
 	FVector NearCannonCameraOffset;
-<<<<<<< .merge_file_a18820
-=======
 	UPROPERTY(EditAnywhere)
 	int32 CurrentTargetIndex;
 
 	
->>>>>>> .merge_file_a20104
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
 	FGameplayTagContainer ActiveWeaponTags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
-	UAnimMontage* AxeSkill1Montage;
+	UAnimMontage* AxeSkill1StartMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
+	UAnimMontage* AxeSkill1EndMontage;
 	
 public:
 	UFUNCTION()
@@ -269,7 +260,7 @@ public:
 	void UpdatePlayerStatebar();
 	
 	UPROPERTY()
-	AAxe_Weapon* Axe;
+	class AAxe_Weapon* Axe;
 	
 	FOnMontageEnded OnBlockingEnded;
 	FOnMontageEnded OnParryEnded;
