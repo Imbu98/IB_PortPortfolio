@@ -7,15 +7,24 @@
 #include "GameplayTagContainer.h"
 #include "NativeGameplayTags.h"
 #include "ImbuPortfolio/Interface/DamageInterface.h"
+#include "TargetSystemComponent.h"
+#include "ImbuPortfolio/Item/Axe_Weapon.h"
+#include "MotionWarpingComponent.h"
 #include "IBCharBase.generated.h"
 
 
 class UInputAction;
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusInteracting)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusIdle)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDie)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
+<<<<<<< .merge_file_a18820
+=======
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionDodge)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionBlock)
+>>>>>>> .merge_file_a20104
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponAxeThrow)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponSwordSlash)
 
@@ -39,6 +48,12 @@ public:
 	class UStateComponent* StateComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UDamageSystemComponent* DamageSystemComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
+	class UTargetSystemComponent* TargetSystemComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
+	class UMotionWarpingComponent* MotionWarpingComponent;
+	
+	
 
 protected:
 	FGameplayTagContainer GameplayContatiner;
@@ -86,7 +101,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_Aiming;
 	UPROPERTY(EditAnywhere, Category = Input)
+<<<<<<< .merge_file_a18820
 	UInputAction* IA_IBChar_SKill1;
+=======
+	UInputAction* IA_IBChar_Blocking;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_SKill1;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_AngerState;
+>>>>>>> .merge_file_a20104
 
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
@@ -105,8 +128,19 @@ public:
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Aim_Completed();
 	UFUNCTION(BlueprintCallable,Category="Input")
+<<<<<<< .merge_file_a18820
 	void Skill1();
+=======
+	void Blocking();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void EndBlocking();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void Skill1();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void AngerState();
+>>>>>>> .merge_file_a20104
 
+	
 	
 public:
 	FORCEINLINE  USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -115,20 +149,73 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
 	UAnimMontage* AM_Dodge;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_Blocking;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_ParryAttack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_Stagger;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_HitReaction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation) 
+	UAnimMontage* AM_BeginAngerSate;
+
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractRadius=20.f;
+	float InteractRadius=300.f;
 	UPROPERTY()
 	E_Weapon WeaponEnum;
 	UPROPERTY()
 	FItemStruct ItemStruct;
 	UPROPERTY(EditAnywhere)
 	TSoftClassPtr<ABaseEquippable> Equippable22;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,Category=combat)
 	bool IsAiming=false;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,Category=combat)
 	bool IsWeaponAttached=false;
+	UPROPERTY(EditAnywhere,Category=combat)
+	bool IsWithinParry;
+	UPROPERTY(EditAnywhere,Category=combat)
+	bool IsReactingToBlock;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float ParryAttackDamage;
+	UPROPERTY(EditAnywhere,Category=combat)
+	UParticleSystem* ParryEffect;
+	UPROPERTY(EditAnywhere,Category=combat)
+	TArray<AActor*> EnemyActors;
+	UPROPERTY(EditAnywhere,Category=combat)
+	TArray<FVector> EnemyActorLocation;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float DodgeDistance;
+	
+	UPROPERTY(EditAnywhere,Category=combat)
+	float MaxAngerAmount;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float CurrentAngerAmount;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float AttackRate=1.0f;
+	UPROPERTY(EditAnywhere,Category=combat)
+	float OriginalMaxWalkSpeed;
+	UPROPERTY(EditAnywhere,Category=combat)
+	bool IsInAngerState;
+	UPROPERTY(EditAnywhere,Category=combat)
+	UMaterial* AngerStateOverlayMaterial;
+	
+	UPROPERTY(EditAnywhere,Category=Equip)
+	UMaterialInstanceDynamic* LeftWeaponDynamicMaterial;
+	UPROPERTY(EditAnywhere,Category=Equip)
+	UMaterialInstanceDynamic* RightWeaponDynamicMaterial;
+	UPROPERTY(EditAnywhere,Category=Equip)
+	class UTimelineComponent* Timeline; 
+	UPROPERTY(EditAnywhere,Category=Equip)
+	UCurveFloat* FloatCurve;
+
+	
+
+	UFUNCTION()
+	void TimelineUpdate(float Value);
+	
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cannon)
@@ -143,6 +230,13 @@ public:
 	FVector DefaultCameraOffset;
 	UPROPERTY(EditAnywhere)
 	FVector NearCannonCameraOffset;
+<<<<<<< .merge_file_a18820
+=======
+	UPROPERTY(EditAnywhere)
+	int32 CurrentTargetIndex;
+
+	
+>>>>>>> .merge_file_a20104
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
 	FGameplayTagContainer ActiveWeaponTags;
@@ -155,6 +249,31 @@ public:
 	void SwitchController();
 	UFUNCTION()
 	void PlayFlyingAnimation();
+	
+	void PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate);
+	UFUNCTION()
+	void CallOnBlockingEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void CallOnParryEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION()
+	void ParryAttack(AActor* AttackTarget);
+	UFUNCTION()
+	void HitCameraShake();
+	UFUNCTION()
+	void IncreaseAngerGauge(float Amount);
+	UFUNCTION()
+	void SetAngerStatus();
+	UFUNCTION()
+	void ResetStatus();
+	UFUNCTION()
+	void UpdatePlayerStatebar();
+	
+	UPROPERTY()
+	AAxe_Weapon* Axe;
+	
+	FOnMontageEnded OnBlockingEnded;
+	FOnMontageEnded OnParryEnded;
+	
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
@@ -177,6 +296,10 @@ public:
 	void ResetAttack();
 	UFUNCTION()
 	virtual void DamageResponse(E_DamageResponse DamageResponse) override;
+	UFUNCTION()
+	virtual void OnBlocked(bool CanBeParried, AActor* DamageCursor) override;
+	UFUNCTION()
+	virtual void Dodged() override;
 
 
 
@@ -192,3 +315,5 @@ public:
 	virtual float SetHealth() override;
 
 };
+
+

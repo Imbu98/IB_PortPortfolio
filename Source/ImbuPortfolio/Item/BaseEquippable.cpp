@@ -120,6 +120,12 @@ void ABaseEquippable::SaveEquippedWeapon(ABaseEquippable* Weapon)
 
 void ABaseEquippable::OnHitActor(FHitResult HitResult)
 {
+	AIBCharBase* IBChar = Cast<AIBCharBase>(GetOwner());
+	if (IBChar != nullptr)
+	{
+		IBChar->HitCameraShake();
+		IBChar->IncreaseAngerGauge(HitAngerGauge);
+	}
 	if (HitResult.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass())==true)
 	{
 		IDamageInterface* DamageInterface=Cast<IDamageInterface>(HitResult.GetActor());
@@ -139,6 +145,12 @@ void ABaseEquippable::OnHitActor(FHitResult HitResult)
 				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),HitEffects,HitResult.Location,FRotator::ZeroRotator,FVector::ZeroVector,true);
 			
 			}
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.2f);
+			FTimerHandle TimerHandle;
+			GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.0f);
+			}, 0.02f, false);
 		}
 	}
 }
@@ -419,6 +431,7 @@ void ABaseEquippable::SetAppearance()
 		case E_Armor::Top:
 			{
 				ItemSKeletalMesh->SetSkeletalMesh(ItemProperty->HelemetSkeletalMesh);
+<<<<<<< .merge_file_a20124
 		
 				// switch by Helmet rarity
 				switch (ItemInfo.ItemRarity)
@@ -460,6 +473,49 @@ void ABaseEquippable::SetAppearance()
 		}
 	
 		
+=======
+		
+				// switch by Helmet rarity
+				switch (ItemInfo.ItemRarity)
+				{
+				case E_ItemRarity::Common:
+					{
+						ItemInfo.Thumnail = ItemProperty->Common_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Common_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Rare:
+					{
+						ItemInfo.Thumnail = ItemProperty->Rare_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Rare_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Epic:
+					{
+						ItemInfo.Thumnail = ItemProperty->Epic_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Epic_Drop_Effect;
+						break;
+					}
+				case E_ItemRarity::Legendary:
+					{
+						ItemInfo.Thumnail = ItemProperty->Legendary_Helmet_Texture;
+						ItemDropEffect=ItemProperty->Legendary_Drop_Effect;
+						break;
+					}
+				default:
+					break;
+				}
+				case E_Armor::Middle:
+					{
+				
+					}
+			}
+		default:
+			break;
+		}
+	
+		
+>>>>>>> .merge_file_a06516
 		//스폰시에 스켈레탈 메쉬 구하면 활성화하기
 		
 			
@@ -587,7 +643,7 @@ void ABaseEquippable::ItemImpulse()
 		
 		ItemSKeletalMesh->SetSimulatePhysics(true);
 		ItemSKeletalMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-		FVector RandomImpulseVector = FVector(FMath::RandRange(0.f,60.f),FMath::RandRange(0.f,60.f),FMath::RandRange(0.f,30.f));
+		FVector RandomImpulseVector = FVector(FMath::RandRange(30.f,60.f),FMath::RandRange(30.f,60.f),FMath::RandRange(30.f,30.f));
 		FVector Location = GetActorLocation();
 		ItemSKeletalMesh->AddImpulseAtLocation(RandomImpulseVector,Location);
 	}

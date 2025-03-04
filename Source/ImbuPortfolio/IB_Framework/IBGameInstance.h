@@ -36,7 +36,23 @@ public:
 	FItemStruct IGI_EquippedWeapon;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float IGI_InventoryGold;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 IGI_InventorySize;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 IGI_DungeonCurrentClearCount;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 IGI_DungeonMaxClearCount=2;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	int32 IGI_DungeonTicket;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool IsNewGame;
 
 	FCriticalSection SaveLoadLock;
-	
+
+public:
+	UFUNCTION()
+	void IncreaseDungeonClearCounting();
+	UFUNCTION()
+	void IGI_Initialize();
 };

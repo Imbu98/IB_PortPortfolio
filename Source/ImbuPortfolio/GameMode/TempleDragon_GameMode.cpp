@@ -15,7 +15,7 @@ void ATempleDragon_GameMode::BeginPlay()
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_Base::StaticClass(), GetEnemyChar);
 	
-	UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
+	IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
 	if (IBGameInstance)
 	{
 		IBGameInstance->LoadGame();
@@ -30,7 +30,9 @@ void ATempleDragon_GameMode::RemoveEnemyChar(AActor* EnemyActor)
 		EnemyActor->SetLifeSpan(7.0f);
 		if (GetEnemyChar.IsEmpty())
 		{
+			IBGameInstance->IncreaseDungeonClearCounting();
 			SpawnPortal();
+			
 			
 		}				
 		
@@ -54,8 +56,8 @@ void ATempleDragon_GameMode::SpawnPortal()
 		APortal* SpawnedPortal =  GetWorld()->SpawnActor<APortal>(Portal,SpawnTransform,SpawnParameters);
 		if (SpawnedPortal!=nullptr)
 		{
-			float TotalPorobability = StartLevelProbability+BossLevelProbability;
-			float LevelProbability= FMath::RandRange(0.0f,TotalPorobability);
+			float TotalProbability = StartLevelProbability+BossLevelProbability;
+			float LevelProbability= FMath::RandRange(0.0f,TotalProbability);
 			if (LevelProbability<=StartLevelProbability)
 			{
 				SpawnedPortal->OpenPortal(LevelToStart);

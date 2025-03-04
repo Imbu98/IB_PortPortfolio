@@ -4,6 +4,7 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Float.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "BTT_MoveToIdealRange.generated.h"
 
 UCLASS()
@@ -15,6 +16,11 @@ public:
 	UBTT_MoveToIdealRange();
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	
+	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
+
+	UPROPERTY(EditAnywhere)
+	UBehaviorTreeComponent* OwnerCompRef;
 
 	
 };

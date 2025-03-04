@@ -14,9 +14,14 @@
 #include "../Item/BaseEquippable.h"
 #include "../Item/EItems.h"
 #include "../Item/Axe_Weapon.h"
+#include "Shakes/LegacyCameraShake.h"
+#include "Camera/CameraShakeSourceComponent.h"
+#include "Components/TimelineComponent.h"
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
+#include "ImbuPortfolio/EnemyChar/Enemy_Base.h"
 #include "ImbuPortfolio/ETC/Cannon.h"
+#include "ImbuPortfolio/ETC/MyLegacyCameraShake.h"
 #include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
 #include "ImbuPortfolio/Item/Axe_Weapon.h"
 #include "ImbuPortfolio/Item/Helmet_Armor.h"
@@ -25,7 +30,14 @@
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusIdle, "Status.Idle", "Tag Character In Idle")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDie,"Status.Die","Tag Character In Die")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusAction,"Status.Action","Tag Character In Action")
-UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attacking")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionBlock,"Status.Action.Block","Tag When Blocking")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attack")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionDodge,"Status.Action.Dodge","Tag When Dodge")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusInteracting,"Status.Interaction","Tag When Interaction")
+
+
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponAxeThrow,"Weapon.Axe.Throw","Tag Axe Skill1")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponSwordSlash,"Weapon.Sword.Slash","Tag Sword Skill1")
 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponAxeThrow,"Weapon.Axe.Throw","Tag Axe Skill1")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponSwordSlash,"Weapon.Sword.Slash","Tag Sword Skill1")
@@ -59,6 +71,7 @@ AIBCharBase::AIBCharBase()
 	
 	DamageSystemComponent=CreateDefaultSubobject<UDamageSystemComponent>(TEXT("DamageSystemComponent"));
 
+<<<<<<< .merge_file_a06644
 	
 	FGameplayTagContainer AxeTags;
 	
@@ -66,8 +79,24 @@ AIBCharBase::AIBCharBase()
 	FGameplayTagContainer SwordTags;
 	
 
+=======
+	TargetSystemComponent=CreateDefaultSubobject<UTargetSystemComponent>(TEXT("TargetSystemComponent"));
+
+	MotionWarpingComponent=CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarpingComponent"));
+
+	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
+
+	
+>>>>>>> .merge_file_a03164
 	
 	
+	FGameplayTagContainer AxeTags;
+	
+	// Sword 무기의 태그들
+	FGameplayTagContainer SwordTags;
+
+	OnBlockingEnded.BindUObject(this,&ThisClass::CallOnBlockingEnded);
+	OnParryEnded.BindUObject(this,&ThisClass::CallOnParryEnded);
 	
 
 }
@@ -94,6 +123,14 @@ void AIBCharBase::BeginPlay()
 		Equip(IBGameInstance->IGI_EquippedWeapon,this);
 	}
 	
+if (Timeline)
+	{
+	
+	FOnTimelineFloat ProgressFunction;
+	ProgressFunction.BindUFunction(this, FName("TimelineUpdate"));
+	Timeline->AddInterpFloat(FloatCurve, ProgressFunction);
+	
+	}
 	
 	
 	
@@ -104,7 +141,17 @@ void AIBCharBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+	if (IsInAngerState)
+	{
+		CurrentAngerAmount-=DeltaTime*4.0f;
+		if (CurrentAngerAmount <= 0.0f)
+		{
+			CurrentAngerAmount = 0.0f;
+			
+			ResetStatus();
+		}
+		UpdatePlayerStatebar();
+	}
 
 }
 
@@ -129,9 +176,18 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Interact, ETriggerEvent::Started, this, &ThisClass::Interact);
 		EnhancedInputComponent->BindAction(IA_IBChar_OpenInventory, ETriggerEvent::Started, this, &ThisClass::OpenInventory);
 		EnhancedInputComponent->BindAction(IA_IBChar_Attack,ETriggerEvent::Started,this,&AIBCharBase::Attack);
-		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Triggered,this,&AIBCharBase::Aim_Start);
+		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Started,this,&AIBCharBase::Aim_Start);
 		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Completed,this,&AIBCharBase::Aim_Completed);
+<<<<<<< .merge_file_a06644
 		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
+=======
+		EnhancedInputComponent->BindAction(IA_IBChar_Blocking,ETriggerEvent::Started,this,&AIBCharBase::Blocking);
+		EnhancedInputComponent->BindAction(IA_IBChar_Blocking,ETriggerEvent::Completed,this,&AIBCharBase::EndBlocking);
+		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
+		EnhancedInputComponent->BindAction(IA_IBChar_AngerState,ETriggerEvent::Started,this,&AIBCharBase::AngerState);
+
+		
+>>>>>>> .merge_file_a03164
 		
 	}
 
@@ -139,6 +195,10 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AIBCharBase::Move(const FInputActionValue& Value)
 {
+	if (StateComponent->CurrentState==TAG_StatusInteracting||StateComponent->CurrentState==TAG_StatusActionDodge)
+	{
+		return;
+	}
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	if (Controller != nullptr)
 	{
@@ -151,12 +211,15 @@ void AIBCharBase::Move(const FInputActionValue& Value)
 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+		
+		
 	}
+	
 }
 
 void AIBCharBase::Look(const FInputActionValue& Value)
 {
-	if (IsNearCannon)
+	if (IsNearCannon||StateComponent->CurrentState==TAG_StatusInteracting)
 	{
 		return;
 	}
@@ -167,17 +230,107 @@ void AIBCharBase::Look(const FInputActionValue& Value)
 
 void AIBCharBase::Dodge()
 {
+	if (StateComponent->CurrentState==TAG_StatusActionDodge||GetCharacterMovement()->IsFalling())
+	{
+		return;
+	}
+	if (GetLastMovementInputVector().Length() <=0)
+	{
+		return;
+	}
+	
+	if (bUseControllerRotationYaw==true)
+	{
+		bUseControllerRotationYaw = false;
+	}
+	
+	FVector CurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
+	FVector IBAcceleration2D=FVector(CurrentAcceleration.X,CurrentAcceleration.Y,0);
+	
+	IBAcceleration2D.Normalize(); // 방향을 정규화
+	
+	FRotator NewRotation = IBAcceleration2D.Rotation();
+	// 캐릭터가 해당 방향을 바라보도록 설정
+	SetActorRotation(NewRotation);
+	
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [IBAcceleration2D,this]()
+		{
+		LaunchCharacter(IBAcceleration2D * DodgeDistance, true, true); // 1000.0f 값은 속도 조절 가능
+		}, 0.1f, false);
+	
+	FVector DodgePoint = IBAcceleration2D*DodgeDistance;
+	
+	MotionWarpingComponent->AddOrUpdateWarpTargetFromLocationAndRotation(TEXT("Dodge"),DodgePoint,GetActorRotation());
+
+	
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Play(AM_Dodge);
+	AnimInstance->Montage_Play(AM_Dodge,AttackRate);
+	StateComponent->SetState(TAG_StatusActionDodge);
+	
 	
 }
 
 void AIBCharBase::Interact()
 {
-	if (InventoryComponents)
-	{
-		InventoryComponents->Interaction();
-	}
+    FHitResult OutHit;
+    TArray<AActor*> ActorsToIgnore;
+
+    ActorsToIgnore.Add(this);
+    // 장착한 아이템은 인터렉션 되지 않게
+    if (!InventoryComponents->EquippedWeapon.IsEmpty())
+    {
+        for (auto EquippedWeapon : InventoryComponents->EquippedWeapon)
+        {
+            ActorsToIgnore.Add(EquippedWeapon);
+        }
+    }
+    
+    
+    FVector VCharacterLocation = this->GetActorLocation();
+    FVector VLocation = VCharacterLocation - FVector(0.f, 0.f, 50.f);
+
+    
+    bool Hit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), VLocation, VLocation, InteractRadius,
+         UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
+    GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
+    if (Hit)
+    {
+        AActor* HitActor = OutHit.GetActor();
+        if (HitActor==nullptr)
+        {
+            return;
+        }
+        if (ACharacter* HitCharacter = Cast<ACharacter>(HitActor))
+        {
+            if (HitCharacter==nullptr)
+            {
+                return;
+            }
+            if (HitCharacter->GetClass()->ImplementsInterface(UAction_Interface::StaticClass()))
+            {
+                IAction_Interface* InteractionInterface = Cast<IAction_Interface>(HitCharacter);
+                if (InteractionInterface)
+                {
+                    InteractionInterface->Interaction();
+                }
+            }
+        }
+        else if (ABaseEquippable* Item= Cast<ABaseEquippable>(HitActor))
+        {
+            if (InventoryComponents)
+            {
+                    for (AActor* Actor : InventoryComponents->EquippedWeapon)
+                    {
+                        ActorsToIgnore.Add(Actor);
+                    }
+                
+                InventoryComponents->InteractionItem(OutHit.GetActor());
+            }
+        }
+    }
+    
+    
 	
 }
 
@@ -224,6 +377,17 @@ void AIBCharBase::Aim_Start()
 		{
 			IBCharAnimInstance->ReceiveIBIsAiming(IsAiming);
 		}
+		if (TargetSystemComponent)
+		{
+			TargetSystemComponent->TargetActor();
+		}
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_Base::StaticClass(),EnemyActors);
+		
+		for (AActor* Enemy : EnemyActors)
+		{
+			EnemyActorLocation.Add(Enemy->GetActorLocation());
+		}
+		
 	}
 	
 }
@@ -240,9 +404,73 @@ void AIBCharBase::Aim_Completed()
 		{
 			IBCharAnimInstance->ReceiveIBIsAiming(IsAiming);
 		}
+		EnemyActors.Empty();
+		EnemyActorLocation.Empty();
 	}
 }
 
+void AIBCharBase::Blocking()
+{
+	if (AM_Blocking!=nullptr)
+	{
+		PlayMontageOnCompleted(AM_Blocking,OnBlockingEnded);
+	}
+	
+}
+
+void AIBCharBase::EndBlocking()
+{
+	CallOnBlockingEnded(AM_Blocking,false);
+}
+void AIBCharBase::Skill1()
+{
+	
+	
+	if (ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
+	{
+		if (AxeSkill1Montage)
+		{
+			PlayAnimMontage(AxeSkill1Montage);
+			InventoryComponents->RightWeapon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+			for (AActor* EnemyBase : EnemyActors)
+			{
+				InventoryComponents->RightWeapon->SetActorLocation(EnemyBase->GetActorLocation());
+			}
+			
+		}
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("You cannot throw an axe!"));
+	}
+}
+
+void AIBCharBase::AngerState()
+{
+	if (CurrentAngerAmount==MaxAngerAmount)
+	{
+		IsInAngerState=true;
+
+		if (AM_BeginAngerSate)
+		{
+			SetAngerStatus();
+		}
+	}
+	
+}
+
+void AIBCharBase::SetAngerStatus()
+{
+	OriginalMaxWalkSpeed=GetCharacterMovement()->MaxWalkSpeed;
+	GetMesh()->GetAnimInstance()->Montage_Play(AM_BeginAngerSate);
+	GetMesh()->SetOverlayMaterial(AngerStateOverlayMaterial);
+	AttackRate=1.5f;
+	StateComponent->SetState(TAG_StatusInteracting);
+	GetCharacterMovement()->MaxWalkSpeed=OriginalMaxWalkSpeed+300.0f;
+}
+
+<<<<<<< .merge_file_a06644
 void AIBCharBase::Skill1()
 {
 	if (ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
@@ -257,6 +485,14 @@ void AIBCharBase::Skill1()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You cannot throw an axe!"));
 	}
+=======
+void AIBCharBase::ResetStatus()
+{
+	AttackRate=1.0f;
+	GetCharacterMovement()->MaxWalkSpeed=OriginalMaxWalkSpeed;
+	IsInAngerState=false;
+	GetMesh()->SetOverlayMaterial(nullptr);
+>>>>>>> .merge_file_a03164
 }
 
 
@@ -295,7 +531,7 @@ void AIBCharBase::PerformAttack(float InAttackCount, FGameplayTag InAttackType)
 					StateComponent->SetState(TAG_StatusActionAttack);
 					StateComponent->SetCurrentAction(InAttackType);
 
-					PlayAnimMontage(CurrentAttackMontage);
+					PlayAnimMontage(CurrentAttackMontage,AttackRate);
 					CombatComponent->AttackCount++;
 					float AttackMontageCount= MainWeapon->AttackMontage.Num()-1;
 				
@@ -354,6 +590,34 @@ void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 	}
 	IB_PlayerController->UpdatePlayerStateBar();
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "Char:%f is Remain"),DamageSystemComponent->CurrentHealth));
+
+	switch (DamageResponse)
+	{
+	case E_DamageResponse::None:
+		{
+				
+		}break;
+	case E_DamageResponse::Stagger:
+		{
+			if (AM_Stagger)
+			{
+				PlayAnimMontage(AM_Stagger);
+			}
+		
+		}break;
+	case E_DamageResponse::HitReaction:
+		{
+			if (AM_HitReaction&&!GetMesh()->GetAnimInstance()->IsAnyMontagePlaying())
+			{
+				PlayAnimMontage(AM_HitReaction);
+			}
+		}break;
+	default:
+		{
+				
+		}break;
+			
+	}
 }
 
 
@@ -382,6 +646,19 @@ void AIBCharBase::Equip(FItemStruct InventoryItemStruct, AActor* Caller)
 						{
 							Equippables->OnEquipped();
 						}
+<<<<<<< .merge_file_a06644
+=======
+						if (InventoryComponents->EquippedWeapon[0])
+						{
+						    LeftWeaponDynamicMaterial = InventoryComponents->EquippedWeapon[0]->ItemSKeletalMesh->CreateDynamicMaterialInstance(0);
+							Timeline->PlayFromStart();
+						}
+						if (InventoryComponents->EquippedWeapon[1])
+						{
+							RightWeaponDynamicMaterial = InventoryComponents->EquippedWeapon[1]->ItemSKeletalMesh->CreateDynamicMaterialInstance(0);
+							Timeline->PlayFromStart();
+						}
+>>>>>>> .merge_file_a03164
 					
 						InventoryComponents->OnInventoryUpdate.Broadcast();
 					
@@ -452,6 +729,82 @@ bool AIBCharBase::TakeDamage(FDamageInfo& DamageInfo, AActor* Cursor)
 	
 }
 
+void AIBCharBase::OnBlocked(bool CanBeParried, AActor* DamageCursor)
+{
+	IsReactingToBlock=true;
+	if (AM_ParryAttack!=nullptr)
+	{
+		PlayMontageOnCompleted(AM_ParryAttack,OnParryEnded);
+	}
+	if (CanBeParried&&IsWithinParry)
+	{
+		ParryAttack(DamageCursor);
+	}
+}
+
+void AIBCharBase::Dodged()
+{
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.2f);
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, [this]()
+			{
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.0f);
+			}, 0.1f, false);
+}
+
+void AIBCharBase::ParryAttack(AActor* AttackTarget)
+{
+	FDamageInfo DamageInfo;
+	DamageInfo.DamageAmount= ParryAttackDamage;
+	DamageInfo.DamageType=E_DamageType::Melee;
+	DamageInfo.DamageResponse=E_DamageResponse::Stagger;
+	DamageInfo.ShouldDamageInvincible=false;
+	DamageInfo.CanBeBlocked=false;
+	DamageInfo.CanBeParried=false;
+	DamageInfo.ShouldForceInterrupt=true;
+	if (AttackTarget->GetClass()->ImplementsInterface(UDamageInterface::StaticClass())==true)
+	{
+		IDamageInterface* DamageInterface=Cast<IDamageInterface>(AttackTarget);
+		if (DamageInterface==nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("DamageInterface Is Null"));
+			return;
+		}
+			DamageInterface->TakeDamage(DamageInfo,AttackTarget);
+			if (ParryEffect!=nullptr)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ParryEffect,AttackTarget->GetActorLocation(),FRotator::ZeroRotator,FVector::ZeroVector,true);
+			
+			}
+		
+	}
+}
+
+void AIBCharBase::HitCameraShake()
+{
+		APlayerController* PlayerController= Cast<APlayerController>(GetController());
+		if (PlayerController!=nullptr)
+		{
+			PlayerController->ClientStartCameraShake(UMyLegacyCameraShake::StaticClass());
+		}
+}
+
+void AIBCharBase::IncreaseAngerGauge(float Amount)
+{
+	if (IsInAngerState)
+	{
+		return;
+	}
+	CurrentAngerAmount+=Amount;
+	if (CurrentAngerAmount>=MaxAngerAmount)
+	{
+		CurrentAngerAmount=MaxAngerAmount;
+	}
+		UpdatePlayerStatebar();
+	
+	
+}
+
 float AIBCharBase::SetHealth()
 {
 	return CharMaxHealth;
@@ -503,7 +856,11 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(FItemStruct InventoryItemStru
 					ABaseEquippable* Axe_L = GetWorld()->SpawnActor<ABaseEquippable>(EquippableClass, SpawnTransform, ActorSpawnParameters);
 					if (Axe_L)
 					{
+<<<<<<< .merge_file_a06644
 						AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_L);
+=======
+						 Axe = Cast<AAxe_Weapon>(Axe_L);
+>>>>>>> .merge_file_a03164
 						if (Axe!=nullptr)
 						{
 							Axe->InitializeItem(ItemRarity);
@@ -513,7 +870,11 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(FItemStruct InventoryItemStru
 					ABaseEquippable* Axe_R = GetWorld()->SpawnActor<ABaseEquippable>(EquippableClass, SpawnTransform, ActorSpawnParameters);
 					if (Axe_R)
 					{
+<<<<<<< .merge_file_a06644
 						AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_R);
+=======
+						Axe = Cast<AAxe_Weapon>(Axe_R);
+>>>>>>> .merge_file_a03164
 						if (Axe!=nullptr)
 						{
 							Axe->InitializeItem(ItemRarity);
@@ -588,6 +949,22 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(FItemStruct InventoryItemStru
 	
 	return nullptr;
 		
+<<<<<<< .merge_file_a06644
+=======
+}
+
+
+void AIBCharBase::TimelineUpdate(float Value)
+{
+	if (LeftWeaponDynamicMaterial)
+	{
+		LeftWeaponDynamicMaterial->SetScalarParameterValue("Bounds", Value);
+	}
+	if (RightWeaponDynamicMaterial)
+	{
+		RightWeaponDynamicMaterial->SetScalarParameterValue("Bounds", Value);
+	}
+>>>>>>> .merge_file_a03164
 }
 
 
@@ -640,7 +1017,52 @@ void AIBCharBase::PlayFlyingAnimation()
 		}
 	}
 	
+	
 }
+
+void AIBCharBase::PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate)
+{
+	
+		if (Montage)	
+		{
+			GetMesh()->GetAnimInstance()->Montage_Play(Montage);
+			GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(MontageEndDelegate,Montage);
+		}
+	
+	
+}
+
+void AIBCharBase::CallOnBlockingEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	DamageSystemComponent->IsBlocking=false;
+	StopAnimMontage();
+	IsWithinParry=false;
+	IsReactingToBlock=false;
+	StateComponent->ResetState();
+	
+}
+
+void AIBCharBase::CallOnParryEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	EndBlocking();
+	if (StateComponent==nullptr)
+	{
+		return;
+	}
+	StateComponent->ResetState();
+}
+
+
+void AIBCharBase::UpdatePlayerStatebar()
+{
+	AIB_PlayerController* IBPlayerController=Cast<AIB_PlayerController>(GetController());
+	if (IBPlayerController!=nullptr)
+	{
+		IBPlayerController->PlayerStateBar->UpdatePlayerStateBar(this);
+	}
+}
+
+
 
 void AIBCharBase::SetupGamePlayTag()
 {

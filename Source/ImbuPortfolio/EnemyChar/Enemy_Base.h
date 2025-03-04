@@ -5,7 +5,7 @@
 #include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
-#include "ImbuPortfolio/BehaviorTree/BTT_EnemyAttack.h"
+#include "ImbuPortfolio/BehaviorTree/BTT_EnemyBossAttack.h"
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/ETC/Spline.h"
@@ -32,7 +32,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-protected:
+public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Components")
 	UDamageSystemComponent* DamageSystemComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Components")
@@ -53,7 +53,15 @@ protected:
 	float Reward_GoldMax;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Reward)
 	float Reward_GoldMin;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Reward)
+	float AngerPoint;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UParticleSystemComponent* SpawnEffectComponent;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UParticleSystem* SpawnEffectSystem;
 
+	
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Character")
 	float EnemyMaxHealth;
@@ -102,12 +110,15 @@ protected:
 	FOnMontageEnded EnemyAttackEnded;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
-	TObjectPtr<UAnimMontage> DamageResponseMontage;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
 	TObjectPtr<UAnimMontage> AttackMontage;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
 	TObjectPtr<UAnimMontage> DeathMontage;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
+	TObjectPtr<UAnimMontage> AM_HitReaction;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Montages")
+	TObjectPtr<UAnimMontage> AM_Stagger;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UBTT_EnemyAttack* EnemyAttackTask;
 
 public:

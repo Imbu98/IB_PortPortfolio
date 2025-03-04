@@ -3,6 +3,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 #include "ImbuPortfolio/Enum/E_Enemy.h"
+#include "ImbuPortfolio/Interface/AI_Interface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Damage.h"
@@ -28,6 +29,23 @@ void AEnemy_Base_AIController::OnPossess(APawn* InPawn)
 
 	RunBehaviorTree(EnemyBehaviorTree);
 	BlackboardComponent= this->Blackboard;
+
+	if (InPawn==nullptr)
+	{
+		return;
+	}
+	if (InPawn->GetClass()->ImplementsInterface(UAI_Interface::StaticClass()))
+	{
+		IAI_Interface* AI_Interface = Cast<IAI_Interface>(InPawn);
+		if (AI_Interface)
+		{
+			float IdealAttackRange;
+			float DefendRadiusRange;
+			AI_Interface->GetIdealRange(IdealAttackRange,DefendRadiusRange);
+			BlackboardComponent->SetValueAsFloat(TEXT("DefendRadiusKey"),DefendRadiusRange);
+			BlackboardComponent->SetValueAsFloat(TEXT("IdealRangeKey"),IdealAttackRange);
+		}
+	}
 }
 
 void AEnemy_Base_AIController::ActorsPerceptionUpdated(const TArray<AActor*>& UpdatedActors)

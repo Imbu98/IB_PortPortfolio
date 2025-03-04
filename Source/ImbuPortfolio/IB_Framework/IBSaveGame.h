@@ -17,8 +17,17 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	FItemStruct SavedEquippedWeapon;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
+	int32 SavedInventorySize;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	float SavedInventoryGold;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
+	int32 SavedDungeonClearCount;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
+	int32 SavedDungeonTicket;
 	
 	
+public:
+	UFUNCTION()
+	void ISG_Initialize();
 	
 };

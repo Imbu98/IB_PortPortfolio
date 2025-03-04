@@ -5,7 +5,6 @@ void UAN_ResetAttack::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase
 	const FAnimNotifyEventReference& EventReference)
 {
 	
-	
 	AIBCharBase* IBChar =  Cast<AIBCharBase>(MeshComp->GetOwner());
 	if (IBChar==nullptr)
 	{

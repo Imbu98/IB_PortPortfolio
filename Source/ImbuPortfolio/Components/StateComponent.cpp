@@ -1,5 +1,6 @@
 #include "StateComponent.h"
 #include "GameplayTagContainer.h"
+#include "ImbuPortfolio/Character/IBCharBase.h"
 
 UStateComponent::UStateComponent()
 {
@@ -31,6 +32,7 @@ void UStateComponent::SetState(FGameplayTag NewState)
 
 void UStateComponent::ResetState()
 {
+	SetState(TAG_StatusIdle);
 }
 
 bool UStateComponent::IsCurrentStateEqualtoAny(TArray<FGameplayTag> StateToCheck)

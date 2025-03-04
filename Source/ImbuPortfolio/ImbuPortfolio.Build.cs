@@ -6,10 +6,10 @@ public class ImbuPortfolio : ModuleRules
 {
 	public ImbuPortfolio(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PrivateDependencyModuleNames.AddRange(new string[] { "AnimGraphRuntime"});
+		PrivateDependencyModuleNames.AddRange(new string[] { "AnimGraphRuntime", /*"PropertyEditor"*/ });
 
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","UMG","GameplayTags" ,"AIModule","Niagara"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","UMG","GameplayTags" ,"AIModule","Niagara","TargetSystem","MotionWarping","GameplayCameras","EngineCameras"});
 	}
 }

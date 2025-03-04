@@ -18,10 +18,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	UAIPerceptionComponent* AIPerceptionComponent;
 	
-private:
+public:
 	UPROPERTY()
 	UBlackboardComponent* BlackboardComponent;
-	UPROPERTY()
+	UPROPERTY(EditAnywhere,BluePrintReadWrite)
 	AActor* EnemyAttackTarget;
 	
 public:

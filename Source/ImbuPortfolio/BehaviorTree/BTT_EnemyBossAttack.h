@@ -1,0 +1,28 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "BehaviorTree/BTTaskNode.h"
+#include "BTT_EnemyBossAttack.generated.h"
+
+UCLASS()
+class IMBUPORTFOLIO_API UBTT_EnemyBossAttack : public UBTTaskNode
+{
+	GENERATED_BODY()
+public:
+	UBTT_EnemyBossAttack();
+
+public:
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	
+
+public:
+	UPROPERTY(EditAnywhere)
+	UBehaviorTreeComponent* OwnerCompRef;
+UPROPERTY(EditAnywhere)
+	FBlackboardKeySelector DistanceToTargetRange;
+	UPROPERTY(EditAnywhere)
+	FBlackboardKeySelector AttackTarget;
+	
+	UPROPERTY(EditAnywhere)
+	bool IsAttacking;
+};
