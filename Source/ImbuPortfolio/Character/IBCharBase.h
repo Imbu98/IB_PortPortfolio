@@ -8,7 +8,6 @@
 #include "NativeGameplayTags.h"
 #include "ImbuPortfolio/Interface/DamageInterface.h"
 #include "TargetSystemComponent.h"
-#include "ImbuPortfolio/Item/Axe_Weapon.h"
 #include "MotionWarpingComponent.h"
 #include "IBCharBase.generated.h"
 
@@ -22,8 +21,10 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionDodge)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionBlock)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionSkill1)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponAxeThrow)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponSwordSlash)
+
 
 
 UCLASS()
@@ -127,6 +128,8 @@ public:
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Skill1();
 	UFUNCTION(BlueprintCallable,Category="Input")
+	void Skill1End();
+	UFUNCTION(BlueprintCallable,Category="Input")
 	void AngerState();
 
 	
@@ -172,9 +175,9 @@ public:
 	UPROPERTY(EditAnywhere,Category=combat)
 	UParticleSystem* ParryEffect;
 	UPROPERTY(EditAnywhere,Category=combat)
-	TArray<AActor*> EnemyActors;
+	AActor* EnemyActor;
 	UPROPERTY(EditAnywhere,Category=combat)
-	TArray<FVector> EnemyActorLocation;
+	FVector EnemyActorLocation;
 	UPROPERTY(EditAnywhere,Category=combat)
 	float DodgeDistance;
 	
@@ -228,7 +231,9 @@ public:
 	FGameplayTagContainer ActiveWeaponTags;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
-	UAnimMontage* AxeSkill1Montage;
+	UAnimMontage* AxeSkill1StartMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
+	UAnimMontage* AxeSkill1EndMontage;
 	
 public:
 	UFUNCTION()
@@ -255,7 +260,7 @@ public:
 	void UpdatePlayerStatebar();
 	
 	UPROPERTY()
-	AAxe_Weapon* Axe;
+	class AAxe_Weapon* Axe;
 	
 	FOnMontageEnded OnBlockingEnded;
 	FOnMontageEnded OnParryEnded;

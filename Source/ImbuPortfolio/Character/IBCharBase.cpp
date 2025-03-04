@@ -32,6 +32,7 @@ UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDie,"Status.Die","Tag Character In Die"
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusAction,"Status.Action","Tag Character In Action")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionBlock,"Status.Action.Block","Tag When Blocking")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attack")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionSkill1,"Status.Action.Skill1","Tag When Skill1")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionDodge,"Status.Action.Dodge","Tag When Dodge")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusInteracting,"Status.Interaction","Tag When Interaction")
 
@@ -110,7 +111,7 @@ void AIBCharBase::BeginPlay()
 		Equip(IBGameInstance->IGI_EquippedWeapon,this);
 	}
 	
-if (Timeline)
+	if (Timeline)
 	{
 	
 	FOnTimelineFloat ProgressFunction;
@@ -169,7 +170,7 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Blocking,ETriggerEvent::Completed,this,&AIBCharBase::EndBlocking);
 		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
 		EnhancedInputComponent->BindAction(IA_IBChar_AngerState,ETriggerEvent::Started,this,&AIBCharBase::AngerState);
-
+		
 		
 		
 	}
@@ -179,6 +180,10 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void AIBCharBase::Move(const FInputActionValue& Value)
 {
 	if (StateComponent->CurrentState==TAG_StatusInteracting||StateComponent->CurrentState==TAG_StatusActionDodge)
+	{
+		return;
+	}
+	if (StateComponent->CurrentState==TAG_StatusActionSkill1)
 	{
 		return;
 	}
@@ -353,43 +358,45 @@ void AIBCharBase::Aim_Start()
 {
 	if (IsWeaponAttached==true)
 	{
-		IsAiming=true;
-		GetCharacterMovement()->bOrientRotationToMovement = false;
-		UIBCharAnimInstance* IBCharAnimInstance = Cast<UIBCharAnimInstance>( GetMesh()->GetAnimInstance());
-		if (IBCharAnimInstance!=nullptr)
+		if (IsAiming==false)
 		{
-			IBCharAnimInstance->ReceiveIBIsAiming(IsAiming);
-		}
-		if (TargetSystemComponent)
-		{
-			TargetSystemComponent->TargetActor();
-		}
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_Base::StaticClass(),EnemyActors);
+			IsAiming=true;
 		
-		for (AActor* Enemy : EnemyActors)
-		{
-			EnemyActorLocation.Add(Enemy->GetActorLocation());
-		}
 		
+			UIBCharAnimInstance* IBCharAnimInstance = Cast<UIBCharAnimInstance>( GetMesh()->GetAnimInstance());
+			if (IBCharAnimInstance!=nullptr)
+			{
+				IBCharAnimInstance->ReceiveIBIsAiming(IsAiming);
+			}
+			if (TargetSystemComponent)
+			{
+				TargetSystemComponent->TargetActor();
+				EnemyActor= TargetSystemComponent->GetLockedOnTargetActor();
+
+				if (EnemyActor)
+				{
+					EnemyActorLocation = EnemyActor->GetActorLocation();
+				}
+			}
+		
+		}
+		else if (IsAiming==true)
+		{
+			IsAiming=false;	
+			
+			if (TargetSystemComponent)
+			{
+				TargetSystemComponent->TargetLockOff();
+				EnemyActor=nullptr;
+				EnemyActorLocation=FVector(0.0f,0.0f,0.0f);
+			}
+		}
 	}
-	
 }
 
 void AIBCharBase::Aim_Completed()
 {
-	if (IsWeaponAttached==true)
-	{
-		IsAiming=false;
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-		
-		UIBCharAnimInstance* IBCharAnimInstance = Cast<UIBCharAnimInstance>( GetMesh()->GetAnimInstance());
-		if (IBCharAnimInstance!=nullptr)
-		{
-			IBCharAnimInstance->ReceiveIBIsAiming(IsAiming);
-		}
-		EnemyActors.Empty();
-		EnemyActorLocation.Empty();
-	}
+	
 }
 
 void AIBCharBase::Blocking()
@@ -407,25 +414,57 @@ void AIBCharBase::EndBlocking()
 }
 void AIBCharBase::Skill1()
 {
-	
-	
-	if (ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
+	if (StateComponent==nullptr)
 	{
-		if (AxeSkill1Montage)
+		return;
+	}
+	if (StateComponent->CurrentState.MatchesTag(TAG_StatusAction))
+	{
+		return;
+	}
+	if (EnemyActor!=nullptr&&ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
+	{
+		if (AxeSkill1StartMontage)
 		{
-			PlayAnimMontage(AxeSkill1Montage);
-			InventoryComponents->RightWeapon->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-			for (AActor* EnemyBase : EnemyActors)
+			PlayAnimMontage(AxeSkill1StartMontage);
+			if (InventoryComponents->RightWeapon)
 			{
-				InventoryComponents->RightWeapon->SetActorLocation(EnemyBase->GetActorLocation());
+				Axe = Cast<AAxe_Weapon>(InventoryComponents->RightWeapon);
+				if (Axe!=nullptr)
+				{
+					FVector MyLocation = GetActorLocation();
+					FVector TargetLocation = EnemyActor->GetActorLocation();
+
+					FVector Direction = (TargetLocation - MyLocation).GetSafeNormal();
+					FRotator LooKAtRotation = Direction.Rotation();
+					SetActorRotation(LooKAtRotation);
+					
+					StateComponent->SetState(TAG_StatusActionSkill1);
+					
+					Axe->ThrowToTarget(EnemyActor);
+					
+				}
+				
 			}
-			
 		}
 		
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You cannot throw an axe!"));
+	}
+}
+
+void AIBCharBase::Skill1End()
+{
+	if (AxeSkill1EndMontage)
+	{
+		PlayAnimMontage(AxeSkill1EndMontage);
+		Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));
+		if (StateComponent)
+		{
+			StateComponent->SetState(TAG_StatusIdle);
+		}
 	}
 }
 

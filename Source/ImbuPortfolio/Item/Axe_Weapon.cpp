@@ -2,19 +2,54 @@
 
 #include "../Structure/Structure_WeaponProperty.h"
 #include "Components\StaticMeshComponent.h"
+#include "GameFramework/RotatingMovementComponent.h"
 
 
 struct FStructure_WeaponProperty;
 
 AAxe_Weapon::AAxe_Weapon()
 {
+
+	MoveTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("MoveTimeline"));
+
+	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovement"));
+
 	
 }
 
 void AAxe_Weapon::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	if (MoveCurve)
+	{
+		if (MoveTimeline)
+		{
+	
+			FOnTimelineFloat ProgressFunction;
+			ProgressFunction.BindUFunction(this, FName("UpdateMovement"));
+			MoveTimeline->AddInterpFloat(MoveCurve, ProgressFunction);
+			
+
+			 FOnTimelineEvent FinishFunction;
+			 FinishFunction.BindUFunction(this, FName("OnReachedTarget"));
+			 MoveTimeline->SetTimelineFinishedFunc(FinishFunction);
+		
+	
+		}
+
+	
+	}
 }
+
+void AAxe_Weapon::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	
+	
+}
+
+
 
 void AAxe_Weapon::InitializeItem(E_ItemRarity ItemRarity)
 {
@@ -60,28 +95,70 @@ void AAxe_Weapon::InitializeItem(E_ItemRarity ItemRarity)
 	
 }
 
-void AAxe_Weapon::MoveTo(FVector NewTargetLocation, FOnAxeMoveComplete OnCompleteCallback)
+void AAxe_Weapon::ThrowToTarget(AActor* InTargetActor)
 {
-	TargetLocation = NewTargetLocation;
-	OnComplete = OnCompleteCallback;
-	GetWorldTimerManager().SetTimer(MoveTimer, this, &ThisClass::MoveStep, 0.01f, true);
+	if (!InTargetActor || !MoveCurve )
+	{
+		return;
+	}
+	
+	IsToActor=false;
+	
+	TargetActor = InTargetActor;
+	OwnerCharacter = Cast<ACharacter>(GetOwner());
+
+	StartLocation = OwnerCharacter->GetMesh()->GetSocketLocation(TEXT("HandR_Axe"));
+	AxeStartLocation = StartLocation;
+	TargetLocation = TargetActor->GetActorLocation();
+
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	MoveTimeline->PlayFromStart();
+
+	if (CollisionComponent)
+	{
+		CollisionComponent->EnableCollision();
+	}
+	
 }
 
-void AAxe_Weapon::MoveStep()
+void AAxe_Weapon::UpdateMovement(float Value)
 {
-	FVector CurrentLocation = GetActorLocation();
-	FVector Direction = (TargetLocation - CurrentLocation).GetSafeNormal();
-	FVector NewLocation = CurrentLocation + Direction * Speed * 0.01f;
-
-	SetActorLocation(NewLocation);
-
-	if (FVector::Dist(NewLocation, TargetLocation) < 10.0f)
+	if (IsToActor)
 	{
-		GetWorldTimerManager().ClearTimer(MoveTimer);
-		if (OnComplete.IsBound())
+		return;
+	}
+	NewLocation = FMath::Lerp(StartLocation, TargetLocation, Value);
+	SetActorLocation(NewLocation);
+	RotatingMovement->RotationRate = FRotator(0.0f	,0.0f, 720.0f);
+
+	if (StartLocation.Equals(TargetLocation, 150.0f) && !IsToActor)
+	{
+		AIBCharBase* IBChar = Cast<AIBCharBase>(OwnerCharacter);
+		if (IBChar)
 		{
-			OnComplete.Execute();
+			IsToActor=true;
+			RotatingMovement->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+			IBChar->Skill1End();
+			if (CollisionComponent)
+			{
+				CollisionComponent->DisableCollision();
+			}
+			
 		}
+		
 	}
 }
+
+void AAxe_Weapon::OnReachedTarget()
+{
+	if (!OwnerCharacter||IsToActor==true) return;
+	
+	StartLocation = GetActorLocation();
+	TargetLocation = OwnerCharacter->GetMesh()->GetSocketLocation(TEXT("HandR_Axe"));
+	
+	MoveTimeline->PlayFromStart();
+	
+}
+
 

@@ -20,13 +20,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
 
-	virtual void Interaction() override;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UUserWidget> WBP_DungeonEnter;
-	UPROPERTY()
-	class UW_DungeonEnter* DungeonEnterWidget;
+	
 };
 
 

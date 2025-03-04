@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "BaseEquippable.h"
+#include "Components/TimelineComponent.h"
+#include "ImbuPortfolio/Character/IBCharBase.h"
 #include "Axe_Weapon.generated.h"
 
 DECLARE_DELEGATE(FOnAxeMoveComplete);
@@ -11,10 +13,13 @@ class IMBUPORTFOLIO_API AAxe_Weapon : public ABaseEquippable
 {
 	GENERATED_BODY()
 
-public:
+protected:
 	AAxe_Weapon();
-	protected:
 	virtual void BeginPlay() override;
+public:
+	virtual void Tick(float DeltaTime) override;
+	
+	
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=ItemInfo)
@@ -34,21 +39,46 @@ public:
 public:
 	void InitializeItem(E_ItemRarity ItemRarity);
 
-	void MoveTo(FVector TargetLocation, FOnAxeMoveComplete OnCompleteCallback);
-
+	
+private:
+	UPROPERTY()
+	FVector StartLocation;
 	UPROPERTY()
 	FVector TargetLocation;
 	UPROPERTY()
-	float Speed = 800.0f;
+	FVector AxeStartLocation;
+	UPROPERTY()
+	FVector NewLocation;
+
+
+	UPROPERTY()
+	ACharacter* OwnerCharacter;
+	UPROPERTY()
+	AActor* TargetActor;
 	
-	FOnAxeMoveComplete OnComplete;
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UCurveFloat* MoveCurve;  
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UTimelineComponent* MoveTimeline;
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	class URotatingMovementComponent* RotatingMovement;
+	
+public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float MoveSpeed;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool IsToActor=false;
 
-	FTimerHandle MoveTimer;
-
-	void MoveStep();
+public:
+	UFUNCTION()
+	void ThrowToTarget(AActor* InTargetActor);
+	UFUNCTION()
+	void UpdateMovement(float Value);
+	UFUNCTION()
+	void OnReachedTarget();
 	
 	
-
-
+	
 
 };
+
