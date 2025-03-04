@@ -100,11 +100,8 @@ public:
 	float Weight;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float Defense;
-<<<<<<< HEAD
-=======
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float HitAngerGauge=0.0f;
->>>>>>> c66d87d30c2dc59d92cea4fb92b635d72d039f39
 
 public:
 	void SetIsEquipped(bool Equip) { IsEquipped = Equip; }

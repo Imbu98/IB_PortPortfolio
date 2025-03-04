@@ -2,6 +2,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "IBCharAnimInstance.h"
+#include "../../../../Unreal Engine/UE_5.5/Engine/Source/Runtime/Core/Public/Math/UnrealMathUtility.h"
+#include "../../../../Unreal Engine/UE_5.5/Engine/Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
+#include "../../../../Unreal Engine/UE_5.5/Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -14,6 +17,7 @@
 #include "../Item/BaseEquippable.h"
 #include "../Item/EItems.h"
 #include "../Item/Axe_Weapon.h"
+#include "../Widget/W_PlayerStateBar.h"
 #include "Shakes/LegacyCameraShake.h"
 #include "Camera/CameraShakeSourceComponent.h"
 #include "Components/TimelineComponent.h"
@@ -36,9 +40,6 @@ UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionSkill1,"Status.Action.Skill1","Ta
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionDodge,"Status.Action.Dodge","Tag When Dodge")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusInteracting,"Status.Interaction","Tag When Interaction")
 
-
-UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponAxeThrow,"Weapon.Axe.Throw","Tag Axe Skill1")
-UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponSwordSlash,"Weapon.Sword.Slash","Tag Sword Skill1")
 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponAxeThrow,"Weapon.Axe.Throw","Tag Axe Skill1")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_WeaponSwordSlash,"Weapon.Sword.Slash","Tag Sword Skill1")
@@ -72,15 +73,6 @@ AIBCharBase::AIBCharBase()
 	
 	DamageSystemComponent=CreateDefaultSubobject<UDamageSystemComponent>(TEXT("DamageSystemComponent"));
 
-<<<<<<< .merge_file_a06644
-	
-	FGameplayTagContainer AxeTags;
-	
-	// Sword 무기의 태그들
-	FGameplayTagContainer SwordTags;
-	
-
-=======
 	TargetSystemComponent=CreateDefaultSubobject<UTargetSystemComponent>(TEXT("TargetSystemComponent"));
 
 	MotionWarpingComponent=CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("MotionWarpingComponent"));
@@ -88,7 +80,6 @@ AIBCharBase::AIBCharBase()
 	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Timeline"));
 
 	
->>>>>>> .merge_file_a03164
 	
 	
 	FGameplayTagContainer AxeTags;
@@ -154,6 +145,18 @@ void AIBCharBase::Tick(float DeltaTime)
 		UpdatePlayerStatebar();
 	}
 
+	if (!ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
+	{
+		AxeSkill1_RemainingCooldown = FMath::Clamp(AxeSkill1_RemainingCooldown - DeltaTime, 0.0f, AxeSkill1_Cooldown);
+		float CalculateCooldown =FMath::Clamp(AxeSkill1_RemainingCooldown / AxeSkill1_Cooldown, 0.0f, 1.0f);
+		
+		AIB_PlayerController* IBPlayerController=Cast<AIB_PlayerController>(GetController());
+		if (IBPlayerController!=nullptr)
+		{
+			IBPlayerController->PlayerStateBar->WBP_Skill1_Icon->UpdateSkill1_Cooldown(CalculateCooldown);
+		}
+	}
+
 }
 
 void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -179,16 +182,12 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Attack,ETriggerEvent::Started,this,&AIBCharBase::Attack);
 		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Started,this,&AIBCharBase::Aim_Start);
 		EnhancedInputComponent->BindAction(IA_IBChar_Aiming,ETriggerEvent::Completed,this,&AIBCharBase::Aim_Completed);
-<<<<<<< .merge_file_a06644
-		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
-=======
 		EnhancedInputComponent->BindAction(IA_IBChar_Blocking,ETriggerEvent::Started,this,&AIBCharBase::Blocking);
 		EnhancedInputComponent->BindAction(IA_IBChar_Blocking,ETriggerEvent::Completed,this,&AIBCharBase::EndBlocking);
 		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
 		EnhancedInputComponent->BindAction(IA_IBChar_AngerState,ETriggerEvent::Started,this,&AIBCharBase::AngerState);
 		
 		
->>>>>>> .merge_file_a03164
 		
 	}
 
@@ -459,6 +458,12 @@ void AIBCharBase::Skill1()
 					StateComponent->SetState(TAG_StatusActionSkill1);
 					
 					Axe->ThrowToTarget(EnemyActor);
+
+					ActiveWeaponTags.RemoveTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw")));
+					FTimerHandle TimerHandle;
+					AxeSkill1_RemainingCooldown = AxeSkill1_Cooldown;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle,this,&AIBCharBase::AxeSkill1_CooldownReset,AxeSkill1_Cooldown);
+					
 					
 				}
 				
@@ -485,6 +490,12 @@ void AIBCharBase::Skill1End()
 	}
 }
 
+void AIBCharBase::AxeSkill1_CooldownReset()
+{
+	ActiveWeaponTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw")));
+	AxeSkill1_RemainingCooldown=0.0f;
+}
+
 void AIBCharBase::AngerState()
 {
 	if (CurrentAngerAmount==MaxAngerAmount)
@@ -509,29 +520,12 @@ void AIBCharBase::SetAngerStatus()
 	GetCharacterMovement()->MaxWalkSpeed=OriginalMaxWalkSpeed+300.0f;
 }
 
-<<<<<<< .merge_file_a06644
-void AIBCharBase::Skill1()
-{
-	if (ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
-	{
-		if (AxeSkill1Montage)
-		{
-			PlayAnimMontage(AxeSkill1Montage);
-		}
-		
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("You cannot throw an axe!"));
-	}
-=======
 void AIBCharBase::ResetStatus()
 {
 	AttackRate=1.0f;
 	GetCharacterMovement()->MaxWalkSpeed=OriginalMaxWalkSpeed;
 	IsInAngerState=false;
 	GetMesh()->SetOverlayMaterial(nullptr);
->>>>>>> .merge_file_a03164
 }
 
 
@@ -685,8 +679,6 @@ void AIBCharBase::Equip(FItemStruct InventoryItemStruct, AActor* Caller)
 						{
 							Equippables->OnEquipped();
 						}
-<<<<<<< .merge_file_a06644
-=======
 						if (InventoryComponents->EquippedWeapon[0])
 						{
 						    LeftWeaponDynamicMaterial = InventoryComponents->EquippedWeapon[0]->ItemSKeletalMesh->CreateDynamicMaterialInstance(0);
@@ -697,7 +689,6 @@ void AIBCharBase::Equip(FItemStruct InventoryItemStruct, AActor* Caller)
 							RightWeaponDynamicMaterial = InventoryComponents->EquippedWeapon[1]->ItemSKeletalMesh->CreateDynamicMaterialInstance(0);
 							Timeline->PlayFromStart();
 						}
->>>>>>> .merge_file_a03164
 					
 						InventoryComponents->OnInventoryUpdate.Broadcast();
 					
@@ -895,11 +886,7 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(FItemStruct InventoryItemStru
 					ABaseEquippable* Axe_L = GetWorld()->SpawnActor<ABaseEquippable>(EquippableClass, SpawnTransform, ActorSpawnParameters);
 					if (Axe_L)
 					{
-<<<<<<< .merge_file_a06644
-						AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_L);
-=======
 						 Axe = Cast<AAxe_Weapon>(Axe_L);
->>>>>>> .merge_file_a03164
 						if (Axe!=nullptr)
 						{
 							Axe->InitializeItem(ItemRarity);
@@ -909,11 +896,7 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(FItemStruct InventoryItemStru
 					ABaseEquippable* Axe_R = GetWorld()->SpawnActor<ABaseEquippable>(EquippableClass, SpawnTransform, ActorSpawnParameters);
 					if (Axe_R)
 					{
-<<<<<<< .merge_file_a06644
-						AAxe_Weapon* Axe = Cast<AAxe_Weapon>(Axe_R);
-=======
 						Axe = Cast<AAxe_Weapon>(Axe_R);
->>>>>>> .merge_file_a03164
 						if (Axe!=nullptr)
 						{
 							Axe->InitializeItem(ItemRarity);
@@ -988,8 +971,6 @@ ABaseEquippable* AIBCharBase::SpawnAndAttachWeapon(FItemStruct InventoryItemStru
 	
 	return nullptr;
 		
-<<<<<<< .merge_file_a06644
-=======
 }
 
 
@@ -1003,9 +984,7 @@ void AIBCharBase::TimelineUpdate(float Value)
 	{
 		RightWeaponDynamicMaterial->SetScalarParameterValue("Bounds", Value);
 	}
->>>>>>> .merge_file_a03164
 }
-
 
 void AIBCharBase::SwitchController()
 {
