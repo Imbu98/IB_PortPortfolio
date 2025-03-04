@@ -15,11 +15,15 @@ public:
 
 public:
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
-	TObjectPtr<class UProgressBar> PB_Skill1CoolDown;
+	class UProgressBar* PB_Skill1CoolDown;
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	TObjectPtr<class UImage> IMG_Skill1_Icon;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	class UTexture2D* IMG_AxeSkill1_Icon;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void UpdateSkill1_Cooldown(float Cooldown);
 	
 };

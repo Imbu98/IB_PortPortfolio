@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "W_Skill1_Icon.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ProgressBar.h"
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
@@ -18,6 +19,8 @@ public:
 	UProgressBar* PlayerStatminaBar;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
 	UProgressBar* PlayerAngerGaugeBar;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
+	class UW_Skill1_Icon* WBP_Skill1_Icon;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UDamageSystemComponent* DamageSystemComponent;
 	

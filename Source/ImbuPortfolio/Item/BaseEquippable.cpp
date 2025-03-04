@@ -431,7 +431,6 @@ void ABaseEquippable::SetAppearance()
 		case E_Armor::Top:
 			{
 				ItemSKeletalMesh->SetSkeletalMesh(ItemProperty->HelemetSkeletalMesh);
-<<<<<<< .merge_file_a20124
 		
 				// switch by Helmet rarity
 				switch (ItemInfo.ItemRarity)
@@ -473,49 +472,6 @@ void ABaseEquippable::SetAppearance()
 		}
 	
 		
-=======
-		
-				// switch by Helmet rarity
-				switch (ItemInfo.ItemRarity)
-				{
-				case E_ItemRarity::Common:
-					{
-						ItemInfo.Thumnail = ItemProperty->Common_Helmet_Texture;
-						ItemDropEffect=ItemProperty->Common_Drop_Effect;
-						break;
-					}
-				case E_ItemRarity::Rare:
-					{
-						ItemInfo.Thumnail = ItemProperty->Rare_Helmet_Texture;
-						ItemDropEffect=ItemProperty->Rare_Drop_Effect;
-						break;
-					}
-				case E_ItemRarity::Epic:
-					{
-						ItemInfo.Thumnail = ItemProperty->Epic_Helmet_Texture;
-						ItemDropEffect=ItemProperty->Epic_Drop_Effect;
-						break;
-					}
-				case E_ItemRarity::Legendary:
-					{
-						ItemInfo.Thumnail = ItemProperty->Legendary_Helmet_Texture;
-						ItemDropEffect=ItemProperty->Legendary_Drop_Effect;
-						break;
-					}
-				default:
-					break;
-				}
-				case E_Armor::Middle:
-					{
-				
-					}
-			}
-		default:
-			break;
-		}
-	
-		
->>>>>>> .merge_file_a06516
 		//스폰시에 스켈레탈 메쉬 구하면 활성화하기
 		
 			
