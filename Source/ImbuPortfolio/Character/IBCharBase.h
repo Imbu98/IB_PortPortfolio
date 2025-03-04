@@ -234,6 +234,14 @@ public:
 	UAnimMontage* AxeSkill1StartMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
 	UAnimMontage* AxeSkill1EndMontage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
+	float AxeSkill1_Cooldown=7.0f;
+	UPROPERTY()
+	float AxeSkill1_RemainingCooldown=0.0f;
+
+public:
+	UFUNCTION(BlueprintCallable,Category="Skill")
+	void AxeSkill1_CooldownReset();
 	
 public:
 	UFUNCTION()
