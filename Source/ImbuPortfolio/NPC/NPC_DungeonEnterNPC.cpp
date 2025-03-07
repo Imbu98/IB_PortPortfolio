@@ -5,7 +5,7 @@
 #include "../Widget/W_DungeonEnter.h"
 #include "Kismet/GameplayStatics.h"
 
-void ANPC_DungeonEnterNPC::Interaction()
+void ANPC_DungeonEnterNPC::Interaction(AActor* Player)
 {
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(),0);
 	if (PC==nullptr)
@@ -24,8 +24,18 @@ void ANPC_DungeonEnterNPC::Interaction()
 		DungeonEnterWidget=CreateWidget<UW_DungeonEnter>(PC,WBP_DungeonEnter);
 		if (DungeonEnterWidget)
 		{
-			DungeonEnterWidget->AddToViewport(0);
-			GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+			if (DungeonEnterWidget->IsInViewport()==false)
+			{
+				DungeonEnterWidget->AddToViewport(0);
+				GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+			}
+			else
+			{
+				DungeonEnterWidget->RemoveFromParent();
+				GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+				IBChar->StateComponent->SetState(TAG_StatusIdle);
+			}
+			
 		}
 	}
 }

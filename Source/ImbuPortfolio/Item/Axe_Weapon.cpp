@@ -95,13 +95,13 @@ void AAxe_Weapon::InitializeItem(E_ItemRarity ItemRarity)
 	
 }
 
-void AAxe_Weapon::ThrowToTarget(AActor* InTargetActor)
+void AAxe_Weapon::ThrowToTarget(AActor* InTargetActor,float AttackRate)
 {
 	if (!InTargetActor || !MoveCurve )
 	{
 		return;
 	}
-	
+	MoveSpeed=AttackRate;
 	IsToActor=false;
 	
 	TargetActor = InTargetActor;
@@ -113,6 +113,7 @@ void AAxe_Weapon::ThrowToTarget(AActor* InTargetActor)
 
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
+	MoveTimeline->SetPlayRate(MoveSpeed);
 	MoveTimeline->PlayFromStart();
 
 	if (CollisionComponent)

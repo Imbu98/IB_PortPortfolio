@@ -15,6 +15,8 @@ public:
 	UIBGameInstance();
 
 	virtual void Init() override;
+	
+	virtual void Shutdown() override;
 
 	UFUNCTION()
 	void CreateSaveFile();
@@ -44,6 +46,17 @@ public:
 	int32 IGI_DungeonMaxClearCount=2;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 IGI_DungeonTicket;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float IGI_UpgradeInventoryCost;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float IGI_AngerGauge;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool IGI_IsClearTempleDragon;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool IGI_IsClearCaveRuins;
+	
+	
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool IsNewGame;

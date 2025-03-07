@@ -106,6 +106,9 @@ Content/StarterContent/*
 Content/Infinity_Mage_starterAnimations/*
 Content/Village/*
 
+#Level
+Content/IB_Project/Levels/L_Start.umap/*
+
 # Rider 
 .idea/*
 

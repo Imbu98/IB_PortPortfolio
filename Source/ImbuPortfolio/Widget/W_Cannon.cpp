@@ -62,6 +62,10 @@ void UW_Cannon::SetWidgetProperty()
 		{
 			PB_Power->SetVisibility(ESlateVisibility::Visible);
 			BTN_ControlTakeCannon->SetVisibility(ESlateVisibility::Collapsed);
+			if (IBChar->IsFlying)
+			{
+				PB_Power->SetVisibility(ESlateVisibility::Collapsed);
+			}
 		}
 		else
 		{

@@ -15,13 +15,31 @@ void UIBGameInstance::Init()
 
 	if(!UGameplayStatics::DoesSaveGameExist("Save1",0))
 	{
-		IGI_Initialize();
 		CreateSaveFile();
+		IGI_Initialize();
+		
 	}
 	else
 	{
-		LoadGame();
+		//LoadGame();
 	}
+}
+
+void UIBGameInstance::Shutdown()
+{
+	Super::Shutdown();
+	
+	if(!UGameplayStatics::DoesSaveGameExist("Save1",0))
+	{
+		CreateSaveFile();
+		SaveGame();
+	}
+	else
+	{
+		
+		SaveGame();
+	}
+	
 }
 
 void UIBGameInstance::CreateSaveFile()
@@ -71,8 +89,13 @@ void UIBGameInstance::SaveItems()
 		IBSaveGame->SavedEquippedWeapon=IGI_EquippedWeapon;
 		IBSaveGame->SavedInventorySize =IGI_InventorySize;
 		IBSaveGame->SavedInventoryGold=IGI_InventoryGold;
+		IBSaveGame->SavedUpgradeInventoryCost=IGI_UpgradeInventoryCost;
+		
 		IBSaveGame->SavedDungeonClearCount=IGI_DungeonCurrentClearCount;
 		IBSaveGame->SavedDungeonTicket=IGI_DungeonTicket;
+		IBSaveGame->SavedIsClearCaveRuins=IGI_IsClearCaveRuins;
+		IBSaveGame->SavedIsClearTempleDragon=IGI_IsClearTempleDragon;
+		IBSaveGame->SavedAngerGauge=IGI_AngerGauge;
 		
 		UGameplayStatics::SaveGameToSlot(IBSaveGame, "Save1", 0);
 	}
@@ -88,8 +111,15 @@ void UIBGameInstance::LoadItems()
 		IGI_EquippedWeapon=IBSaveGame->SavedEquippedWeapon;
 		IGI_InventorySize=IBSaveGame->SavedInventorySize;
 		IGI_InventoryGold=IBSaveGame->SavedInventoryGold;
+		
 		IGI_DungeonCurrentClearCount = IBSaveGame->SavedDungeonClearCount;
 		IGI_DungeonTicket=IBSaveGame->SavedDungeonTicket;
+		IGI_UpgradeInventoryCost=IBSaveGame->SavedUpgradeInventoryCost;
+		
+		IGI_AngerGauge=IBSaveGame->SavedAngerGauge;
+		IGI_IsClearCaveRuins=IBSaveGame->SavedIsClearCaveRuins;
+		IGI_IsClearTempleDragon=IBSaveGame->SavedIsClearTempleDragon;
+		
 		
 	}
 }
@@ -116,7 +146,10 @@ void UIBGameInstance::IGI_Initialize()
 	{
 		return;
 	}
-	IGI_InventoryItem.SetNum(IBChar->InventoryComponents->InventorySize);
+
+	IGI_InventorySize=5;
+	
+	IGI_InventoryItem.SetNum(IGI_InventorySize);
 	
 	 for(FItemStruct InventoryItem : IGI_InventoryItem )
 	{
@@ -132,5 +165,15 @@ void UIBGameInstance::IGI_Initialize()
 	IGI_DungeonMaxClearCount=0;
 	
 	IGI_DungeonTicket=0;
+
+	IGI_UpgradeInventoryCost=500.0f;
+
+	IGI_AngerGauge=0.0f;
+
+	IGI_IsClearCaveRuins=false;
+
+	IGI_IsClearTempleDragon=false;
+
+	IBSaveGame->ISG_Initialize();
 }
 

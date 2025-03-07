@@ -17,6 +17,7 @@ void UANS_Landing::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 		TArray<AActor*> ActorsToIgnore;
+		ActorsToIgnore.Add(Boss);
 		FHitResult OutHit;
 		FVector SphereLocation = Boss->GetActorLocation()+Boss->GetActorForwardVector()*300*FVector(1.0f,1.0f,0.0f);
 		UWorld* World = MeshComp->GetWorld();

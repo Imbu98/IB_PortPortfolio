@@ -55,7 +55,13 @@ void UW_MainMenu::OnClickStartButton()
 
 void UW_MainMenu::OnClickLoadGameButton()
 {
-	UGameplayStatics::OpenLevel(GetWorld(),L_StartName);
+	UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>( GetGameInstance());
+	if (IBGameInstance)
+	{
+		IBGameInstance->LoadGame();
+		UGameplayStatics::OpenLevel(GetWorld(),L_StartName);
+	}
+	
 }
 
 UW_PopUp* UW_MainMenu::CreatePopup(const FText& PopUpMessage,const FText& LeftButtonText,const FText& RightButtonText)

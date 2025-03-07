@@ -21,9 +21,18 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	float SavedInventoryGold;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
+	float SavedUpgradeInventoryCost;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	int32 SavedDungeonClearCount;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	int32 SavedDungeonTicket;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float SavedAngerGauge;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool SavedIsClearTempleDragon;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool SavedIsClearCaveRuins;
 	
 	
 public:

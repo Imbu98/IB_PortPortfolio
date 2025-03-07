@@ -157,8 +157,11 @@ void ACannon::ShootChar()
 				IBChar->SwitchController();
 				IBChar->IsNearCannon=false;
 				IBChar->IsFlying=true;
-				IBChar->PlayFlyingAnimation();
-				
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,IBChar]()
+				{
+					IBChar->PlayFlyingAnimation();
+				},0.1f,false);
 				
 				
 				CurrentCannonPower=0.0f;

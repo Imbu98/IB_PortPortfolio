@@ -9,6 +9,9 @@
 #include "ImbuPortfolio/Interface/DamageInterface.h"
 #include "TargetSystemComponent.h"
 #include "MotionWarpingComponent.h"
+#include "Components/TimelineComponent.h"
+#include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
+#include "ImbuPortfolio/IB_Framework/IB_PlayerController.h"
 #include "IBCharBase.generated.h"
 
 
@@ -50,6 +53,13 @@ public:
 	class UTargetSystemComponent* TargetSystemComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UMotionWarpingComponent* MotionWarpingComponent;
+
+	UPROPERTY()
+	AIB_PlayerController* IB_PlayerController;
+	UPROPERTY()
+	UIBGameInstance* IBGameInstance;
+	UPROPERTY()
+	class UW_PlayerStateBar* PlayerStateBar;
 	
 	
 
@@ -155,7 +165,7 @@ public:
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractRadius=300.f;
+	float InteractRadius=150.f;
 	UPROPERTY()
 	E_Weapon WeaponEnum;
 	UPROPERTY()
@@ -202,7 +212,7 @@ public:
 	class UTimelineComponent* Timeline; 
 	UPROPERTY(EditAnywhere,Category=Equip)
 	UCurveFloat* FloatCurve;
-
+	
 	
 
 	UFUNCTION()
@@ -236,17 +246,33 @@ public:
 	UAnimMontage* AxeSkill1EndMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
 	float AxeSkill1_Cooldown=7.0f;
+	UPROPERTY(EditAnywhere,Category="Skill")
+	FVector CameraStartLocation;
+	UPROPERTY(EditAnywhere,Category="Skill")
+	FVector CameraTargetLocation;
+	UPROPERTY()
+	FVector OriginalCameraOffset;
 	UPROPERTY()
 	float AxeSkill1_RemainingCooldown=0.0f;
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* CameraCurveData;
+
+	FTimeline CameraTimeline;
 
 public:
 	UFUNCTION(BlueprintCallable,Category="Skill")
 	void AxeSkill1_CooldownReset();
+	UFUNCTION(BlueprintCallable,Category="Skill")
+	void OnCameraUpdate(float Value);
+	UFUNCTION(BlueprintCallable,Category="Skill")
+	void MoveCameraToImpact(FVector ImpactPoint);
+	UFUNCTION(BlueprintCallable,Category="Skill")
+	void ReturnCamera();
 	
 public:
 	UFUNCTION()
 	void SwitchController();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void PlayFlyingAnimation();
 	
 	void PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate);
@@ -266,6 +292,8 @@ public:
 	void ResetStatus();
 	UFUNCTION()
 	void UpdatePlayerStatebar();
+	UFUNCTION()
+	void ResetPlayer();
 	
 	UPROPERTY()
 	class AAxe_Weapon* Axe;
@@ -277,6 +305,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
 	float CharMaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
+	float CharMaxStamina;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
+	float CharCurrentStamina;
 
 private:
 	UFUNCTION()
@@ -314,5 +346,6 @@ public:
 	virtual float SetHealth() override;
 
 };
+
 
 

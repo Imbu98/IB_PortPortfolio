@@ -8,7 +8,9 @@
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
 #include "../Structure/DamageInfo.h"
+#include "Camera/CameraComponent.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/Structure/Structure_ArmorProperty.h"
 #include "ImbuPortfolio/Structure/Structure_WeaponProperty.h"
 #include "ImbuPortfolio/Structure/Struct_ItemProperty.h"
@@ -121,10 +123,23 @@ void ABaseEquippable::SaveEquippedWeapon(ABaseEquippable* Weapon)
 void ABaseEquippable::OnHitActor(FHitResult HitResult)
 {
 	AIBCharBase* IBChar = Cast<AIBCharBase>(GetOwner());
-	if (IBChar != nullptr)
+	if (IBChar == nullptr)
 	{
+		return;
+	}
 		IBChar->HitCameraShake();
 		IBChar->IncreaseAngerGauge(HitAngerGauge);
+	
+	if (IBChar->StateComponent->CurrentState==TAG_StatusActionSkill1)
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.0f);
+		IBChar->MoveCameraToImpact(HitResult.ImpactPoint);
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, [this,IBChar]()
+		{
+			IBChar->ReturnCamera();
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(),1.0f);
+		}, 0.1, false);
 	}
 	if (HitResult.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass())==true)
 	{

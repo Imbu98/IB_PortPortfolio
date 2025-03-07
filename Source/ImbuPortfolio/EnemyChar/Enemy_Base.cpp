@@ -226,6 +226,10 @@ void AEnemy_Base::EnemyAttack(UBTT_EnemyAttack* AttackTask)
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
+	TArray<AActor*> FoundEnemies;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), StaticClass(), FoundEnemies);
+	ActorsToIgnore.Append(FoundEnemies);
+	
 	FHitResult OutHit;
 	bool hit =UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartLocation, EndLocation, AttackSize, ObjectTypes, false, ActorsToIgnore,
 		EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Red, FLinearColor::Green,2.0f);

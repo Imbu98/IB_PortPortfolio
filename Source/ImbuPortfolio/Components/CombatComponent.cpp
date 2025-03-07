@@ -53,6 +53,10 @@ void UCombatComponent::SetMainWeapon(ABaseEquippable* NewWeapon)
 		MainWeapon->OnUnEquipped();
 
 		AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
+		if (PlayerCharacter==nullptr)
+		{
+			return;
+		}
 		UInventoryComponent* InventoryComponent = PlayerCharacter->FindComponentByClass <UInventoryComponent>();
 		if (InventoryComponent)
 		{

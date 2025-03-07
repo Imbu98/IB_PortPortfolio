@@ -16,7 +16,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
 	UProgressBar* PlayerHealthBar;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
-	UProgressBar* PlayerStatminaBar;
+	UProgressBar* PlayerStaminaBar;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
 	UProgressBar* PlayerAngerGaugeBar;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
@@ -25,7 +25,11 @@ public:
 	UDamageSystemComponent* DamageSystemComponent;
 	
 public:
+	UFUNCTION(BlueprintCallable)
 	void UpdatePlayerStateBar(AActor* Owner);
+	UFUNCTION(BlueprintCallable)
+	void BlinkBar();
+	
 
 	
 	

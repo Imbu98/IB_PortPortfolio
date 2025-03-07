@@ -75,6 +75,8 @@ public:
 	void UnEquipMiddle();
 	UFUNCTION()
 	void UnEquipBottmo();
+	UFUNCTION()
+	void UpdateInventorySize();
 
 	FOnInventoryChanged OnInventoryUpdate;
 

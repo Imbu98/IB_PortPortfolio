@@ -76,13 +76,15 @@ void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 		//
 	if (T_GoldAmount)
 	{
-		FText GoldAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryGoldAmount,HalfToEven);
+		FString GoldAmountString = FString::Printf(TEXT("%.0fG"), Inventory->InventoryGoldAmount);
+		FText GoldAmountText = FText::FromString(GoldAmountString);
 		T_GoldAmount->SetText(GoldAmountText);
 	}
 	if (T_WeightAmount)
 	{
-		FText TextAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryWeightAmount,HalfToEven);
-		T_WeightAmount->SetText(TextAmountText);
+		FString WeightAmount = FString::Printf(TEXT("%.0fKG"), Inventory->InventoryWeightAmount);
+		FText WeightAmountText = FText::FromString(WeightAmount);
+		T_WeightAmount->SetText(WeightAmountText);
 	}
 	
 
