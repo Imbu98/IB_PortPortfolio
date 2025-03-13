@@ -27,4 +27,8 @@ void UIBSaveGame::ISG_Initialize()
 	SavedIsClearTempleDragon=false;
 	
 	SavedIsClearCaveRuins=false;
+
+	SavedIsFirstGameStart=true;
+	
+	SavedIsNewGame=true;
 }

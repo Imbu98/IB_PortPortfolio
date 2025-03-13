@@ -26,7 +26,7 @@ void UANS_Landing::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 			return;
 		}
 		bool hit = UKismetSystemLibrary::SphereTraceSingleForObjects(World,SphereLocation,SphereLocation,200.0f,
-			ObjectTypes,false,ActorsToIgnore,EDrawDebugTrace::ForDuration,OutHit,true,FColor::Red,FColor::Green,10.0f);
+			ObjectTypes,false,ActorsToIgnore,EDrawDebugTrace::None,OutHit,true,FColor::Red,FColor::Green,10.0f);
 		if (hit)
 		{
 			if (OutHit.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass()))

@@ -4,6 +4,7 @@
 #include "W_Skill1_Icon.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "W_PlayerStateBar.generated.h"
 
@@ -20,6 +21,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
 	UProgressBar* PlayerAngerGaugeBar;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
+	UTextBlock* TEXT_AngerState;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(BindWidget))
 	class UW_Skill1_Icon* WBP_Skill1_Icon;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UDamageSystemComponent* DamageSystemComponent;
@@ -29,6 +32,8 @@ public:
 	void UpdatePlayerStateBar(AActor* Owner);
 	UFUNCTION(BlueprintCallable)
 	void BlinkBar();
+	UFUNCTION(BlueprintCallable)
+	void BlinkAngerTEXT();
 	
 
 	

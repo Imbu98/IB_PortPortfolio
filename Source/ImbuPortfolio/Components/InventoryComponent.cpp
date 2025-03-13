@@ -18,11 +18,8 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	LoadInventory();
-	
-	
-
 	// InventoryWidget�� LoadInventory�� �� �� �ʿ��� InventoryComponent�� �־��ش�
 	AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	PlayerInventory = PlayerController->GetInventoryWidget();
@@ -140,12 +137,6 @@ void UInventoryComponent::LoadInventory()
 		{
 			GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("[UInventoryComponent::SaveInventory] : IBSaveGame Is Nullptr"));
 			return;
-		}
-		if (IBGameInstance->IsNewGame==true)
-		{
-			IBGameInstance->IGI_Initialize();
-			IBGameInstance->IBSaveGame->ISG_Initialize();
-			IBGameInstance->IsNewGame = false;
 		}
 		
 		Items=IBGameInstance->IGI_InventoryItem;

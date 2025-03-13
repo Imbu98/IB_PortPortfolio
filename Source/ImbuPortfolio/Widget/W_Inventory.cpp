@@ -17,13 +17,27 @@ void UW_Inventory::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	EquippedArmor_Head->EquippedItemSlot->OnClicked.Clear();
-	EquippedWeapon1->EquippedItemSlot->OnClicked.Clear();
-	EquippedWeapon2->EquippedItemSlot->OnClicked.Clear();
+	if (EquippedArmor_Head)
+	{
+		EquippedArmor_Head->EquippedItemSlot->OnClicked.Clear();
+		EquippedArmor_Head->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipHelmet);
+	}
+	if (EquippedWeapon1)
+	{
+		EquippedWeapon1->EquippedItemSlot->OnClicked.Clear();
+		EquippedWeapon1->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+	}
+	if (EquippedWeapon2)
+	{
+		EquippedWeapon2->EquippedItemSlot->OnClicked.Clear();
+		EquippedWeapon2->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+	}
 	
-	EquippedArmor_Head->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipHelmet);
-	EquippedWeapon1->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
-	EquippedWeapon2->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+
+	if (WBP_ItemInfo)
+	{
+		WBP_ItemInfo->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 

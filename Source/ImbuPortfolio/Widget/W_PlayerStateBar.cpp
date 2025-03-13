@@ -29,8 +29,6 @@ void UW_PlayerStateBar::UpdatePlayerStateBar(AActor* Owner)
 				PlayerStaminaBar->SetPercent(StaminaPercent);
 			}
 		}
-		if (IBChar)
-		{
 			if (PlayerAngerGaugeBar)
 			{
 				float PlayerMaxAnger = IBChar->MaxAngerAmount;
@@ -46,6 +44,12 @@ void UW_PlayerStateBar::UpdatePlayerStateBar(AActor* Owner)
 				{
 					PlayerAngerGaugeBar->SetFillColorAndOpacity(FColor::Silver);
 				}
+			}
+		if (TEXT_AngerState)
+		{
+			if (IBChar->CurrentAngerAmount<IBChar->MaxAngerAmount)
+			{
+				TEXT_AngerState->SetVisibility(ESlateVisibility::Collapsed);
 			}
 		}
 	}
@@ -66,4 +70,9 @@ void UW_PlayerStateBar::BlinkBar()
 	
 	
 	
+}
+
+void UW_PlayerStateBar::BlinkAngerTEXT()
+{
+	TEXT_AngerState->SetVisibility(ESlateVisibility::Visible);
 }

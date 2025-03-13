@@ -24,6 +24,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionDodge)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionBlock)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDebuffStun)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionSkill1)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponAxeThrow)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponSwordSlash)
@@ -114,6 +115,8 @@ public:
 	UInputAction* IA_IBChar_SKill1;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_AngerState;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_Pause;
 
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
@@ -141,6 +144,8 @@ public:
 	void Skill1End();
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void AngerState();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void PauseMenu();
 
 	
 	

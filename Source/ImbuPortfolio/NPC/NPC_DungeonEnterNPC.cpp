@@ -18,7 +18,7 @@ void ANPC_DungeonEnterNPC::Interaction(AActor* Player)
 		IBChar->StateComponent->SetState(TAG_StatusInteracting);
 		
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "NPCInteraction");
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "NPCInteraction");
 	if (WBP_DungeonEnter)
 	{
 		DungeonEnterWidget=CreateWidget<UW_DungeonEnter>(PC,WBP_DungeonEnter);

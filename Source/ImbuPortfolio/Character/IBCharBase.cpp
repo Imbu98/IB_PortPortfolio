@@ -39,6 +39,7 @@ UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionBlock,"Status.Action.Block","Tag 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attack")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionSkill1,"Status.Action.Skill1","Tag When Skill1")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionDodge,"Status.Action.Dodge","Tag When Dodge")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDebuffStun, "Status.Debuff.Stun", "Tag Character In Stun")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusInteracting,"Status.Interaction","Tag When Interaction")
 
 
@@ -145,6 +146,7 @@ void AIBCharBase::BeginPlay()
 		CameraDelegate.BindUFunction(this,TEXT("OnCameraUpdate"));
 		CameraTimeline.AddInterpFloat(CameraCurveData,CameraDelegate);
 	}
+	
 }
 
 
@@ -163,6 +165,13 @@ void AIBCharBase::Tick(float DeltaTime)
 			ResetStatus();
 		}
 		UpdatePlayerStatebar();
+	}
+	if (CurrentAngerAmount==MaxAngerAmount)
+	{
+		if (PlayerStateBar)
+		{
+			PlayerStateBar->BlinkAngerTEXT();
+		}
 	}
 
 	if (!ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
@@ -219,8 +228,7 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Blocking,ETriggerEvent::Completed,this,&AIBCharBase::EndBlocking);
 		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
 		EnhancedInputComponent->BindAction(IA_IBChar_AngerState,ETriggerEvent::Started,this,&AIBCharBase::AngerState);
-		
-		
+		EnhancedInputComponent->BindAction(IA_IBChar_Pause,ETriggerEvent::Started,this,&AIBCharBase::PauseMenu);
 		
 	}
 
@@ -228,7 +236,7 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AIBCharBase::Move(const FInputActionValue& Value)
 {
-	if (StateComponent->CurrentState==TAG_StatusInteracting||StateComponent->CurrentState==TAG_StatusActionDodge)
+	if (StateComponent->CurrentState==TAG_StatusInteracting||StateComponent->CurrentState==TAG_StatusActionDodge||StateComponent->CurrentState==TAG_StatusDebuffStun)
 	{
 		return;
 	}
@@ -341,11 +349,11 @@ void AIBCharBase::Interact()
     
     
     FVector VCharacterLocation = this->GetActorLocation();
-    FVector VLocation = VCharacterLocation - FVector(0.f, 0.f, 50.f);
+    FVector VLocation = VCharacterLocation+FVector(0.0f,0.0f,50.0f)+(GetActorForwardVector()*50.f);
 
     
     bool Hit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), VLocation, VLocation, InteractRadius,
-         UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
+         UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 10.0f);
     GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
     if (Hit)
     {
@@ -592,7 +600,20 @@ void AIBCharBase::AngerState()
 		if (AM_BeginAngerSate)
 		{
 			SetAngerStatus();
+			if (PlayerStateBar)
+			{
+				PlayerStateBar->TEXT_AngerState->SetVisibility(ESlateVisibility::Collapsed);
+			}
 		}
+	}
+	
+}
+
+void AIBCharBase::PauseMenu()
+{
+	if (IB_PlayerController)
+	{
+		IB_PlayerController->OpenPause();
 	}
 	
 }
@@ -707,6 +728,7 @@ bool AIBCharBase::CanPerformToggleCombat()
 
 
 
+
 void AIBCharBase::ResetAttack()
 {
 	CombatComponent->ResetAttack();
@@ -724,7 +746,7 @@ void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 		
 	}
 	IB_PlayerController->UpdatePlayerStateBar();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "Char:%f is Remain"),DamageSystemComponent->CurrentHealth));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "Char:%f is Remain"),DamageSystemComponent->CurrentHealth));
 
 	switch (DamageResponse)
 	{
@@ -737,6 +759,13 @@ void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 			if (AM_Stagger)
 			{
 				PlayAnimMontage(AM_Stagger);
+				StateComponent->SetState(TAG_StatusDebuffStun);
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+				{
+					StopAnimMontage();
+					StateComponent->ResetState();
+				},2.0f,false);
 			}
 		
 		}break;
@@ -932,6 +961,7 @@ void AIBCharBase::IncreaseAngerGauge(float Amount)
 	if (CurrentAngerAmount>=MaxAngerAmount)
 	{
 		CurrentAngerAmount=MaxAngerAmount;
+		
 	}
 	
 	IBGameInstance->IGI_AngerGauge = CurrentAngerAmount;
@@ -1102,6 +1132,11 @@ void AIBCharBase::SwitchController()
 	{
 		if (PlayerController!=nullptr)
 		{
+			AIB_PlayerController* IBPlayerController = Cast<AIB_PlayerController>(PlayerController);
+			if (IBPlayerController==nullptr)
+			{
+				return;
+			}
 			UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 			if (Subsystem!=nullptr)
 			{
@@ -1111,6 +1146,7 @@ void AIBCharBase::SwitchController()
 					Subsystem->AddMappingContext(IMC_Cannon,1);
 					PlayerController->Possess(IBCannon);
 					IsOnCannon=true;
+					IBPlayerController->ClosePlayerWidget();
 				}
 				else if (IsOnCannon==true)
 				{
@@ -1118,6 +1154,7 @@ void AIBCharBase::SwitchController()
 					Subsystem->AddMappingContext(IMC_Default,0);
 					PlayerController->Possess(this);
 					IsOnCannon=false;
+					IBPlayerController->OpenPlayerWidget();
 				}
 			}
 		}

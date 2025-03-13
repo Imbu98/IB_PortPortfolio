@@ -2,9 +2,11 @@
 
 #include "Cannon.h"
 #include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/PlayerStart.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
+#include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/Widget/W_Cannon.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -43,8 +45,11 @@ void AResetCharacterTrigger::ResetCharacter(UPrimitiveComponent* OverlappedCompo
 			if (PlayerStart)
 			{
 				IBChar->SetActorLocation(PlayerStart->GetActorLocation());
+				IBChar->GetCharacterMovement()->StopMovementImmediately();
+				IBChar->GetMesh()->GetAnimInstance()->StopAllMontages(0.5f);
 				IBChar->IsFlying=false;
 				IBChar->IsNearCannon=false;
+				
 				if (IB_PlayerController)
 				{
 					IB_PlayerController->CollapsedCannonWidget();

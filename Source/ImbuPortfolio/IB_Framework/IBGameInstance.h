@@ -28,6 +28,8 @@ public:
 	void SaveItems();
 	UFUNCTION()
 	void LoadItems();
+	UFUNCTION()
+	void NewGame();
 
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
@@ -39,7 +41,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float IGI_InventoryGold;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int32 IGI_InventorySize;
+	int32 IGI_InventorySize=5;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	int32 IGI_DungeonCurrentClearCount;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
@@ -55,11 +57,14 @@ public:
 	bool IGI_IsClearTempleDragon;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool IGI_IsClearCaveRuins;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool IGI_IsFirstGameStart=true;
 	
 	
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	bool IsNewGame;
+	bool IsNewGame=true;
 
 	FCriticalSection SaveLoadLock;
 

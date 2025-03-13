@@ -1,24 +1,33 @@
 #include "IBGameModeBase.h"
 
 #include "IBGameInstance.h"
+#include "IB_PlayerController.h"
 #include "Engine/TargetPoint.h"
 #include "ImbuPortfolio/EnemyChar/Enemy_Base.h"
 #include "ImbuPortfolio/ETC/Portal.h"
 #include "Kismet/GameplayStatics.h"
 
+AIBGameModeBase::AIBGameModeBase()
+{
+	
+}
+
 void AIBGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	RodingScreen();
 
 	RewardGold=0;
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_Base::StaticClass(), GetEnemyChar);
 	
 	IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
-	if (IBGameInstance)
-	{
+	
+	
 		IBGameInstance->LoadGame();
-	}
+	
+	
 }
 
 void AIBGameModeBase::SpawnPortal()
@@ -56,6 +65,21 @@ void AIBGameModeBase::SpawnPortal()
 		}
 	}
 	
+}
+
+void AIBGameModeBase::RodingScreen()
+{
+	AIB_PlayerController* InGamePC = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(),0));
+	if (InGamePC)
+	{
+		InGamePC->OpenRodingScreen();
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [InGamePC,this]()
+			{
+			InGamePC->CloseRodingScreen();
+			}, 2.0f, false);
+		
+	}
 }
 
 void AIBGameModeBase::RemoveEnemyChar(AActor* EnemyActor)

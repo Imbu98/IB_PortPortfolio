@@ -21,9 +21,15 @@ public:
 	TSubclassOf<UUserWidget> WBP_MainMenu;
 	UPROPERTY()
 	class UW_MainMenu* MainMenu;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> WBP_RodingScreen;
+	UPROPERTY(EditAnywhere)
+	UUserWidget* WidgetRodingScreen;
 
 	UFUNCTION(BlueprintCallable)
 	void OpenBootScreen();
 	UFUNCTION(BlueprintCallable)
 	void OpenMainMenu();
+	UFUNCTION(BlueprintCallable)
+	void OpenRodingScreen();
 };

@@ -12,16 +12,16 @@ UIBGameInstance::UIBGameInstance()
 void UIBGameInstance::Init()
 {
 	Super::Init();
-
+	
 	if(!UGameplayStatics::DoesSaveGameExist("Save1",0))
 	{
 		CreateSaveFile();
 		IGI_Initialize();
-		
+		SaveGame();
 	}
 	else
 	{
-		//LoadGame();
+		LoadGame();
 	}
 }
 
@@ -36,7 +36,6 @@ void UIBGameInstance::Shutdown()
 	}
 	else
 	{
-		
 		SaveGame();
 	}
 	
@@ -90,12 +89,14 @@ void UIBGameInstance::SaveItems()
 		IBSaveGame->SavedInventorySize =IGI_InventorySize;
 		IBSaveGame->SavedInventoryGold=IGI_InventoryGold;
 		IBSaveGame->SavedUpgradeInventoryCost=IGI_UpgradeInventoryCost;
+		IBSaveGame->SavedIsNewGame=IsNewGame;
 		
 		IBSaveGame->SavedDungeonClearCount=IGI_DungeonCurrentClearCount;
 		IBSaveGame->SavedDungeonTicket=IGI_DungeonTicket;
 		IBSaveGame->SavedIsClearCaveRuins=IGI_IsClearCaveRuins;
 		IBSaveGame->SavedIsClearTempleDragon=IGI_IsClearTempleDragon;
 		IBSaveGame->SavedAngerGauge=IGI_AngerGauge;
+		IBSaveGame->SavedIsFirstGameStart=IGI_IsFirstGameStart;
 		
 		UGameplayStatics::SaveGameToSlot(IBSaveGame, "Save1", 0);
 	}
@@ -119,7 +120,24 @@ void UIBGameInstance::LoadItems()
 		IGI_AngerGauge=IBSaveGame->SavedAngerGauge;
 		IGI_IsClearCaveRuins=IBSaveGame->SavedIsClearCaveRuins;
 		IGI_IsClearTempleDragon=IBSaveGame->SavedIsClearTempleDragon;
+		IGI_IsFirstGameStart=IBSaveGame->SavedIsFirstGameStart;
+		IsNewGame=IBSaveGame->SavedIsNewGame;
 		
+		
+		
+	}
+}
+
+void UIBGameInstance::NewGame()
+{
+	if(!UGameplayStatics::DoesSaveGameExist("Save1",0))
+	{
+		CreateSaveFile();
+		IGI_Initialize();
+		SaveGame();
+	}
+	else
+	{
 		
 	}
 }
@@ -136,22 +154,12 @@ void UIBGameInstance::IncreaseDungeonClearCounting()
 
 void UIBGameInstance::IGI_Initialize()
 {
-	AIBCharBase* IBChar = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
 	
-	if (IBChar==nullptr)
-	{
-		return;
-	}
-	if (IBChar->InventoryComponents==nullptr)
-	{
-		return;
-	}
-
 	IGI_InventorySize=5;
 	
 	IGI_InventoryItem.SetNum(IGI_InventorySize);
 	
-	 for(FItemStruct InventoryItem : IGI_InventoryItem )
+	 for(FItemStruct& InventoryItem : IGI_InventoryItem )
 	{
 		InventoryItem.Reset();
 	}
@@ -162,7 +170,7 @@ void UIBGameInstance::IGI_Initialize()
 	
 	IGI_DungeonCurrentClearCount=0;
 	
-	IGI_DungeonMaxClearCount=0;
+	IGI_DungeonMaxClearCount=2;
 	
 	IGI_DungeonTicket=0;
 
@@ -173,7 +181,15 @@ void UIBGameInstance::IGI_Initialize()
 	IGI_IsClearCaveRuins=false;
 
 	IGI_IsClearTempleDragon=false;
+	
+	IGI_IsFirstGameStart=true;
 
-	IBSaveGame->ISG_Initialize();
+	IsNewGame=true;
+
+	if (IBSaveGame)
+	{
+		IBSaveGame->ISG_Initialize();
+	}
+	
 }
 

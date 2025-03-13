@@ -56,8 +56,13 @@ void AEnemy_Base::BeginPlay()
 				return;
 			}
 			Widget->SetWidget(EnemyHealthBar);
-			EnemyHealthBar->SetVisibility(ESlateVisibility::Visible);
+			Widget->SetVisibility(false);
 		}
+	}
+	AEnemy_Base_AIController* EnemyAIController = Cast<AEnemy_Base_AIController>(GetController());
+	if (EnemyAIController)
+	{	
+		EnemyAIController->EnemySearchDelegate.AddUObject(this,&AEnemy_Base::VisibleHealthBar);
 	}
 	
 }
@@ -84,6 +89,10 @@ void AEnemy_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AEnemy_Base::OnDeath()
 {
+	if (Widget)
+	{
+		Widget->SetVisibility(false);
+	}
 	// PlayerGoldReward
 	 AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
 	if (GameMode!=nullptr)
@@ -113,34 +122,15 @@ void AEnemy_Base::OnDeath()
 		EnemyHealthBar->UpdateHealthBar(this);
 	}
 
-	// Drop item
-	FTransform SpawnTransfrom = GetActorTransform();
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::MultiplyWithRoot;
+	DropItem();
 	
-	for (int32 i=0;i<NumberOfDropItem;i++)
+	// Increase Player AngerGague
+	AIBCharBase* IBChar = Cast<AIBCharBase>(GetWorld()->GetFirstPlayerController()->GetCharacter());
+	if (IBChar!=nullptr)
 	{
-		ABaseEquippable* SpawnedItem = GetWorld()->SpawnActor<ABaseEquippable>(SpawnItem,SpawnTransfrom,SpawnParams);
-		if (SpawnedItem!=nullptr)
-		{
-			SpawnedItem->SelectItemType();
-			SpawnedItem->SetAppearance();
-			SpawnedItem->ItemImpulse();
-			
-		}
-		if (SpawnedItem->ItemInfo.ItemRarity==E_ItemRarity::Legendary)
-		{
-			if (SpawnEffectSystem)
-			{
-				FVector SpawnLocation = GetActorLocation(); // 현재 액터 위치
-				FRotator SpawnRotation = GetActorRotation();
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SpawnEffectSystem, SpawnLocation, SpawnRotation, true);
-			}
-		}
-		
+		IBChar->IncreaseAngerGauge(AngerPoint);
 	}
-	
+
 	// stop Ai Logic
 	AAIController* AIController=Cast<AAIController>(GetController());
 	if (AIController)
@@ -152,15 +142,10 @@ void AEnemy_Base::OnDeath()
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 			Enemy_AIController->GetBrainComponent()->StopLogic(TEXT("Dead"));
 			Enemy_AIController->ClearFocus(EAIFocusPriority::LastFocusPriority);
+			IBChar->TargetSystemComponent->TargetLockOff();
 			
 			
 		}
-	}
-	// Increase Player AngerGague
-	AIBCharBase* IBChar = Cast<AIBCharBase>(GetWorld()->GetFirstPlayerController()->GetCharacter());
-	if (IBChar!=nullptr)
-	{
-		IBChar->IncreaseAngerGauge(AngerPoint);
 	}
 }
 
@@ -178,7 +163,11 @@ void AEnemy_Base::DamageResponse(E_DamageResponse DamageResponse)
 			}break;
 		case E_DamageResponse::HitReaction:
 			{
-			PlayAnimMontage(AM_HitReaction);
+				if (!GetMesh()->GetAnimInstance()->IsAnyMontagePlaying())
+				{
+					PlayAnimMontage(AM_HitReaction);
+				}
+			
 			}break;
 	default:
 			{
@@ -186,7 +175,7 @@ void AEnemy_Base::DamageResponse(E_DamageResponse DamageResponse)
 			}break;
 			
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "EnemyHp:%f is Remain"),DamageSystemComponent->CurrentHealth));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "EnemyHp:%f is Remain"),DamageSystemComponent->CurrentHealth));
 	if (EnemyHealthBar)
 	{
 		EnemyHealthBar->UpdateHealthBar(this);
@@ -317,6 +306,163 @@ void AEnemy_Base::OnEnemyAttackEnded(UAnimMontage* Montage, bool bInterrupted)
 		EnemyAttackTask->FinishLatentTask(*EnemyAttackTask->OwnerCompRef,EBTNodeResult::Succeeded);
 	}
 	
+}
+
+void AEnemy_Base::DropItem()
+{
+	if (!DT_ItemTypeProbability||!DT_WeaponTypeProbability||!DT_ArmorTypeProbability||!DT_RarityProbability)
+	{
+	 	//GEngine->AddOnScreenDebugMessage(-1,5.f,FColor::Red,TEXT("AbaseEquippable:SelectItemType"));
+	 	return;
+	}
+	// Drop item
+	FTransform SpawnTransfrom = GetActorTransform();
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.TransformScaleMethod = ESpawnActorScaleMethod::MultiplyWithRoot;
+
+	E_ItemType SpawnItemType = E_ItemType::None;
+	E_Weapon SpawnWeapon=E_Weapon::None;
+	E_Armor SpawnArmor=E_Armor::None;
+	
+	for (int32 i=0;i<NumberOfDropItem;i++)
+	{
+		ABaseEquippable* SpawnedItem = GetWorld()->SpawnActor<ABaseEquippable>(SpawnItem,SpawnTransfrom,SpawnParams);
+		if (SpawnedItem!=nullptr)
+		{
+			if (SetItemType(SpawnedItem)==E_ItemType::Weapon)
+			{
+				SpawnWeapon=SetWeaponType(SpawnedItem);
+				SetRarity(SpawnedItem);
+			}
+			if (SetItemType(SpawnedItem)==E_ItemType::Armor)
+			{
+				SpawnArmor=SetArmorType(SpawnedItem);
+				SetRarity(SpawnedItem);
+			}
+			
+			//SpawnedItem->SelectItemType();
+			SpawnedItem->SetAppearance();
+			//SpawnedItem->ItemImpulse();
+			
+		}
+		if (SpawnedItem->ItemInfo.ItemRarity==E_ItemRarity::Legendary)
+		{
+			if (SpawnEffectSystem)
+			{
+				FVector SpawnLocation = GetActorLocation(); // 현재 액터 위치
+				FRotator SpawnRotation = GetActorRotation();
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), SpawnEffectSystem, SpawnLocation, SpawnRotation, true);
+			}
+		}
+		
+	}
+	
+}
+
+E_ItemType AEnemy_Base::SetItemType(ABaseEquippable* SpawnedItem)
+{
+	// choose item type
+	float ItemTypeTotalProbability =0.0f;
+	TArray<FStructure_ItemTypeProbability*> ItemTypeProbabilities;
+	DT_ItemTypeProbability->GetAllRows<FStructure_ItemTypeProbability>(TEXT(""),ItemTypeProbabilities);
+	for (FStructure_ItemTypeProbability* Row : ItemTypeProbabilities)
+	{
+		ItemTypeTotalProbability+=Row->ItemTypeProbability;
+	}
+	float ItemTypeRandomValue= FMath::FRandRange(0,ItemTypeTotalProbability);
+	float ItemTypeAccumulatedProbability =0.0f;
+	for (FStructure_ItemTypeProbability* Row : ItemTypeProbabilities)
+	{
+		ItemTypeAccumulatedProbability+=Row->ItemTypeProbability;
+		if (ItemTypeRandomValue <= ItemTypeAccumulatedProbability)
+		{
+			return SpawnedItem->ItemInfo.ItemType=Row->ItemType;
+		}
+	}
+	return SpawnedItem->ItemInfo.ItemType=E_ItemType::None;
+	
+}
+
+E_Weapon AEnemy_Base::SetWeaponType(ABaseEquippable* SpawnedItem)
+{
+		float WeaponTypeTotalProbability =0.0f;
+		TArray<FStructure_WeaponTypeProbability*> WeaponTypeProbabilities;
+		DT_WeaponTypeProbability->GetAllRows<FStructure_WeaponTypeProbability>(TEXT(""),WeaponTypeProbabilities);
+		for (FStructure_WeaponTypeProbability* Row : WeaponTypeProbabilities)
+		{
+			WeaponTypeTotalProbability+=Row->WeaponTypeProbability;
+		}
+		float WeaponTypeRandomValue= FMath::FRandRange(0,WeaponTypeTotalProbability);
+		float WeaponTypeAccumulatedProbability =0.0f;
+		for (FStructure_WeaponTypeProbability* Row : WeaponTypeProbabilities)
+		{
+			WeaponTypeAccumulatedProbability+=Row->WeaponTypeProbability;
+			if (WeaponTypeRandomValue <= WeaponTypeAccumulatedProbability)
+			{
+				return SpawnedItem->ItemInfo.WeaponType=Row->WeaponType;
+				
+			}
+		}
+	return SpawnedItem->ItemInfo.WeaponType=E_Weapon::None;
+}
+
+E_Armor AEnemy_Base::SetArmorType(ABaseEquippable* SpawnedItem)
+{
+		float ArmorTypeTotalProbability =0.0f;
+		TArray<FStructure_ArmorTypeProbability*> ArmorTypeProbabilities;
+		DT_ArmorTypeProbability->GetAllRows<FStructure_ArmorTypeProbability>(TEXT(""),ArmorTypeProbabilities);
+		for (FStructure_ArmorTypeProbability* Row : ArmorTypeProbabilities)
+		{
+			ArmorTypeTotalProbability+=Row->ArmorTypeProbability;
+		}
+		float ArmorTypeRandomValue= FMath::FRandRange(0,ArmorTypeTotalProbability);
+		float ArmorTypeAccumulatedProbability =0.0f;
+		for (FStructure_ArmorTypeProbability* Row : ArmorTypeProbabilities)
+		{
+			ArmorTypeAccumulatedProbability+=Row->ArmorTypeProbability;
+			if (ArmorTypeRandomValue <= ArmorTypeAccumulatedProbability)
+			{
+				return SpawnedItem->ItemInfo.ArmorType=Row->ArmorType;
+				
+			}
+		}
+	return SpawnedItem->ItemInfo.ArmorType=E_Armor::None;
+				
+	
+}
+
+E_ItemRarity AEnemy_Base::SetRarity(ABaseEquippable* SpawnedItem)
+{
+	
+		float RarityTotalProbability =0.0f;
+		TArray<FStructure_RarityProbability*> RarirtyProbabilities;
+		DT_RarityProbability->GetAllRows<FStructure_RarityProbability>(TEXT(""),RarirtyProbabilities);
+		for (FStructure_RarityProbability* Row : RarirtyProbabilities)
+		{
+			RarityTotalProbability+=Row->RarityProbability;
+		}
+		float RarityRandomValue= FMath::FRandRange(0,RarityTotalProbability);
+		float RarityAccumulatedProbability =0.0f;
+		for (FStructure_RarityProbability* Row : RarirtyProbabilities)
+		{
+			RarityAccumulatedProbability+=Row->RarityProbability;
+			if (RarityRandomValue <= RarityAccumulatedProbability)
+			{
+				return SpawnedItem->ItemInfo.ItemRarity=Row->Rarity;
+				break;
+			}
+		}
+	return SpawnedItem->ItemInfo.ItemRarity=E_ItemRarity::None;
+	
+}
+
+void AEnemy_Base::VisibleHealthBar()
+{
+	if (Widget)
+	{
+		Widget->SetVisibility(true);
+	}
 }
 
 void AEnemy_Base::GetIdealRange(float& GetAttackRange, float& GetDefendRadius)

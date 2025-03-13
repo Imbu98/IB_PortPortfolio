@@ -30,9 +30,8 @@ void AHelmet_Armor::InitializeItem(E_ItemRarity ItemRarity)
 	{
 		ItemSKeletalMesh->SetMaterial(0,Str_ArmorProperty->ItemMaterial);
 	}
-
-	Weight=Str_ArmorProperty->Weight;
-	Defense=Str_ArmorProperty->Defense;
+	
+	ItemInfo.Defense=Str_ArmorProperty->Defense;
 	ItemInfo.Weight=Str_ArmorProperty->Weight;
 	ItemInfo.Thumnail=Str_ArmorProperty->ItemThumbnail;
 	

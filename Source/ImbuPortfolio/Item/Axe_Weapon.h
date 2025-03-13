@@ -62,6 +62,8 @@ private:
 	UTimelineComponent* MoveTimeline;
 	UPROPERTY(EditAnywhere, Category = "Timeline")
 	class URotatingMovementComponent* RotatingMovement;
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* Axe_Skill1_Effect;
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

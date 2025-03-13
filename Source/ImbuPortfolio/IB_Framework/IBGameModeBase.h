@@ -10,6 +10,9 @@ class IMBUPORTFOLIO_API AIBGameModeBase : public AGameModeBase ,  public IGameMo
 {
 	GENERATED_BODY()
 
+public:
+	AIBGameModeBase();
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -38,6 +41,8 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SpawnPortal();
+	UFUNCTION(BlueprintCallable)
+	void RodingScreen();
 public:
 	UFUNCTION()
 	virtual void RemoveEnemyChar(AActor* EnemyActor) override;

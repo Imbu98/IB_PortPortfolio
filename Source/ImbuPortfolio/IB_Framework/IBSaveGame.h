@@ -17,11 +17,11 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	FItemStruct SavedEquippedWeapon;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
-	int32 SavedInventorySize;
+	int32 SavedInventorySize=5;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	float SavedInventoryGold;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
-	float SavedUpgradeInventoryCost;
+	float SavedUpgradeInventoryCost=500.f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
 	int32 SavedDungeonClearCount;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="SaveProperty")
@@ -33,6 +33,10 @@ public:
 	bool SavedIsClearTempleDragon;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool SavedIsClearCaveRuins;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool SavedIsFirstGameStart=true;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	bool SavedIsNewGame;
 	
 	
 public:

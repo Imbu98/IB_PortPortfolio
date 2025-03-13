@@ -33,6 +33,12 @@ void UW_MainMenu::OnClickExit()
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (PlayerController)
 	{
+		UIBGameInstance* GameInstance = Cast<UIBGameInstance>(GetGameInstance());
+		if (GameInstance)
+		{
+			GameInstance->LoadGame();
+			GameInstance->SaveGame();
+		}
 		UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, false);
 	}
 }
@@ -48,9 +54,6 @@ void UW_MainMenu::OnClickStartButton()
 		PopUpMenu->ButtonOKDelegate.AddDynamic(this,&ThisClass::StartGame_Confirm);
 		PopUpMenu->ButtonCancelDelegate.AddDynamic(this,&ThisClass::StartGame_Cancel);
 	}
-	
-	
-	
 }
 
 void UW_MainMenu::OnClickLoadGameButton()
@@ -97,14 +100,15 @@ void UW_MainMenu::StartGame_Confirm()
 		{
 			IBGameInstance->IsNewGame=true;
 			UGameplayStatics::DeleteGameInSlot("Save1", 0);
+			IBGameInstance->NewGame();
 		}
-		
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
-		{
-			UGameplayStatics::OpenLevel(GetWorld(), L_StartName);
-		}, 3.0f, false);
 	}
+	UGameplayStatics::OpenLevel(GetWorld(), L_StartName);
+	// FTimerHandle TimerHandle;
+	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+	// {
+	// 	
+	// }, 1.0f, false);
 	
 }
 

@@ -9,11 +9,16 @@ class IMBUPORTFOLIO_API AIB_UpgradeNPC : public AIB_NPC
 {
 	GENERATED_BODY()
 
+public:
+	AIB_UpgradeNPC();
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUserWidget> WBP_UpgradeInventoryWidget;
 	UPROPERTY()
 	class UW_UpgradeInventory* UpgradeInventoryWidget;
-
-	virtual void Interaction(AActor* Player) override;
 	
+	virtual void Interaction(AActor* Player) override;
+
+	
+
 };

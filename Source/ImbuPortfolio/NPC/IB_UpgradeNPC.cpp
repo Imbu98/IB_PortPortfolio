@@ -3,10 +3,17 @@
 #include "../Components/StateComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "../Widget/W_UpgradeWidget.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "ImbuPortfolio/Widget/W_UpgradeInventory.h"
 #include "Kismet/GameplayStatics.h"
 
 
+AIB_UpgradeNPC::AIB_UpgradeNPC()
+{
+	
+
+}
 
 void AIB_UpgradeNPC::Interaction(AActor* Player)
 {
@@ -22,7 +29,7 @@ void AIB_UpgradeNPC::Interaction(AActor* Player)
 		
 	}
 	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "NPCInteraction");
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, "NPCInteraction");
 	
 	if (WBP_UpgradeInventoryWidget)
 	{
@@ -46,3 +53,4 @@ void AIB_UpgradeNPC::Interaction(AActor* Player)
 		}
 	}
 }
+
