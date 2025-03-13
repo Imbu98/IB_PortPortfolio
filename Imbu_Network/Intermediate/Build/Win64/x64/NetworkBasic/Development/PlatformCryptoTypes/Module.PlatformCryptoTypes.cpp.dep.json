@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\platformcryptotypes\\module.platformcryptotypes.cpp",
+        "ProvidedModule": "",
+        "PCH": "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\core\\sharedpch.core.cpp20.h.pch",
+        "Includes": [
+            "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\platformcryptotypes\\definitions.platformcryptotypes.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\experimental\\platformcrypto\\source\\platformcryptotypes\\private\\platformcryptotypes.cpp",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\experimental\\platformcrypto\\source\\platformcryptotypes\\public\\platformcryptotypes.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

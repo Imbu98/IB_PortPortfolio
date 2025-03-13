@@ -1,0 +1,9 @@
+{
+	"SourceFiles": [
+		"D:\\Imbu_Network\\Source\\NetworkBasic\\NetworkBasic.Build.cs",
+		"D:\\Imbu_Network\\Source\\NetworkBasic.Target.cs",
+		"D:\\Imbu_Network\\Source\\NetworkBasicEditor.Target.cs",
+		"D:\\Imbu_Network\\Source\\NetworkBasicServer.Target.cs"
+	],
+	"EngineVersion": "5.5.1"
+}

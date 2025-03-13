@@ -1,0 +1,12 @@
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Classes\Generators\AudioGenerator.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Classes\SubmixEffects\AudioMixerSubmixEffectDynamicsProcessor.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Classes\SubmixEffects\AudioMixerSubmixEffectReverb.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Classes\SubmixEffects\AudioMixerSubmixEffectEQ.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Public\AudioBusSubsystem.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Public\AudioDeviceNotificationSubsystem.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Public\AudioMixerBlueprintLibrary.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Public\AudioMixerDevice.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Public\Quartz\AudioMixerClockHandle.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Public\Components\SynthComponent.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Public\Quartz\QuartzSubsystem.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\AudioMixer\Private\AudioMixerSourceManager.h

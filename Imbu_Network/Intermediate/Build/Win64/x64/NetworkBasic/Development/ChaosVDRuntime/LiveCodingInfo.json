@@ -1,0 +1,23 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.ChaosVDRuntime.cpp.obj": [
+			"ChaosVDAccelerationStructureDataWrappers.gen.cpp.obj",
+			"ChaosVDCharacterGroundConstraintDataWrappers.gen.cpp.obj",
+			"ChaosVDCollisionDataWrappers.gen.cpp.obj",
+			"ChaosVDDebugShapeDataWrapper.gen.cpp.obj",
+			"ChaosVDJointDataWrappers.gen.cpp.obj",
+			"ChaosVDParticleDataWrapper.gen.cpp.obj",
+			"ChaosVDQueryDataWrappers.gen.cpp.obj",
+			"ChaosVDRuntime.init.gen.cpp.obj",
+			"ChaosVDRuntimeModule.cpp.obj",
+			"ChaosVDAccelerationStructureDataWrappers.cpp.obj",
+			"ChaosVDCharacterGroundConstraintDataWrappers.cpp.obj",
+			"ChaosVDCollisionDataWrappers.cpp.obj",
+			"ChaosVDDebugShapeDataWrapper.cpp.obj",
+			"ChaosVDJointDataWrappers.cpp.obj",
+			"ChaosVDParticleDataWrapper.cpp.obj",
+			"ChaosVDQueryDataWrappers.cpp.obj"
+		]
+	}
+}
