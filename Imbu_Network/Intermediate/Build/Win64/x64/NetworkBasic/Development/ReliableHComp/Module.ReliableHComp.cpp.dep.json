@@ -1,0 +1,22 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\reliablehcomp\\module.reliablehcomp.cpp",
+        "ProvidedModule": "",
+        "PCH": "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\coreuobject\\sharedpch.coreuobject.cpp20.h.pch",
+        "Includes": [
+            "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\reliablehcomp\\definitions.reliablehcomp.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\packethandlers\\reliabilityhandlercomponent\\private\\reliabilityhandlercomponent.cpp",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\packethandlers\\reliabilityhandlercomponent\\public\\reliabilityhandlercomponent.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\net\\common\\public\\net\\common\\packets\\packettraits.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\packethandlers\\packethandler\\public\\packethandler.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\sockets\\public\\ipaddress.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\sockets\\public\\sockettypes.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\net\\common\\public\\net\\common\\packets\\packetview.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\net\\common\\public\\net\\common\\sockets\\socketerrors.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\net\\core\\public\\net\\core\\misc\\packetaudit.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

@@ -1,0 +1,8 @@
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\GameplayTask.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\GameplayTaskOwnerInterface.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\GameplayTaskResource.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\GameplayTasksComponent.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\Tasks\GameplayTask_ClaimResource.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\Tasks\GameplayTask_TimeLimitedExecution.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\Tasks\GameplayTask_WaitDelay.h
+D:\UE5_R5.5.1\Engine\Source\Runtime\GameplayTasks\Classes\Tasks\GameplayTask_SpawnActor.h

@@ -1,0 +1,20 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\graph\\gain_mixer_node.cc",
+        "ProvidedModule": "",
+        "PCH": "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\resonanceaudio\\pch.resonanceaudio.h.pch",
+        "Includes": [
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\graph\\gain_mixer_node.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\base\\source_parameters.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\api\\resonance_audio_api.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\base\\object_transform.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\dsp\\gain_mixer.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\dsp\\gain_processor.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\graph\\system_settings.h",
+            "d:\\ue5_r5.5.1\\engine\\plugins\\runtime\\resonanceaudio\\source\\resonanceaudio\\private\\resonanceaudiolibrary\\resonance_audio\\graph\\source_parameters_manager.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

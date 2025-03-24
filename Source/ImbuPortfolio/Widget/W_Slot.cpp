@@ -40,8 +40,6 @@ void UW_Slot::NativePreConstruct()
 			}
 			
 		}
-	
-	
 }
 
 void UW_Slot::NativeConstruct()
@@ -55,6 +53,13 @@ void UW_Slot::NativeConstruct()
 		ItemSlot->OnClicked.RemoveDynamic(this, &UW_Slot::OnButtonClicked);
 		
 		ItemSlot->OnClicked.AddDynamic(this, &UW_Slot::OnButtonClicked);
+
+	
+		ItemSlot->OnHovered.Clear();
+		ItemSlot->OnHovered.AddDynamic(this,&UW_Slot::OnButtonHovered);
+
+		ItemSlot->OnUnhovered.Clear();
+		ItemSlot->OnUnhovered.AddDynamic(this,&UW_Slot::OnButtonUnHovered);
 	}
 }
 
@@ -90,6 +95,34 @@ void UW_Slot::OnButtonClicked()
 	InventoryComponent->OnInventoryUpdate.Broadcast();
 }
 
+void UW_Slot::OnButtonHovered()
+{
+	if (InventoryComponent)
+	{
+		if (InventoryComponent->PlayerInventory->WBP_ItemInfo)
+		{
+			if (Item.ItemQuantity<=0)
+			{
+				return;
+			}
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->UpdateItemInfo(Item);
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+}
+
+void UW_Slot::OnButtonUnHovered()
+{
+	
+	if (InventoryComponent)
+	{
+		if (InventoryComponent->PlayerInventory->WBP_ItemInfo)
+		{
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
+
 void UW_Slot::ClearSlot()
 {
 	if (InventoryComponent!=nullptr)
@@ -115,6 +148,7 @@ void UW_Slot::ClearSlot()
 				InventoryItem.WeaponType=E_Weapon::None;
 				InventoryItem.ItemRarity=E_ItemRarity::None;
 				InventoryItem.Weight=0;
+				InventoryItem.Damage=0;
 			}
 		}
 	}

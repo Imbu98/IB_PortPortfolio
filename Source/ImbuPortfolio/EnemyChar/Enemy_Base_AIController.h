@@ -5,6 +5,8 @@
 #include "ImbuPortfolio/Enum/E_Enemy.h"
 #include "Enemy_Base_AIController.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FEnemySearch)
+
 UCLASS()
 class IMBUPORTFOLIO_API AEnemy_Base_AIController : public AAIController
 {
@@ -17,6 +19,8 @@ public:
 	TObjectPtr<UBehaviorTree> EnemyBehaviorTree;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	UAIPerceptionComponent* AIPerceptionComponent;
+
+	FEnemySearch EnemySearchDelegate;
 	
 public:
 	UPROPERTY()

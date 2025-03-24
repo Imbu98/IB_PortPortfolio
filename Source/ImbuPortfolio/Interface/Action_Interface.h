@@ -22,7 +22,7 @@ public:
 
 	virtual void ChangeWeapon(ABaseEquippable* MainWeapon) { }
 
-	virtual void Interaction() {}
+	virtual void Interaction(AActor* Player) {}
 };
 
 

@@ -17,7 +17,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UUserWidget> InventoryWidgetClass;
 	UPROPERTY()
-	UUserWidget* Inventory;
+	UW_Inventory* Inventory;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UUserWidget> WBP_PlayerStateBar;
 	UPROPERTY()
@@ -27,6 +27,16 @@ public:
 	class TSubclassOf<UUserWidget> WBP_Cannon;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget")
 	class UW_Cannon* CannonWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget")
+	class TSubclassOf<UUserWidget> WBP_PauseMenu;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget")
+	class UW_PauseMenu* PauseWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget")
+	class TSubclassOf<UUserWidget> WBP_RodingScreen;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Widget")
+	class UUserWidget* WidgetRodingScreen;
 	
 	
 	
@@ -44,6 +54,18 @@ public:
 	void VisibleCannonWidget();
 	UFUNCTION(BlueprintCallable)
 	void CollapsedCannonWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void OpenPause();
+	UFUNCTION(BlueprintCallable)
+	void OpenPlayerWidget();
+	UFUNCTION(BlueprintCallable)
+	void ClosePlayerWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void OpenRodingScreen();
+	UFUNCTION(BlueprintCallable)
+	void CloseRodingScreen();
 	
 	
 

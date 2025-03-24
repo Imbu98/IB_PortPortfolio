@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\AdvancedShooting.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\AdvancedShooting.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\AdvancedShootingEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\.vsconfig" />
+    <None Include="..\..\AdvancedShooting.sln.DotSettings.user" />
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\AdvancedShooting">
+      <UniqueIdentifier>{942B9A30-FA6D-3205-BABC-8E3059285799}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\AdvancedShooting\AdvancedShooting.Build.cs">
+      <Filter>Source\AdvancedShooting</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\AdvancedShooting\AdvancedShooting.cpp">
+      <Filter>Source\AdvancedShooting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\AdvancedShooting.h">
+      <Filter>Source\AdvancedShooting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\MyClass.cpp">
+      <Filter>Source\AdvancedShooting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\MyClass.h">
+      <Filter>Source\AdvancedShooting</Filter>
+    </ClCompile>
+    <Filter Include="Source\AdvancedShooting\BehaviorTree">
+      <UniqueIdentifier>{122D6E14-FD58-308F-9F44-10BD4C3E06CA}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\AdvancedShooting\BehaviorTree\BTT_KrakenAttack.cpp">
+      <Filter>Source\AdvancedShooting\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\BehaviorTree\BTT_KrakenAttack.h">
+      <Filter>Source\AdvancedShooting\BehaviorTree</Filter>
+    </ClCompile>
+    <Filter Include="Source\AdvancedShooting\Character">
+      <UniqueIdentifier>{D256E4A9-A78D-31FC-AD88-2E5DA17234F8}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\ABPInterface.h">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\BPI_KraKen.cpp">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\BPI_KraKen.h">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\IBCharBase.cpp">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\IBCharBase.h">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\IBShootingAnimInstance.cpp">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\IBShootingAnimInstance.h">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\IBShootingChar.cpp">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\IBShootingChar.h">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Character\WBPInterface.h">
+      <Filter>Source\AdvancedShooting\Character</Filter>
+    </ClCompile>
+    <Filter Include="Source\AdvancedShooting\Enemy">
+      <UniqueIdentifier>{AC9F2C7C-57F9-3101-BE00-48AEC7E7DA59}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Enemy\IBKraken.cpp">
+      <Filter>Source\AdvancedShooting\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Enemy\IBKraken.h">
+      <Filter>Source\AdvancedShooting\Enemy</Filter>
+    </ClCompile>
+    <Filter Include="Source\AdvancedShooting\Enum">
+      <UniqueIdentifier>{99714560-374E-38C2-ADE7-6AFC21C9391F}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Enum\IBEnum.h">
+      <Filter>Source\AdvancedShooting\Enum</Filter>
+    </ClCompile>
+    <Filter Include="Source\AdvancedShooting\ETC">
+      <UniqueIdentifier>{AC09B81E-6B9C-3904-A3B6-063967D1EA6D}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\AdvancedShooting\ETC\HDebugMacros.h">
+      <Filter>Source\AdvancedShooting\ETC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\ETC\Item.cpp">
+      <Filter>Source\AdvancedShooting\ETC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\ETC\Item.h">
+      <Filter>Source\AdvancedShooting\ETC</Filter>
+    </ClCompile>
+    <Filter Include="Source\AdvancedShooting\Struct">
+      <UniqueIdentifier>{89DD50B3-8CC4-3DC6-8337-1C88F8BE5B6F}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Struct\DebugOption.h">
+      <Filter>Source\AdvancedShooting\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Struct\DircetionalAnimation.h">
+      <Filter>Source\AdvancedShooting\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Struct\GateSetting.h">
+      <Filter>Source\AdvancedShooting\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Struct\ItemStruct.h">
+      <Filter>Source\AdvancedShooting\Struct</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Struct\WeaponSocket.h">
+      <Filter>Source\AdvancedShooting\Struct</Filter>
+    </ClCompile>
+    <Filter Include="Source\AdvancedShooting\Widget">
+      <UniqueIdentifier>{11F97FD2-B349-3E7C-AF3B-211D142B77EB}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Widget\KrakenHealthWidget.cpp">
+      <Filter>Source\AdvancedShooting\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Widget\KrakenHealthWidget.h">
+      <Filter>Source\AdvancedShooting\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Widget\PistolUIWidget.cpp">
+      <Filter>Source\AdvancedShooting\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Widget\PistolUIWidget.h">
+      <Filter>Source\AdvancedShooting\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Widget\ShieldUIWidget.cpp">
+      <Filter>Source\AdvancedShooting\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\AdvancedShooting\Widget\ShieldUIWidget.h">
+      <Filter>Source\AdvancedShooting\Widget</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

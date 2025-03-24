@@ -34,7 +34,7 @@ public:
 	ABaseEquippable* EquippedHelmet;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	int64 InventorySize=12; // 인벤토리 슬롯 개수
+	int64 InventorySize=5; // 인벤토리 슬롯 개수
 
 	UPROPERTY()
 	TArray<FItemStruct> Items;
@@ -52,7 +52,7 @@ public:
 	FItemStruct EquippedHelmetInfo;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float InventoryGoldAmount;
+	float InventoryGoldAmount=0;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float InventoryWeightAmount;
 
@@ -75,6 +75,8 @@ public:
 	void UnEquipMiddle();
 	UFUNCTION()
 	void UnEquipBottmo();
+	UFUNCTION()
+	void UpdateInventorySize();
 
 	FOnInventoryChanged OnInventoryUpdate;
 

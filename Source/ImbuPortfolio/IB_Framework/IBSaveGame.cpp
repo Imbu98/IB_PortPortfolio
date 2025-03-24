@@ -2,7 +2,15 @@
 
 void UIBSaveGame::ISG_Initialize()
 {
-	SavedInventoryInfo.Empty();
+
+	SavedInventorySize=5;
+	
+	SavedInventoryInfo.SetNum(SavedInventorySize);
+	
+	for(FItemStruct InventoryItem : SavedInventoryInfo )
+	{
+		InventoryItem.Reset();
+	}
 	
 	SavedEquippedWeapon.Reset();
 	
@@ -11,4 +19,16 @@ void UIBSaveGame::ISG_Initialize()
 	SavedDungeonClearCount=0;
 	
 	SavedDungeonTicket=0;
+
+	SavedUpgradeInventoryCost=500.0f;
+	
+	SavedAngerGauge=0.0f;
+	
+	SavedIsClearTempleDragon=false;
+	
+	SavedIsClearCaveRuins=false;
+
+	SavedIsFirstGameStart=true;
+	
+	SavedIsNewGame=true;
 }

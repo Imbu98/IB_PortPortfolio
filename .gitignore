@@ -104,6 +104,8 @@ Content/Dragon_Rise/*
 Content/FXVarietyPack/*
 Content/StarterContent/*
 Content/Infinity_Mage_starterAnimations/*
+Content/Village/*
+Content/ParagonRampage/*
 
 # Rider 
 .idea/*
@@ -114,3 +116,4 @@ Platform/Saved/*
 Platform/.vsconfig
 Platform/Binaries/*
 Platform/Build/*
+Content/IB_Project/Levels/L_Start_BuiltData.zip

@@ -1,6 +1,7 @@
 #include "W_Cannon.h"
 #include "Components//TextBlock.h"
 #include "Components/Button.h"
+#include "Components/VerticalBox.h"
 #include "ImbuPortfolio/Character/IBCharBase.h"
 #include "ImbuPortfolio/ETC/Cannon.h"
 #include "ImbuPortfolio/IB_Framework/IB_PlayerController.h"
@@ -28,6 +29,11 @@ void UW_Cannon::NativeConstruct()
 		BTN_ControlTakeCannon->OnClicked.AddDynamic(this,&ThisClass::OnPosses);
 	}
 	SetWidgetProperty();
+
+	if (T_EquipWeaponCaution)
+	{
+		T_EquipWeaponCaution->SetVisibility(ESlateVisibility::Collapsed);
+	}
 	
 }
 
@@ -36,9 +42,22 @@ void UW_Cannon::OnPosses()
 	
 	if (IBChar)
 	{
-		IBChar->SwitchController();
-		SetWidgetProperty();
-	
+		if (IBChar->IsWeaponAttached==false)
+		{
+			T_EquipWeaponCaution->SetVisibility(ESlateVisibility::Visible);
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+			{
+				T_EquipWeaponCaution->SetVisibility(ESlateVisibility::Collapsed);
+			},0.5f,false);
+		}
+		else
+		{
+			IBChar->SwitchController();
+			SetWidgetProperty();
+			
+		}
+		
 	}
 }
 
@@ -49,10 +68,12 @@ void UW_Cannon::SetWidgetProperty()
 		if (IBChar->IsOnCannon==false)
 		{
 			T_ButtonText->SetText(TakeOnText);
+			VBox_KeyDescription->SetVisibility(ESlateVisibility::Collapsed);
 		}
 		else if (IBChar->IsOnCannon==true)
 		{
 			T_ButtonText->SetText(TakeOffText);
+			VBox_KeyDescription->SetVisibility(ESlateVisibility::Visible);
 		}
 	}
 
@@ -62,6 +83,10 @@ void UW_Cannon::SetWidgetProperty()
 		{
 			PB_Power->SetVisibility(ESlateVisibility::Visible);
 			BTN_ControlTakeCannon->SetVisibility(ESlateVisibility::Collapsed);
+			if (IBChar->IsFlying)
+			{
+				PB_Power->SetVisibility(ESlateVisibility::Collapsed);
+			}
 		}
 		else
 		{

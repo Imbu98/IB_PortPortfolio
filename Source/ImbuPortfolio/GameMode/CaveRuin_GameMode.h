@@ -3,23 +3,17 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "ImbuPortfolio/ETC/Portal.h"
+#include "ImbuPortfolio/IB_Framework/IBGameModeBase.h"
 #include "CaveRuin_GameMode.generated.h"
 
 UCLASS()
-class IMBUPORTFOLIO_API ACaveRuin_GameMode : public AGameModeBase
+class IMBUPORTFOLIO_API ACaveRuin_GameMode : public AIBGameModeBase
 {
 	GENERATED_BODY()
 
-	protected:
+protected:
 	virtual void BeginPlay() override;
 	
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Enemy")
-	TArray<AActor*> GetEnemyChar;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Maps)
-	APortal* Portal;
 	
-public:
-	void RemoveEnemyChar(AActor* EnemyActor);
-	
+	virtual void SpawnPortal() override;
 };

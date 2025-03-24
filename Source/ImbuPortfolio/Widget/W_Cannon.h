@@ -19,10 +19,15 @@ public:
 	TObjectPtr<class UTextBlock> T_ButtonText;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget",meta=(BindWidget))
 	TObjectPtr<class UProgressBar> PB_Power;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget",meta=(BindWidget))
+	TObjectPtr<class UVerticalBox> VBox_KeyDescription;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget",meta=(BindWidget))
+	TObjectPtr<class UTextBlock>  T_EquipWeaponCaution;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
 	FText TakeOnText;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
 	FText TakeOffText;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	class AIBCharBase* IBChar;

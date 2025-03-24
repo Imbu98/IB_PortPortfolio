@@ -1,4 +1,6 @@
 ﻿#include "W_EquippedSlot.h"
+
+#include "W_ItemInfo.h"
 #include "../Character/IBCharBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Components/InventoryComponent.h"
@@ -23,14 +25,62 @@ void UW_EquippedSlot::NativeConstruct()
 	{
 		
 		EquippedItemSlot->OnClicked.RemoveDynamic(this, &UW_EquippedSlot::ButtonOnClicked);
-
-		
 		EquippedItemSlot->OnClicked.AddDynamic(this, &UW_EquippedSlot::ButtonOnClicked);
+
+		EquippedItemSlot->OnHovered.RemoveDynamic(this, &UW_EquippedSlot::ButtonOnHovered);
+		EquippedItemSlot->OnHovered.AddDynamic(this, &UW_EquippedSlot::ButtonOnHovered);
+		
+		EquippedItemSlot->OnUnhovered.RemoveDynamic(this, &UW_EquippedSlot::ButtonOnUnHovered);
+		EquippedItemSlot->OnUnhovered.AddDynamic(this, &UW_EquippedSlot::ButtonOnUnHovered);
 	}
 }
 
 void UW_EquippedSlot::ButtonOnClicked()
 {
+	
+}
+
+void UW_EquippedSlot::ButtonOnHovered()
+{
+	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "PlayerCharacter is null");
+		return;
+	}
+	
+	InventoryComponent = PlayerCharacter->InventoryComponents;
+	if (InventoryComponent)
+	{
+		if (InventoryComponent->PlayerInventory->WBP_ItemInfo)
+		{
+			if (EquippedItemInfo.ItemQuantity<=0)
+			{
+				return;
+			}
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->UpdateItemInfo(EquippedItemInfo);
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+}
+
+void UW_EquippedSlot::ButtonOnUnHovered()
+{
+	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "PlayerCharacter is null");
+		return;
+	}
+	
+	InventoryComponent = PlayerCharacter->InventoryComponents;
+	if (InventoryComponent)
+	{
+		if (InventoryComponent->PlayerInventory->WBP_ItemInfo)
+		{
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
 }
 
 
@@ -50,6 +100,7 @@ void UW_EquippedSlot::ClearSlot()
 		InventoryComponent->EquippedWeaponInfo.ArmorType=E_Armor::None;
 		InventoryComponent->EquippedWeaponInfo.ItemRarity=E_ItemRarity::None;
 		InventoryComponent->EquippedWeaponInfo.Weight=0;
+		InventoryComponent->EquippedWeaponInfo.Damage=0;
 	}
 }
 

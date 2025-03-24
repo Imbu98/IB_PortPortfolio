@@ -3,6 +3,7 @@
 #include "../Structure/Structure_WeaponProperty.h"
 #include "Components\StaticMeshComponent.h"
 #include "GameFramework/RotatingMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 struct FStructure_WeaponProperty;
@@ -76,10 +77,10 @@ void AAxe_Weapon::InitializeItem(E_ItemRarity ItemRarity)
 	}
 	
 	
-	Damage=Str_WeaponProperty->Damage;
-	Weight=Str_WeaponProperty->Weight;
+
 	ItemInfo.Thumnail=Str_WeaponProperty->ItemThumbnail;
 	ItemInfo.Weight=Str_WeaponProperty->Weight;
+	ItemInfo.Damage=Str_WeaponProperty->Damage;
 	
 	ItemInfo.ItemRarity=ItemRarity;
 	ItemInfo.WeaponType=E_Weapon::Axe;
@@ -95,13 +96,13 @@ void AAxe_Weapon::InitializeItem(E_ItemRarity ItemRarity)
 	
 }
 
-void AAxe_Weapon::ThrowToTarget(AActor* InTargetActor)
+void AAxe_Weapon::ThrowToTarget(AActor* InTargetActor,float AttackRate)
 {
 	if (!InTargetActor || !MoveCurve )
 	{
 		return;
 	}
-	
+	MoveSpeed=AttackRate;
 	IsToActor=false;
 	
 	TargetActor = InTargetActor;
@@ -113,6 +114,7 @@ void AAxe_Weapon::ThrowToTarget(AActor* InTargetActor)
 
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
+	MoveTimeline->SetPlayRate(MoveSpeed);
 	MoveTimeline->PlayFromStart();
 
 	if (CollisionComponent)
@@ -153,6 +155,10 @@ void AAxe_Weapon::UpdateMovement(float Value)
 void AAxe_Weapon::OnReachedTarget()
 {
 	if (!OwnerCharacter||IsToActor==true) return;
+	if (Axe_Skill1_Effect)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),Axe_Skill1_Effect,GetActorLocation(),FRotator::ZeroRotator,true);
+	}
 	
 	StartLocation = GetActorLocation();
 	TargetLocation = OwnerCharacter->GetMesh()->GetSocketLocation(TEXT("HandR_Axe"));

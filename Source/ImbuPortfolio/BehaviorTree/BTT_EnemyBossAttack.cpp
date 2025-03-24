@@ -41,7 +41,7 @@ EBTNodeResult::Type UBTT_EnemyBossAttack::ExecuteTask(UBehaviorTreeComponent& Ow
 			FName DistanceToTargetName = DistanceToTargetRange.SelectedKeyName;
 			
 			float AttackRange = BlackboardComponent->GetValueAsFloat(DistanceToTargetName);
-			float EnemyAttackProbability=70.0f;
+			float EnemyAttackProbability=50.0f;
 			float SpecialAttack1Probability=30.0f;
 			float RandomAttackProbability = FMath::RandRange(0.0f,EnemyAttackProbability+SpecialAttack1Probability);
 			

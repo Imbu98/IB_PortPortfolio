@@ -42,6 +42,9 @@ public:
 	USceneComponent* CannonMuzzle;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
 	class UBoxComponent* BoardingTriggerBox;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Components")
+	class UParticleSystemComponent* ParticleSystemComponent;
+
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite )

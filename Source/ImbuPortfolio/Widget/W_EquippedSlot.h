@@ -23,12 +23,20 @@ public:
 	UInventoryComponent* InventoryComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FItemStruct EquippedItemInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UUserWidget> WBP_ItemInfo;
+	UPROPERTY(BlueprintReadWrite)
+	class UW_ItemInfo* ItemInfoWidget;
 
 public:
 	virtual void NativeConstruct() override;
 	virtual void NativePreConstruct() override;
 	UFUNCTION(BlueprintCallable)
 	void ButtonOnClicked();
+	UFUNCTION(BlueprintCallable)
+	void ButtonOnHovered();
+	UFUNCTION(BlueprintCallable)
+	void ButtonOnUnHovered();
 	UFUNCTION(BlueprintCallable)
 	void ClearSlot();
 	UFUNCTION(BlueprintCallable)

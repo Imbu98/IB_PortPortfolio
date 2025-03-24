@@ -18,20 +18,13 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	LoadInventory();
-	
-	Items.SetNum(InventorySize);
-	
-	
-	
-	
-
 	// InventoryWidget�� LoadInventory�� �� �� �ʿ��� InventoryComponent�� �־��ش�
 	AIB_PlayerController* PlayerController = Cast<AIB_PlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	PlayerInventory = PlayerController->GetInventoryWidget();
-	PlayerInventory->LoadInventory(this);
-
+	UpdateInventorySize();
+	
 	OnInventoryUpdate.AddDynamic(this, &UInventoryComponent::SaveInventory);
 	
 }
@@ -128,6 +121,7 @@ void UInventoryComponent::SaveInventory()
 		IBGameInstance->IGI_InventoryItem = Items;
 		IBGameInstance->IGI_EquippedWeapon=EquippedWeaponInfo;
 		IBGameInstance->IGI_InventoryGold=InventoryGoldAmount;
+		IBGameInstance->IGI_InventorySize=InventorySize;
 		
 		IBGameInstance->SaveGame();
 		
@@ -144,16 +138,11 @@ void UInventoryComponent::LoadInventory()
 			GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,TEXT("[UInventoryComponent::SaveInventory] : IBSaveGame Is Nullptr"));
 			return;
 		}
-		if (IBGameInstance->IsNewGame==true)
-		{
-			IBGameInstance->IGI_Initialize();
-			IBGameInstance->IBSaveGame->ISG_Initialize();
-			IBGameInstance->IsNewGame = false;
-		}
 		
 		Items=IBGameInstance->IGI_InventoryItem;
 		EquippedWeaponInfo=IBGameInstance->IGI_EquippedWeapon;
 		InventoryGoldAmount=IBGameInstance->IGI_InventoryGold;
+		InventorySize=IBGameInstance->IGI_InventorySize;
 		
 	}
 }
@@ -227,4 +216,15 @@ void UInventoryComponent::UnEquipMiddle()
 
 void UInventoryComponent::UnEquipBottmo()
 {
+}
+
+void UInventoryComponent::UpdateInventorySize()
+{
+	Items.SetNum(InventorySize);
+	if (PlayerInventory!=nullptr)
+	{
+		PlayerInventory->LoadInventory(this);
+		OnInventoryUpdate.Broadcast();
+	}
+	
 }

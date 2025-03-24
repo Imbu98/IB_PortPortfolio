@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "W_ItemInfo.h"
 #include "Blueprint/UserWidget.h"
 #include "../Interface/Action_Interface.h"
 #include "W_Slot.generated.h"
@@ -21,6 +22,8 @@ public:
 	TObjectPtr<class UButton> ItemSlot;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UTextBlock> ItemQuantity;
+	
+	 
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
@@ -41,6 +44,10 @@ public:
 	virtual void NativeConstruct() override;
 	UFUNCTION()
 	void OnButtonClicked();
+	UFUNCTION()
+	void OnButtonHovered();
+	UFUNCTION()
+	void OnButtonUnHovered();
 	UFUNCTION()
 	void ClearSlot();
 

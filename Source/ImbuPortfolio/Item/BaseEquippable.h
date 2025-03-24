@@ -34,7 +34,9 @@ public:
 	class UCapsuleComponent* CapsuleComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UNiagaraComponent* NiagaraComponent;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UWidgetComponent* WidgetComponent;
+	
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Item)
 	FItemStruct ItemInfo;
@@ -42,7 +44,8 @@ public:
 	UDataTable* DT_Item;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Item)
 	class UNiagaraSystem* ItemDropEffect;
-
+	
+		
 	UPROPERTY(BlueprintReadOnly,Category=DataTableText)
 	FText DT_Item_AxeRawName=FText::FromString("Axe");
 	UPROPERTY(BlueprintReadOnly,Category=DataTableText)
@@ -122,7 +125,9 @@ public:
 	void ItemImpulse();
 	UFUNCTION()
 	void NearItem(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
+	UFUNCTION()
+	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=AttackMontage)
 	TArray<UAnimMontage*> AttackMontage;

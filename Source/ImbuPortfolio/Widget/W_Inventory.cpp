@@ -17,13 +17,27 @@ void UW_Inventory::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	EquippedArmor_Head->EquippedItemSlot->OnClicked.Clear();
-	EquippedWeapon1->EquippedItemSlot->OnClicked.Clear();
-	EquippedWeapon2->EquippedItemSlot->OnClicked.Clear();
+	if (EquippedArmor_Head)
+	{
+		EquippedArmor_Head->EquippedItemSlot->OnClicked.Clear();
+		EquippedArmor_Head->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipHelmet);
+	}
+	if (EquippedWeapon1)
+	{
+		EquippedWeapon1->EquippedItemSlot->OnClicked.Clear();
+		EquippedWeapon1->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+	}
+	if (EquippedWeapon2)
+	{
+		EquippedWeapon2->EquippedItemSlot->OnClicked.Clear();
+		EquippedWeapon2->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+	}
 	
-	EquippedArmor_Head->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipHelmet);
-	EquippedWeapon1->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
-	EquippedWeapon2->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+
+	if (WBP_ItemInfo)
+	{
+		WBP_ItemInfo->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 
@@ -76,13 +90,15 @@ void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 		//
 	if (T_GoldAmount)
 	{
-		FText GoldAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryGoldAmount,HalfToEven);
+		FString GoldAmountString = FString::Printf(TEXT("%.0fG"), Inventory->InventoryGoldAmount);
+		FText GoldAmountText = FText::FromString(GoldAmountString);
 		T_GoldAmount->SetText(GoldAmountText);
 	}
 	if (T_WeightAmount)
 	{
-		FText TextAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryWeightAmount,HalfToEven);
-		T_WeightAmount->SetText(TextAmountText);
+		FString WeightAmount = FString::Printf(TEXT("%.0fKG"), Inventory->InventoryWeightAmount);
+		FText WeightAmountText = FText::FromString(WeightAmount);
+		T_WeightAmount->SetText(WeightAmountText);
 	}
 	
 

@@ -1,0 +1,10 @@
+{
+	"RemapUnityFiles": 
+	{
+		"Module.ChaosVDBlueprint.cpp.obj": [
+			"ChaosVDBlueprint.init.gen.cpp.obj",
+			"ChaosVDRuntimeBlueprintLibrary.gen.cpp.obj",
+			"ChaosVDRuntimeBlueprintLibrary.cpp.obj"
+		]
+	}
+}

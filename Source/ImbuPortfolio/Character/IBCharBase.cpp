@@ -2,9 +2,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "IBCharAnimInstance.h"
-#include "../../../../Unreal Engine/UE_5.5/Engine/Source/Runtime/Core/Public/Math/UnrealMathUtility.h"
-#include "../../../../Unreal Engine/UE_5.5/Engine/Source/Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
-#include "../../../../Unreal Engine/UE_5.5/Engine/Source/Runtime/GameplayTags/Classes/GameplayTagContainer.h"
+
+#include "Math/UnrealMathUtility.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -20,6 +20,7 @@
 #include "../Widget/W_PlayerStateBar.h"
 #include "Shakes/LegacyCameraShake.h"
 #include "Camera/CameraShakeSourceComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/TimelineComponent.h"
 #include "ImbuPortfolio/Components/DamageSystemComponent.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
@@ -38,6 +39,7 @@ UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionBlock,"Status.Action.Block","Tag 
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionAttack,"Status.Action.Attack","Tag When Attack")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionSkill1,"Status.Action.Skill1","Tag When Skill1")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusActionDodge,"Status.Action.Dodge","Tag When Dodge")
+UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusDebuffStun, "Status.Debuff.Stun", "Tag Character In Stun")
 UE_DEFINE_GAMEPLAY_TAG_COMMENT(TAG_StatusInteracting,"Status.Interaction","Tag When Interaction")
 
 
@@ -97,11 +99,21 @@ void AIBCharBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	IB_PlayerController = Cast<AIB_PlayerController>(GetController());
+
+	if (IB_PlayerController)
+	{
+		PlayerStateBar=IB_PlayerController->PlayerStateBar;
+	}
 	
+	// SetGameplayTag
 	SetupGamePlayTag();
 
-	StateComponent->SetState(TAG_StatusIdle);
-
+	if (StateComponent!=nullptr)
+	{
+		StateComponent->SetState(TAG_StatusIdle);
+	}
+	
 	if (ABP_UnArmed!=nullptr)
 	{
 		GetMesh()->LinkAnimClassLayers(ABP_UnArmed);
@@ -109,22 +121,31 @@ void AIBCharBase::BeginPlay()
 
 	DefaultCameraOffset=GetCameraBoom()->TargetOffset;
 
-	UIBGameInstance* IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
-	if (IBGameInstance!=nullptr)
+	 IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
+	if (IBGameInstance==nullptr)
 	{
-		Equip(IBGameInstance->IGI_EquippedWeapon,this);
+		return;
 	}
+	// Equip Saved weapon
+	Equip(IBGameInstance->IGI_EquippedWeapon,this);
+	
+	// Load Saved AngerGauge
+	CurrentAngerAmount = IBGameInstance->IGI_AngerGauge;
+
+	// Set Stamina
+	CharCurrentStamina =CharMaxStamina;
+	UpdatePlayerStatebar();
 	
 	if (Timeline)
 	{
-	
-	FOnTimelineFloat ProgressFunction;
-	ProgressFunction.BindUFunction(this, FName("TimelineUpdate"));
-	Timeline->AddInterpFloat(FloatCurve, ProgressFunction);
-	
+		FOnTimelineFloat ProgressFunction;
+		ProgressFunction.BindUFunction(this, FName("TimelineUpdate"));
+		Timeline->AddInterpFloat(FloatCurve, ProgressFunction);
+		
+		FOnTimelineFloat CameraDelegate;
+		CameraDelegate.BindUFunction(this,TEXT("OnCameraUpdate"));
+		CameraTimeline.AddInterpFloat(CameraCurveData,CameraDelegate);
 	}
-	
-	
 	
 }
 
@@ -136,6 +157,7 @@ void AIBCharBase::Tick(float DeltaTime)
 	if (IsInAngerState)
 	{
 		CurrentAngerAmount-=DeltaTime*4.0f;
+		IBGameInstance->IGI_AngerGauge = CurrentAngerAmount;
 		if (CurrentAngerAmount <= 0.0f)
 		{
 			CurrentAngerAmount = 0.0f;
@@ -143,6 +165,13 @@ void AIBCharBase::Tick(float DeltaTime)
 			ResetStatus();
 		}
 		UpdatePlayerStatebar();
+	}
+	if (CurrentAngerAmount==MaxAngerAmount)
+	{
+		if (PlayerStateBar)
+		{
+			PlayerStateBar->BlinkAngerTEXT();
+		}
 	}
 
 	if (!ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
@@ -156,6 +185,19 @@ void AIBCharBase::Tick(float DeltaTime)
 			IBPlayerController->PlayerStateBar->WBP_Skill1_Icon->UpdateSkill1_Cooldown(CalculateCooldown);
 		}
 	}
+
+	// Restore Stamina
+		if (CharMaxStamina>CharCurrentStamina)
+		{
+			CharCurrentStamina+=DeltaTime*4.0f;
+			if (CharMaxStamina==CharCurrentStamina)
+			{
+				CharMaxStamina=CharCurrentStamina;
+			}
+			UpdatePlayerStatebar();
+		}
+		
+	
 
 }
 
@@ -186,8 +228,7 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		EnhancedInputComponent->BindAction(IA_IBChar_Blocking,ETriggerEvent::Completed,this,&AIBCharBase::EndBlocking);
 		EnhancedInputComponent->BindAction(IA_IBChar_SKill1,ETriggerEvent::Started,this,&AIBCharBase::Skill1);
 		EnhancedInputComponent->BindAction(IA_IBChar_AngerState,ETriggerEvent::Started,this,&AIBCharBase::AngerState);
-		
-		
+		EnhancedInputComponent->BindAction(IA_IBChar_Pause,ETriggerEvent::Started,this,&AIBCharBase::PauseMenu);
 		
 	}
 
@@ -195,11 +236,15 @@ void AIBCharBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AIBCharBase::Move(const FInputActionValue& Value)
 {
-	if (StateComponent->CurrentState==TAG_StatusInteracting||StateComponent->CurrentState==TAG_StatusActionDodge)
+	if (StateComponent->CurrentState==TAG_StatusInteracting||StateComponent->CurrentState==TAG_StatusActionDodge||StateComponent->CurrentState==TAG_StatusDebuffStun)
 	{
 		return;
 	}
 	if (StateComponent->CurrentState==TAG_StatusActionSkill1)
+	{
+		return;
+	}
+	if (IsFlying)
 	{
 		return;
 	}
@@ -247,6 +292,16 @@ void AIBCharBase::Dodge()
 	{
 		bUseControllerRotationYaw = false;
 	}
+	float Dodgecost=20.0f;
+	
+	if (CharCurrentStamina<Dodgecost)
+	{
+		if (PlayerStateBar)
+		{
+			PlayerStateBar->BlinkBar();
+		}
+		return;
+	}
 	
 	FVector CurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
 	FVector IBAcceleration2D=FVector(CurrentAcceleration.X,CurrentAcceleration.Y,0);
@@ -271,6 +326,8 @@ void AIBCharBase::Dodge()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(AM_Dodge,AttackRate);
 	StateComponent->SetState(TAG_StatusActionDodge);
+
+	CharCurrentStamina-=Dodgecost;
 	
 	
 }
@@ -292,11 +349,11 @@ void AIBCharBase::Interact()
     
     
     FVector VCharacterLocation = this->GetActorLocation();
-    FVector VLocation = VCharacterLocation - FVector(0.f, 0.f, 50.f);
+    FVector VLocation = VCharacterLocation+FVector(0.0f,0.0f,50.0f)+(GetActorForwardVector()*50.f);
 
     
     bool Hit = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), VLocation, VLocation, InteractRadius,
-         UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Green, FLinearColor::Red, 10.0f);
+         UEngineTypes::ConvertToTraceType(ECC_Visibility), false, ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 10.0f);
     GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, FString::Printf(TEXT("Interact")));
     if (Hit)
     {
@@ -316,7 +373,7 @@ void AIBCharBase::Interact()
                 IAction_Interface* InteractionInterface = Cast<IAction_Interface>(HitCharacter);
                 if (InteractionInterface)
                 {
-                    InteractionInterface->Interaction();
+                    InteractionInterface->Interaction(this);
                 }
             }
         }
@@ -438,11 +495,22 @@ void AIBCharBase::Skill1()
 	{
 		return;
 	}
+
+	float Skill1Cost=15.0f;
+	if (CharCurrentStamina<Skill1Cost)
+	{
+		if (PlayerStateBar)
+		{
+			PlayerStateBar->BlinkBar();
+		}
+		return;
+	}
+	
 	if (EnemyActor!=nullptr&&ActiveWeaponTags.HasTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw"))))
 	{
 		if (AxeSkill1StartMontage)
 		{
-			PlayAnimMontage(AxeSkill1StartMontage);
+			PlayAnimMontage(AxeSkill1StartMontage,AttackRate);
 			if (InventoryComponents->RightWeapon)
 			{
 				Axe = Cast<AAxe_Weapon>(InventoryComponents->RightWeapon);
@@ -457,7 +525,7 @@ void AIBCharBase::Skill1()
 					
 					StateComponent->SetState(TAG_StatusActionSkill1);
 					
-					Axe->ThrowToTarget(EnemyActor);
+					Axe->ThrowToTarget(EnemyActor,AttackRate);
 
 					ActiveWeaponTags.RemoveTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw")));
 					FTimerHandle TimerHandle;
@@ -475,13 +543,15 @@ void AIBCharBase::Skill1()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("You cannot throw an axe!"));
 	}
+
+	CharCurrentStamina-=Skill1Cost;
 }
 
 void AIBCharBase::Skill1End()
 {
 	if (AxeSkill1EndMontage)
 	{
-		PlayAnimMontage(AxeSkill1EndMontage);
+		PlayAnimMontage(AxeSkill1EndMontage,AttackRate);
 		Axe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("HandR_Axe"));
 		if (StateComponent)
 		{
@@ -496,6 +566,31 @@ void AIBCharBase::AxeSkill1_CooldownReset()
 	AxeSkill1_RemainingCooldown=0.0f;
 }
 
+
+
+void AIBCharBase::OnCameraUpdate(float Value)
+{
+	FVector NewLocation = FMath::Lerp(CameraStartLocation, CameraTargetLocation, Value);
+	FollowCamera->SetWorldLocation(NewLocation);
+}
+
+void AIBCharBase::MoveCameraToImpact(FVector ImpactPoint)
+{
+	CameraStartLocation = FollowCamera->GetComponentLocation(); // 원래 위치 저장
+	CameraTargetLocation = ImpactPoint; // 충돌 지점으로 이동
+	CameraTimeline.PlayFromStart();
+}
+
+void AIBCharBase::ReturnCamera()
+{
+	if (Timeline)
+	{
+		FVector ReturnTarget = CameraStartLocation + DefaultCameraOffset; // 원래 위치 + 오프셋
+		CameraTargetLocation = ReturnTarget;
+		CameraTimeline.PlayFromStart();
+	}
+}
+
 void AIBCharBase::AngerState()
 {
 	if (CurrentAngerAmount==MaxAngerAmount)
@@ -505,7 +600,20 @@ void AIBCharBase::AngerState()
 		if (AM_BeginAngerSate)
 		{
 			SetAngerStatus();
+			if (PlayerStateBar)
+			{
+				PlayerStateBar->TEXT_AngerState->SetVisibility(ESlateVisibility::Collapsed);
+			}
 		}
+	}
+	
+}
+
+void AIBCharBase::PauseMenu()
+{
+	if (IB_PlayerController)
+	{
+		IB_PlayerController->OpenPause();
 	}
 	
 }
@@ -518,6 +626,13 @@ void AIBCharBase::SetAngerStatus()
 	AttackRate=1.5f;
 	StateComponent->SetState(TAG_StatusInteracting);
 	GetCharacterMovement()->MaxWalkSpeed=OriginalMaxWalkSpeed+300.0f;
+	if (!InventoryComponents->EquippedWeapon.IsEmpty())
+	{
+		for (ABaseEquippable* EquippedWeapon:InventoryComponents->EquippedWeapon)
+		{
+			EquippedWeapon->ItemSKeletalMesh->SetOverlayMaterial(AngerStateOverlayMaterial);
+		}
+	}
 }
 
 void AIBCharBase::ResetStatus()
@@ -526,6 +641,14 @@ void AIBCharBase::ResetStatus()
 	GetCharacterMovement()->MaxWalkSpeed=OriginalMaxWalkSpeed;
 	IsInAngerState=false;
 	GetMesh()->SetOverlayMaterial(nullptr);
+
+	if (!InventoryComponents->EquippedWeapon.IsEmpty())
+	{
+		for (ABaseEquippable* EquippedWeapon:InventoryComponents->EquippedWeapon)
+		{
+			EquippedWeapon->ItemSKeletalMesh->SetOverlayMaterial(nullptr);
+		}
+	}
 }
 
 
@@ -605,6 +728,7 @@ bool AIBCharBase::CanPerformToggleCombat()
 
 
 
+
 void AIBCharBase::ResetAttack()
 {
 	CombatComponent->ResetAttack();
@@ -615,14 +739,14 @@ void AIBCharBase::ResetAttack()
 
 void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 {
-	AIB_PlayerController* IB_PlayerController= Cast<AIB_PlayerController>(GetController());
+	 IB_PlayerController= Cast<AIB_PlayerController>(GetController());
 	if (IB_PlayerController==nullptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,TEXT( "DamageResponse:AIController is Remain"));
 		
 	}
 	IB_PlayerController->UpdatePlayerStateBar();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "Char:%f is Remain"),DamageSystemComponent->CurrentHealth));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "Char:%f is Remain"),DamageSystemComponent->CurrentHealth));
 
 	switch (DamageResponse)
 	{
@@ -635,6 +759,13 @@ void AIBCharBase::DamageResponse(E_DamageResponse DamageResponse)
 			if (AM_Stagger)
 			{
 				PlayAnimMontage(AM_Stagger);
+				StateComponent->SetState(TAG_StatusDebuffStun);
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this]()
+				{
+					StopAnimMontage();
+					StateComponent->ResetState();
+				},2.0f,false);
 			}
 		
 		}break;
@@ -699,6 +830,7 @@ void AIBCharBase::Equip(FItemStruct InventoryItemStruct, AActor* Caller)
 								if (InventoryComponents->EquippedWeaponInfo.ItemRarity==E_ItemRarity::Legendary)
 								{
 									ActiveWeaponTags.AddTag(FGameplayTag::RequestGameplayTag(FName("Weapon.Axe.Throw")));
+									PlayerStateBar->WBP_Skill1_Icon->UpdateSkill1_Thumbnail();
 								}
 								if (ABP_Axe!=nullptr)
 								{
@@ -829,8 +961,11 @@ void AIBCharBase::IncreaseAngerGauge(float Amount)
 	if (CurrentAngerAmount>=MaxAngerAmount)
 	{
 		CurrentAngerAmount=MaxAngerAmount;
+		
 	}
-		UpdatePlayerStatebar();
+	
+	IBGameInstance->IGI_AngerGauge = CurrentAngerAmount;
+	UpdatePlayerStatebar();
 	
 	
 }
@@ -845,11 +980,11 @@ void AIBCharBase::UnEquip()
 	if (InventoryComponents->EquippedWeaponInfo.WeaponType==E_Weapon::Axe)
 	{
 		ActiveWeaponTags.Reset();
+		PlayerStateBar->WBP_Skill1_Icon->ClearSkill1_Thumbnail();
 	}
 	if (ABP_UnArmed!=nullptr)
 	{
 		GetMesh()->LinkAnimClassLayers(ABP_UnArmed);
-		
 		
 	}
 	IsWeaponAttached=false;
@@ -997,6 +1132,11 @@ void AIBCharBase::SwitchController()
 	{
 		if (PlayerController!=nullptr)
 		{
+			AIB_PlayerController* IBPlayerController = Cast<AIB_PlayerController>(PlayerController);
+			if (IBPlayerController==nullptr)
+			{
+				return;
+			}
 			UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 			if (Subsystem!=nullptr)
 			{
@@ -1006,6 +1146,7 @@ void AIBCharBase::SwitchController()
 					Subsystem->AddMappingContext(IMC_Cannon,1);
 					PlayerController->Possess(IBCannon);
 					IsOnCannon=true;
+					IBPlayerController->ClosePlayerWidget();
 				}
 				else if (IsOnCannon==true)
 				{
@@ -1013,6 +1154,7 @@ void AIBCharBase::SwitchController()
 					Subsystem->AddMappingContext(IMC_Default,0);
 					PlayerController->Possess(this);
 					IsOnCannon=false;
+					IBPlayerController->OpenPlayerWidget();
 				}
 			}
 		}
@@ -1034,6 +1176,9 @@ void AIBCharBase::PlayFlyingAnimation()
 			PlayAnimMontage(FlyingAnimMontage);
 		}
 	}
+	
+
+	
 	
 	
 }
@@ -1073,13 +1218,16 @@ void AIBCharBase::CallOnParryEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void AIBCharBase::UpdatePlayerStatebar()
 {
-	AIB_PlayerController* IBPlayerController=Cast<AIB_PlayerController>(GetController());
-	if (IBPlayerController!=nullptr)
+	if (IB_PlayerController!=nullptr)
 	{
-		IBPlayerController->PlayerStateBar->UpdatePlayerStateBar(this);
+		PlayerStateBar->UpdatePlayerStateBar(this);
 	}
 }
 
+void AIBCharBase::ResetPlayer()
+{
+	IsFlying=false;
+}
 
 
 void AIBCharBase::SetupGamePlayTag()
