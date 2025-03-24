@@ -25,5 +25,10 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateSkill1_Cooldown(float Cooldown);
-	
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void UpdateSkill1_Thumbnail();
+	UFUNCTION(BlueprintCallable)
+	void ClearSkill1_Thumbnail();
 };

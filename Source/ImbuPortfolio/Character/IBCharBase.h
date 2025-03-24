@@ -9,6 +9,9 @@
 #include "ImbuPortfolio/Interface/DamageInterface.h"
 #include "TargetSystemComponent.h"
 #include "MotionWarpingComponent.h"
+#include "Components/TimelineComponent.h"
+#include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
+#include "ImbuPortfolio/IB_Framework/IB_PlayerController.h"
 #include "IBCharBase.generated.h"
 
 
@@ -21,6 +24,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusAction)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionAttack)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionDodge)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionBlock)
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusDebuffStun)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_StatusActionSkill1)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponAxeThrow)
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_WeaponSwordSlash)
@@ -50,6 +54,13 @@ public:
 	class UTargetSystemComponent* TargetSystemComponent;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Component")
 	class UMotionWarpingComponent* MotionWarpingComponent;
+
+	UPROPERTY()
+	AIB_PlayerController* IB_PlayerController;
+	UPROPERTY()
+	UIBGameInstance* IBGameInstance;
+	UPROPERTY()
+	class UW_PlayerStateBar* PlayerStateBar;
 	
 	
 
@@ -104,6 +115,8 @@ public:
 	UInputAction* IA_IBChar_SKill1;
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* IA_IBChar_AngerState;
+	UPROPERTY(EditAnywhere, Category = Input)
+	UInputAction* IA_IBChar_Pause;
 
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void Move(const FInputActionValue& Value);
@@ -131,6 +144,8 @@ public:
 	void Skill1End();
 	UFUNCTION(BlueprintCallable,Category="Input")
 	void AngerState();
+	UFUNCTION(BlueprintCallable,Category="Input")
+	void PauseMenu();
 
 	
 	
@@ -155,7 +170,7 @@ public:
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractRadius=300.f;
+	float InteractRadius=150.f;
 	UPROPERTY()
 	E_Weapon WeaponEnum;
 	UPROPERTY()
@@ -202,7 +217,7 @@ public:
 	class UTimelineComponent* Timeline; 
 	UPROPERTY(EditAnywhere,Category=Equip)
 	UCurveFloat* FloatCurve;
-
+	
 	
 
 	UFUNCTION()
@@ -236,17 +251,33 @@ public:
 	UAnimMontage* AxeSkill1EndMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Skill")
 	float AxeSkill1_Cooldown=7.0f;
+	UPROPERTY(EditAnywhere,Category="Skill")
+	FVector CameraStartLocation;
+	UPROPERTY(EditAnywhere,Category="Skill")
+	FVector CameraTargetLocation;
+	UPROPERTY()
+	FVector OriginalCameraOffset;
 	UPROPERTY()
 	float AxeSkill1_RemainingCooldown=0.0f;
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* CameraCurveData;
+
+	FTimeline CameraTimeline;
 
 public:
 	UFUNCTION(BlueprintCallable,Category="Skill")
 	void AxeSkill1_CooldownReset();
+	UFUNCTION(BlueprintCallable,Category="Skill")
+	void OnCameraUpdate(float Value);
+	UFUNCTION(BlueprintCallable,Category="Skill")
+	void MoveCameraToImpact(FVector ImpactPoint);
+	UFUNCTION(BlueprintCallable,Category="Skill")
+	void ReturnCamera();
 	
 public:
 	UFUNCTION()
 	void SwitchController();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void PlayFlyingAnimation();
 	
 	void PlayMontageOnCompleted(UAnimMontage* Montage, FOnMontageEnded MontageEndDelegate);
@@ -266,6 +297,8 @@ public:
 	void ResetStatus();
 	UFUNCTION()
 	void UpdatePlayerStatebar();
+	UFUNCTION()
+	void ResetPlayer();
 	
 	UPROPERTY()
 	class AAxe_Weapon* Axe;
@@ -277,6 +310,10 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
 	float CharMaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
+	float CharMaxStamina;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category=Character)
+	float CharCurrentStamina;
 
 private:
 	UFUNCTION()
@@ -314,5 +351,6 @@ public:
 	virtual float SetHealth() override;
 
 };
+
 
 

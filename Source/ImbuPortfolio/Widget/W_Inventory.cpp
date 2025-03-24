@@ -3,6 +3,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "W_EquippedSlot.h"
+#include "W_InventoryItem.h"
 #include "../Components/InventoryComponent.h"
 #include "W_Slot.h"
 #include "Components/Button.h"
@@ -17,44 +18,72 @@ void UW_Inventory::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	EquippedArmor_Head->EquippedItemSlot->OnClicked.Clear();
-	EquippedWeapon1->EquippedItemSlot->OnClicked.Clear();
-	EquippedWeapon2->EquippedItemSlot->OnClicked.Clear();
+	if (EquippedArmor_Head)
+	{
+		EquippedArmor_Head->EquippedItemSlot->OnClicked.Clear();
+		EquippedArmor_Head->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipHelmet);
+	}
+	if (EquippedWeapon1)
+	{
+		EquippedWeapon1->EquippedItemSlot->OnClicked.Clear();
+		EquippedWeapon1->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+	}
+	if (EquippedWeapon2)
+	{
+		EquippedWeapon2->EquippedItemSlot->OnClicked.Clear();
+		EquippedWeapon2->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+	}
 	
-	EquippedArmor_Head->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipHelmet);
-	EquippedWeapon1->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
-	EquippedWeapon2->EquippedItemSlot->OnClicked.AddDynamic(this,&ThisClass::UnEquipWeapon);
+	if (WBP_ItemInfo)
+	{
+		WBP_ItemInfo->SetVisibility(ESlateVisibility::Collapsed);
+	}
+
+	if (InventoryItem)
+	{
+		InventoryItem->SlotDelegate.BindUObject(this,&ThisClass::OnEquip);
+	}
+	
+	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter)
+	{
+		InventoryComponent = PlayerCharacter->InventoryComponents;
+	}
+	
 }
 
 
 void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 {
-	Inventory->InventoryWeightAmount=0;
-	if (InventoryWrapBox==nullptr)
+	//Inventory->InventoryWeightAmount=0;
+	if (InventoryItem)
 	{
-		return;
+		InventoryItem->UpdateInventory(Inventory);
 	}
-	InventoryWrapBox->ClearChildren();
-	
-	if (ItemSlotWidgetClass != nullptr&& Inventory!=nullptr)
-	{
-		for (int ArrayIndex = 0; ArrayIndex < Inventory->Items.Num(); ArrayIndex++)
-		{
-			UUserWidget* ItemSlotWidget = CreateWidget(this, ItemSlotWidgetClass);
-			UW_Slot* ItemSlot = Cast<UW_Slot>(ItemSlotWidget);
-			if (ItemSlot)
-			{
-				ItemSlot->Index = ArrayIndex;
-				ItemSlot->InventoryComponent = Inventory;
-				ItemSlot->Item = Inventory->Items[ArrayIndex];
-
-				Inventory->InventoryWeightAmount+=Inventory->Items[ArrayIndex].Weight;
-				
-				InventoryWrapBox->AddChild(ItemSlot);
-			}
-		}
-		
-	}
+	// if (InventoryWrapBox==nullptr)
+	// {
+	// 	return;
+	// }
+	// InventoryWrapBox->ClearChildren();
+	//
+	// if (ItemSlotWidgetClass != nullptr&& Inventory!=nullptr)
+	// {
+	// 	for (int ArrayIndex = 0; ArrayIndex < Inventory->Items.Num(); ArrayIndex++)
+	// 	{
+	// 		UUserWidget* ItemSlotWidget = CreateWidget(this, ItemSlotWidgetClass);
+	// 		UW_Slot* ItemSlot = Cast<UW_Slot>(ItemSlotWidget);
+	// 		if (ItemSlot)
+	// 		{
+	// 			ItemSlot->Index = ArrayIndex;
+	// 			ItemSlot->InventoryComponent = Inventory;
+	// 			ItemSlot->Item = Inventory->Items[ArrayIndex];
+	//
+	// 			Inventory->InventoryWeightAmount+=Inventory->Items[ArrayIndex].Weight;
+	// 			
+	// 			InventoryWrapBox->AddChild(ItemSlot);
+	// 		}
+	// 	}
+	// }
 		// Equipped Weapon Texture Update
 		if (EquippedWeapon1!=nullptr&&EquippedWeapon2!=nullptr&&EquippedArmor_Head!=nullptr&&Inventory!=nullptr)
 		{
@@ -76,13 +105,15 @@ void UW_Inventory::LoadInventory(UInventoryComponent* Inventory)
 		//
 	if (T_GoldAmount)
 	{
-		FText GoldAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryGoldAmount,HalfToEven);
+		FString GoldAmountString = FString::Printf(TEXT("%.0fG"), Inventory->InventoryGoldAmount);
+		FText GoldAmountText = FText::FromString(GoldAmountString);
 		T_GoldAmount->SetText(GoldAmountText);
 	}
 	if (T_WeightAmount)
 	{
-		FText TextAmountText = UKismetTextLibrary::Conv_DoubleToText(Inventory->InventoryWeightAmount,HalfToEven);
-		T_WeightAmount->SetText(TextAmountText);
+		FString WeightAmount = FString::Printf(TEXT("%.0fKG"), Inventory->InventoryWeightAmount);
+		FText WeightAmountText = FText::FromString(WeightAmount);
+		T_WeightAmount->SetText(WeightAmountText);
 	}
 	
 
@@ -99,7 +130,7 @@ void UW_Inventory::UnEquipWeapon()
 
 	
 	UCombatComponent* CombatComponent =PlayerCharacter->CombatComponent;
-	UInventoryComponent* InventoryComponent = PlayerCharacter->InventoryComponents;
+	//InventoryComponent = PlayerCharacter->InventoryComponents;
 	
 	// 이 아래로는 나중에 방어구 등을 추가하면 따로 함수를 만들어 무기와 방어구 해제를 한번에 관리하기
 		if (CombatComponent!=nullptr)
@@ -128,10 +159,8 @@ void UW_Inventory::UnEquipHelmet()
 	{
 		return;
 	}
-
-	
 	UCombatComponent* CombatComponent =PlayerCharacter->CombatComponent;
-	UInventoryComponent* InventoryComponent = PlayerCharacter->InventoryComponents;
+	//InventoryComponent = PlayerCharacter->InventoryComponents;
 	if (InventoryComponent!=nullptr)
 	{
 		InventoryComponent->UnEquipHelmet();
@@ -144,6 +173,43 @@ void UW_Inventory::UnEquipHelmet()
 		
 		
 	}
+}
+
+void UW_Inventory::OnEquip(UW_Slot* SlotWidget)
+{
+	if (SlotWidget==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "SlotWidget is null");
+		return;
+	}
+	FItemStruct Item = SlotWidget->Item;
+	
+	FText TextItemQuantity = UKismetTextLibrary::Conv_IntToText(Item.ItemQuantity);
+	FString StringItemQuantity = TextItemQuantity.ToString();
+
+	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "PlayerCharacter is null");
+		return;
+	}
+	
+	InventoryComponent = PlayerCharacter->InventoryComponents;
+	
+	if (InventoryComponent==nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "InventoryComponent is null");
+		return;
+	}
+
+	if (Item.ItemType==E_ItemType::Weapon||Item.ItemType==E_ItemType::Armor)
+	{
+		PlayerCharacter->Equip(Item, PlayerCharacter);
+	}
+	
+	SlotWidget->ClearSlot();
+	LoadInventory(InventoryComponent);
+	InventoryComponent->OnInventoryUpdate.Broadcast();
 }
 
 

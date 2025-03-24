@@ -15,7 +15,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Widget,meta=(BindWidget))
 	class UImage* Logo2;
 	UPROPERTY(Transient,EditAnywhere, BlueprintReadWrite, Category = Widget,meta=(BindWidgetAnim))
-	 UWidgetAnimation* Load_In;
+	UWidgetAnimation* Load_In;
+
+public:
+	
 	
 public:
 	virtual void NativeConstruct() override;
@@ -30,6 +33,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void OpenMainMenuLevel();
-
-
 };

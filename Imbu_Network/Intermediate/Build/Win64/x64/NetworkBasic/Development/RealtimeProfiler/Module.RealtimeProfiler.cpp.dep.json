@@ -1,0 +1,28 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\realtimeprofiler\\module.realtimeprofiler.cpp",
+        "ProvidedModule": "",
+        "PCH": "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\slate\\sharedpch.slate.cpp20.h.pch",
+        "Includes": [
+            "d:\\imbu_network\\intermediate\\build\\win64\\x64\\networkbasic\\development\\realtimeprofiler\\definitions.realtimeprofiler.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\realtimeprofiler.cpp",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\realtimeprofiler.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\profilevisualizer\\public\\visualizerevents.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilerframe.cpp",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilerframe.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilerlinegraph.cpp",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilerlinegraph.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilervisualizer.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilertimeline.cpp",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilertimeline.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\runtime\\slate\\public\\widgets\\input\\sslider.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\profilevisualizer\\public\\stimeline.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\realtimeprofiler\\private\\srealtimeprofilervisualizer.cpp",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\profilevisualizer\\public\\sbarvisualizer.h",
+            "d:\\ue5_r5.5.1\\engine\\source\\developer\\profilevisualizer\\public\\seventstree.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

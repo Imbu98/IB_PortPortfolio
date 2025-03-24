@@ -27,7 +27,6 @@ void UStateComponent::SetState(FGameplayTag NewState)
 	{
 		CurrentState=NewState;
 	}
-	// 나중에 StateEnd, StateBegin Event Call도 필요하다면 해줄 것
 }
 
 void UStateComponent::ResetState()

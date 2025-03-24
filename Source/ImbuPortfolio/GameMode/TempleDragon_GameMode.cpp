@@ -7,85 +7,21 @@
 #include "ImbuPortfolio/ETC/Portal.h"
 #include "Kismet/GameplayStatics.h"
 
+
 void ATempleDragon_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	RewardGold=0;
-
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy_Base::StaticClass(), GetEnemyChar);
-	
-	IBGameInstance = Cast<UIBGameInstance>(GetGameInstance());
-	if (IBGameInstance)
-	{
-		IBGameInstance->LoadGame();
-	}
-}
-
-void ATempleDragon_GameMode::RemoveEnemyChar(AActor* EnemyActor)
-{
-	if (EnemyActor)
-	{
-		GetEnemyChar.Remove(EnemyActor);
-		EnemyActor->SetLifeSpan(7.0f);
-		if (GetEnemyChar.IsEmpty())
-		{
-			IBGameInstance->IncreaseDungeonClearCounting();
-			SpawnPortal();
-			
-			
-		}				
-		
-	}
-
-	else
-	{
-		
-	}
 }
 
 void ATempleDragon_GameMode::SpawnPortal()
-{	
-	ATargetPoint* SpawnPoint= Cast<ATargetPoint>(UGameplayStatics::GetActorOfClass(GetWorld(),ATargetPoint::StaticClass()));
-	if (SpawnPoint)
+{
+	Super::SpawnPortal();
+	
+	IBGameInstance =Cast<UIBGameInstance>(GetGameInstance());
+	if (IBGameInstance)
 	{
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.Owner = this;
-		SpawnParameters.SpawnCollisionHandlingOverride=ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		FTransform SpawnTransform = SpawnPoint->GetActorTransform();
-		APortal* SpawnedPortal =  GetWorld()->SpawnActor<APortal>(Portal,SpawnTransform,SpawnParameters);
-		if (SpawnedPortal!=nullptr)
-		{
-			float TotalProbability = StartLevelProbability+BossLevelProbability;
-			float LevelProbability= FMath::RandRange(0.0f,TotalProbability);
-			if (LevelProbability<=StartLevelProbability)
-			{
-				SpawnedPortal->OpenPortal(LevelToStart);
-				if (SpawnedPortal->StartLevelPortalMaterial!=nullptr)
-				{
-					SpawnedPortal->StaticMesh->SetMaterial(0,SpawnedPortal->StartLevelPortalMaterial);
-				}
-			}
-			else if (LevelProbability<=StartLevelProbability+BossLevelProbability)
-			{
-				SpawnedPortal->OpenPortal(LevelToBoss);
-				if (SpawnedPortal->BossLevelPortalMaterial!=nullptr)
-				{
-					SpawnedPortal->StaticMesh->SetMaterial(0,SpawnedPortal->BossLevelPortalMaterial);
-				}
-				
-			}
-			
-		}
+		IBGameInstance->IGI_IsClearTempleDragon=true;
 	}
 	
-	
-	
 }
-
-void ATempleDragon_GameMode::SaveReward_Gold(float EnemyReward_Gold)
-{
-	RewardGold=+EnemyReward_Gold;
-}
-
 

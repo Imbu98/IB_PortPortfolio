@@ -55,6 +55,14 @@ public:
 	float Reward_GoldMin;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Reward)
 	float AngerPoint;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Drop)
+	UDataTable* DT_ItemTypeProbability;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Drop)
+	UDataTable* DT_WeaponTypeProbability;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Drop)
+	UDataTable* DT_ArmorTypeProbability;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Drop)
+	UDataTable* DT_RarityProbability;
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UParticleSystemComponent* SpawnEffectComponent;
@@ -125,8 +133,22 @@ public:
 	void PlayMontageOnCompleted(UAnimMontage* Montage,FOnMontageEnded MontageEndDelegate) const;
 	UFUNCTION(BlueprintCallable)
 	void OnEnemyAttackEnded(UAnimMontage* Montage, bool bInterrupted);
+	UFUNCTION(BlueprintCallable)
+	void DropItem();
+	UFUNCTION(BlueprintCallable)
+	E_ItemType SetItemType(ABaseEquippable* SpawnedItem);
+	UFUNCTION(BlueprintCallable)
+	E_Weapon SetWeaponType(ABaseEquippable* SpawnedItem);
+	UFUNCTION(BlueprintCallable)
+	E_Armor SetArmorType(ABaseEquippable* SpawnedItem);
+	UFUNCTION(BlueprintCallable)
+	E_ItemRarity SetRarity(ABaseEquippable* SpawnedItem);
+	
+	UFUNCTION(BlueprintCallable)
+	void VisibleHealthBar();
 	
 	
 
 };
+
 

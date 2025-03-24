@@ -1,6 +1,7 @@
 #include "MapSelectTrigger.h"
 
 #include "Components/BoxComponent.h"
+#include "ImbuPortfolio/Character/IBCharBase.h"
 #include "Kismet/GameplayStatics.h"
 
 AMapSelectTrigger::AMapSelectTrigger()
@@ -35,7 +36,16 @@ void AMapSelectTrigger::Tick(float DeltaTime)
 void AMapSelectTrigger::MapSelect(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UGameplayStatics::OpenLevel(GetWorld(),LevelName);
+	if (OtherActor)
+	{
+		AIBCharBase* IBCharBase = Cast<AIBCharBase>(OtherActor);
+		if (IBCharBase)
+		{
+			IBCharBase->GetMesh()->SetSimulatePhysics(false);
+			UGameplayStatics::OpenLevel(GetWorld(),LevelName);
+		}
+	}
+	
 }
 
 

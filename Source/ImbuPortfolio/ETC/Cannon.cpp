@@ -12,6 +12,7 @@
 #include "ImbuPortfolio/IB_Framework/IB_PlayerController.h"
 #include "ImbuPortfolio/Widget/W_Cannon.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 
 class UEnhancedInputLocalPlayerSubsystem;
 
@@ -46,6 +47,10 @@ ACannon::ACannon()
 
 	BoardingTriggerBox = CreateDefaultSubobject<UBoxComponent>("BoardingTriggerBox");
 	BoardingTriggerBox->SetupAttachment(DefaultSceneRoot);
+
+	ParticleSystemComponent=CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystemComponent");
+	ParticleSystemComponent->SetupAttachment(BoardingTriggerBox);
+	
 	BoardingTriggerBox->OnComponentBeginOverlap.AddDynamic(this,&ThisClass::OverlapCannonTrigger);
 	BoardingTriggerBox->OnComponentEndOverlap.AddDynamic(this,&ThisClass::EndOverlapCannonTrigger);
 
@@ -157,8 +162,11 @@ void ACannon::ShootChar()
 				IBChar->SwitchController();
 				IBChar->IsNearCannon=false;
 				IBChar->IsFlying=true;
-				IBChar->PlayFlyingAnimation();
-				
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,IBChar]()
+				{
+					IBChar->PlayFlyingAnimation();
+				},0.1f,false);
 				
 				
 				CurrentCannonPower=0.0f;

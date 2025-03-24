@@ -82,6 +82,7 @@ void AEnemy_Base_AIController::ActorsPerceptionUpdated(const TArray<AActor*>& Up
 			HandleSensedDamage(UpdatedActor);
 		}
 	}
+	
 }
 
 
@@ -104,6 +105,7 @@ void AEnemy_Base_AIController::SetStateAsAttacking(AActor* AttackTarget)
 		int8 EnemyState = static_cast<int8>(E_EnemyState::Attacking);
 		BlackboardComponent->SetValueAsEnum(TEXT("EnemyStateKey"),EnemyState);
 	}
+	EnemySearchDelegate.Broadcast();
 }
 
 void AEnemy_Base_AIController::HandleSensedSight(AActor* Actor)

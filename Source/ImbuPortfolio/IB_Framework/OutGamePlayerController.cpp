@@ -2,6 +2,7 @@
 #include "Blueprint\UserWidget.h"
 #include "ImbuPortfolio/Widget/W_MainMenu.h"
 #include "ImbuPortfolio/Widget/W_BootScreen.h"
+#include "Kismet/GameplayStatics.h"
 
 void AOutGamePlayerController::BeginPlay()
 {
@@ -32,6 +33,18 @@ void AOutGamePlayerController::OpenMainMenu()
 		{
 			MainMenu->AddToViewport(0);
 			
+		}
+	}
+}
+
+void AOutGamePlayerController::OpenRodingScreen()
+{
+	if (WBP_RodingScreen)
+	{
+		WidgetRodingScreen = CreateWidget<UUserWidget>(this,WBP_RodingScreen);
+		if (WidgetRodingScreen)
+		{
+			WidgetRodingScreen->AddToViewport();
 		}
 	}
 }

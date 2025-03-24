@@ -1,9 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "W_ItemInfo.h"
 #include "Blueprint/UserWidget.h"
 #include "../Interface/Action_Interface.h"
 #include "W_Slot.generated.h"
+
+DECLARE_DELEGATE_OneParam(FOnInventorySlotClick,UW_Slot*)
 
 class UInventoryComponent;
 struct FItemStruct;
@@ -21,6 +24,8 @@ public:
 	TObjectPtr<class UButton> ItemSlot;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UTextBlock> ItemQuantity;
+	
+	 
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
@@ -32,6 +37,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
 	UW_Inventory* W_Inventory;
+
+	FOnInventorySlotClick InventorySlotDelegate;
 	
 	
 
@@ -39,10 +46,19 @@ public:
 public:
 	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	UFUNCTION()
 	void OnButtonClicked();
 	UFUNCTION()
+	void OnButtonHovered();
+	UFUNCTION()
+	void OnButtonUnHovered();
+	UFUNCTION()
 	void ClearSlot();
+	UFUNCTION()
+	void OnEquip();
+	UFUNCTION()
+	void OnUpgradeSlot();
 
 	
 	FEventReply OnMouseButtonDown(FGeometry const& MyGeometry, FPointerEvent const& MouseEvent);

@@ -15,5 +15,5 @@ public:
 	UPROPERTY()
 	class UW_DungeonEnter* DungeonEnterWidget;
 
-	virtual void Interaction() override;
+	virtual void Interaction(AActor* Player) override;
 };

@@ -45,6 +45,12 @@ public:
 	E_PotionSize PotionSize;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Weight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Damage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Defense;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 UpgradeValue;
 	
 
 	FItemStruct():
@@ -62,6 +68,9 @@ public:
 	,ItemRarity(E_ItemRarity::None)
 	,PotionSize(E_PotionSize::None)
 	,Weight(0)
+	,Damage(0)
+	,Defense(0)
+	,UpgradeValue(0)
 	{
 		
 	}
@@ -82,6 +91,9 @@ void Reset()
 		ItemRarity=E_ItemRarity::None;
 		PotionSize=E_PotionSize::None;
 		Weight=0;
+		Damage=0;
+		Defense=0;
+		UpgradeValue=0;
 	}
 
 };

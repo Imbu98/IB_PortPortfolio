@@ -1,7 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "W_Slot.h"
 #include "Blueprint/UserWidget.h"
+#include "ImbuPortfolio/Structure/ItemStructure.h"
 #include "W_Inventory.generated.h"
 
 class UInventoryComponent;
@@ -19,9 +21,11 @@ public:
 
 public:
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
-	TObjectPtr<class UImage> InventoryImage;
+	TObjectPtr<class UW_InventoryItem> InventoryItem;
+
+	
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
-	TObjectPtr<class UWrapBox> InventoryWrapBox;
+	TObjectPtr<class UW_ItemInfo> WBP_ItemInfo;
 
 	UPROPERTY(BlueprintReadWrite,meta=(BindWidget))
 	TObjectPtr<class UTextBlock> T_GoldAmount;
@@ -43,12 +47,16 @@ public:
 	TSubclassOf<class UUserWidget> ItemSlotWidgetClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory") 
 	TSubclassOf<class UUserWidget> EquippedItemSlotWidgetClass;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory") 
+	UInventoryComponent* InventoryComponent;
+	
 public:
 	UFUNCTION()
 	void UnEquipWeapon();
 	UFUNCTION()
 	void UnEquipHelmet();
+	UFUNCTION()
+	void OnEquip(UW_Slot* SlotWidget);
 	
 	
 };

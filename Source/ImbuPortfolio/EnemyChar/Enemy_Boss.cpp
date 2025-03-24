@@ -51,7 +51,7 @@ void AEnemy_Boss::EnemyBossAttack(UBTT_EnemyBossAttack* AttackTask)
 	ActorsToIgnore.Add(this);
 	FHitResult OutHit;
 	bool hit =UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartLocation, EndLocation, AttackSize, ObjectTypes, false, ActorsToIgnore,
-		EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Red, FLinearColor::Green,2.0f);
+		EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green,2.0f);
 	if (hit)
 	{
 		if (OutHit.GetActor()->GetClass()->ImplementsInterface(UDamageInterface::StaticClass()))
@@ -166,31 +166,32 @@ FVector AEnemy_Boss::CalculateFutureActorLocation(AActor* TargetActor,float Time
 
 void AEnemy_Boss::DamageResponse(E_DamageResponse DamageResponse)
 {
-	switch (DamageResponse)
-	{
-	case E_DamageResponse::None:
-		{
-				
-		}break;
-	case E_DamageResponse::Stagger:
-		{
-			PlayAnimMontage(AM_Stagger);
-		}break;
-	case E_DamageResponse::HitReaction:
-		{
-			PlayAnimMontage(AM_HitReaction);
-		}break;
-	default:
-		{
-				
-		}break;
-			
-	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "BossHp:%f is Remain"),DamageSystemComponent->CurrentHealth));
-	if (BossHealthBar)
-	{
-		//BossHealthBar->UpdateBossHealthBar(this);
-	}
+	Super::DamageResponse(DamageResponse);
+	// switch (DamageResponse)
+	// {
+	// case E_DamageResponse::None:
+	// 	{
+	// 			
+	// 	}break;
+	// case E_DamageResponse::Stagger:
+	// 	{
+	// 		PlayAnimMontage(AM_Stagger);
+	// 	}break;
+	// case E_DamageResponse::HitReaction:
+	// 	{
+	// 		PlayAnimMontage(AM_HitReaction);
+	// 	}break;
+	// default:
+	// 	{
+	// 			
+	// 	}break;
+	// 		
+	// }
+	// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,FString::Printf(TEXT( "BossHp:%f is Remain"),DamageSystemComponent->CurrentHealth));
+	// if (BossHealthBar)
+	// {
+	// 	//BossHealthBar->UpdateBossHealthBar(this);
+	// }
 	
 }
 

@@ -6,6 +6,11 @@ void UW_PlayerStateBar::UpdatePlayerStateBar(AActor* Owner)
 {
 	if (Owner!=nullptr)
 	{
+		AIBCharBase* IBChar = Cast<AIBCharBase>(Owner);
+		if (IBChar==nullptr)
+		{
+			return;
+		}
 		DamageSystemComponent = Owner->FindComponentByClass<UDamageSystemComponent>();
 		if (DamageSystemComponent!=nullptr)
 		{
@@ -16,10 +21,14 @@ void UW_PlayerStateBar::UpdatePlayerStateBar(AActor* Owner)
 			{
 				PlayerHealthBar->SetPercent(HealthPercent);
 			}
+			float PlayerMaxStamina = IBChar->CharMaxStamina;
+			float PlayerCurrentStamina = IBChar->CharCurrentStamina;
+			float StaminaPercent= PlayerCurrentStamina/PlayerMaxStamina;
+			if (PlayerStaminaBar)
+			{
+				PlayerStaminaBar->SetPercent(StaminaPercent);
+			}
 		}
-		AIBCharBase* IBChar = Cast<AIBCharBase>(Owner);
-		if (IBChar)
-		{
 			if (PlayerAngerGaugeBar)
 			{
 				float PlayerMaxAnger = IBChar->MaxAngerAmount;
@@ -36,6 +45,34 @@ void UW_PlayerStateBar::UpdatePlayerStateBar(AActor* Owner)
 					PlayerAngerGaugeBar->SetFillColorAndOpacity(FColor::Silver);
 				}
 			}
+		if (TEXT_AngerState)
+		{
+			if (IBChar->CurrentAngerAmount<IBChar->MaxAngerAmount)
+			{
+				TEXT_AngerState->SetVisibility(ESlateVisibility::Collapsed);
+			}
 		}
 	}
+}
+
+void UW_PlayerStateBar::BlinkBar()
+{
+	if (PlayerStaminaBar)
+	{
+		FLinearColor CurrentColor= PlayerStaminaBar->GetFillColorAndOpacity();
+		FTimerHandle TimerHandle;
+		PlayerStaminaBar->SetFillColorAndOpacity(FColor::Red);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle,[this,CurrentColor]()
+		{
+			PlayerStaminaBar->SetFillColorAndOpacity(FLinearColor::Yellow);
+		},0.1f,false);
+	}
+	
+	
+	
+}
+
+void UW_PlayerStateBar::BlinkAngerTEXT()
+{
+	TEXT_AngerState->SetVisibility(ESlateVisibility::Visible);
 }

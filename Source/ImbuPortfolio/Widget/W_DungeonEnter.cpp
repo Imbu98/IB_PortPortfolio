@@ -5,6 +5,7 @@
 #include "ImbuPortfolio/Character/IBCharBase.h"
 #include "ImbuPortfolio/Components/StateComponent.h"
 #include "ImbuPortfolio/IB_Framework/IBGameInstance.h"
+#include "ImbuPortfolio/IB_Framework/IBGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 void UW_DungeonEnter::NativeConstruct()
@@ -17,6 +18,33 @@ void UW_DungeonEnter::NativeConstruct()
 		GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"[UW_DungeonEnter::NativeConstruct] : IBGameInstance is Nullptr");
 		return;
 	}
+	
+
+	if (BTN_EnterCaveRuin)
+	{
+		if (!IBGameInstance->IGI_IsClearCaveRuins)
+		{
+			BTN_EnterCaveRuin->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		else
+		{
+			BTN_EnterCaveRuin->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+
+	if (BTN_EnterTempleDragon)
+	{
+		if (!IBGameInstance->IGI_IsClearTempleDragon)
+		{
+			BTN_EnterTempleDragon->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		else
+		{
+			BTN_EnterTempleDragon->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+
+	
 	if (T_DungeonClearCount)
 	{
 		FString String = FString::Printf(TEXT("ClearCount:%d/%d"),IBGameInstance->IGI_DungeonCurrentClearCount,IBGameInstance->IGI_DungeonMaxClearCount);

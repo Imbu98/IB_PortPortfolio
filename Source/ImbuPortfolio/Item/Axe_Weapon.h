@@ -62,16 +62,18 @@ private:
 	UTimelineComponent* MoveTimeline;
 	UPROPERTY(EditAnywhere, Category = "Timeline")
 	class URotatingMovementComponent* RotatingMovement;
+	UPROPERTY(EditAnywhere)
+	class UParticleSystem* Axe_Skill1_Effect;
 	
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float MoveSpeed;
+	float MoveSpeed=0.0f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	bool IsToActor=false;
 
 public:
 	UFUNCTION()
-	void ThrowToTarget(AActor* InTargetActor);
+	void ThrowToTarget(AActor* InTargetActor,float AttackRate);
 	UFUNCTION()
 	void UpdateMovement(float Value);
 	UFUNCTION()

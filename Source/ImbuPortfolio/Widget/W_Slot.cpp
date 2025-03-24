@@ -40,8 +40,6 @@ void UW_Slot::NativePreConstruct()
 			}
 			
 		}
-	
-	
 }
 
 void UW_Slot::NativeConstruct()
@@ -51,43 +49,74 @@ void UW_Slot::NativeConstruct()
 	
 	if (ItemSlot)
 	{
-		
-		ItemSlot->OnClicked.RemoveDynamic(this, &UW_Slot::OnButtonClicked);
-		
-		ItemSlot->OnClicked.AddDynamic(this, &UW_Slot::OnButtonClicked);
+	
+		ItemSlot->OnHovered.Clear();
+		ItemSlot->OnHovered.AddDynamic(this,&UW_Slot::OnButtonHovered);
+
+		ItemSlot->OnUnhovered.Clear();
+		ItemSlot->OnUnhovered.AddDynamic(this,&UW_Slot::OnButtonUnHovered);
 	}
+	
+	if (ItemSlot)
+	{
+		ItemSlot->OnClicked.RemoveDynamic(this, &UW_Slot::OnButtonClicked);
+		ItemSlot->OnClicked.AddDynamic(this,&UW_Slot::OnButtonClicked);
+	}
+}
+
+void UW_Slot::NativeDestruct()
+{
+	Super::NativeDestruct();
+
+	if (InventorySlotDelegate.IsBound())
+	{
+		InventorySlotDelegate.Unbind();
+	}
+	
 }
 
 void UW_Slot::OnButtonClicked()
 {
-	FText TextItemQuantity = UKismetTextLibrary::Conv_IntToText(Item.ItemQuantity);
-	FString StringItemQuantity = TextItemQuantity.ToString();
+	// 
+	//if ()
+	// OnEquip();
+	// else
+	// {
+	// 	OnUpgradeSlot();
+	// }
+	if (InventorySlotDelegate.IsBound())
+	{
+		InventorySlotDelegate.Execute(this);
+	}
+	
+}
 
-	AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (PlayerCharacter == nullptr)
+void UW_Slot::OnButtonHovered()
+{
+	if (InventoryComponent)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "PlayerCharacter is null");
-		return;
+		if (InventoryComponent->PlayerInventory->WBP_ItemInfo)
+		{
+			if (Item.ItemQuantity<=0)
+			{
+				return;
+			}
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->UpdateItemInfo(Item);
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
-	
-	InventoryComponent = PlayerCharacter->InventoryComponents;
-	
-	if (InventoryComponent==nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "InventoryComponent is null");
-		return;
-	}
-	
-	W_Inventory = InventoryComponent->PlayerInventory;
+}
 
-	if (Item.ItemType==E_ItemType::Weapon||Item.ItemType==E_ItemType::Armor)
-	{
-		PlayerCharacter->Equip(Item, PlayerCharacter);
-	}
+void UW_Slot::OnButtonUnHovered()
+{
 	
-	ClearSlot();
-	W_Inventory->LoadInventory(InventoryComponent);
-	InventoryComponent->OnInventoryUpdate.Broadcast();
+	if (InventoryComponent)
+	{
+		if (InventoryComponent->PlayerInventory->WBP_ItemInfo)
+		{
+			InventoryComponent->PlayerInventory->WBP_ItemInfo->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
 }
 
 void UW_Slot::ClearSlot()
@@ -115,9 +144,52 @@ void UW_Slot::ClearSlot()
 				InventoryItem.WeaponType=E_Weapon::None;
 				InventoryItem.ItemRarity=E_ItemRarity::None;
 				InventoryItem.Weight=0;
+				InventoryItem.Damage=0;
 			}
 		}
 	}
+}
+
+void UW_Slot::OnEquip()
+{
+	// FText TextItemQuantity = UKismetTextLibrary::Conv_IntToText(Item.ItemQuantity);
+	// FString StringItemQuantity = TextItemQuantity.ToString();
+	//
+	// AIBCharBase* PlayerCharacter = Cast<AIBCharBase>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	// if (PlayerCharacter == nullptr)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "PlayerCharacter is null");
+	// 	return;
+	// }
+	//
+	// InventoryComponent = PlayerCharacter->InventoryComponents;
+	//
+	// if (InventoryComponent==nullptr)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "InventoryComponent is null");
+	// 	return;
+	// }
+	//
+	// W_Inventory = InventoryComponent->PlayerInventory;
+	//
+	// if (W_Inventory==nullptr)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "W_Inventory is null");
+	// 	return;
+	// }
+	//
+	// if (Item.ItemType==E_ItemType::Weapon||Item.ItemType==E_ItemType::Armor)
+	// {
+	// 	PlayerCharacter->Equip(Item, PlayerCharacter);
+	// }
+	//
+	// ClearSlot();
+	// W_Inventory->LoadInventory(InventoryComponent);
+	// InventoryComponent->OnInventoryUpdate.Broadcast();
+}
+
+void UW_Slot::OnUpgradeSlot()
+{
 }
 
 FEventReply UW_Slot::OnMouseButtonDown(FGeometry const& MyGeometry, FPointerEvent const& MouseEvent)

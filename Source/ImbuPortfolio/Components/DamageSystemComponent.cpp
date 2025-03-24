@@ -27,8 +27,6 @@ void UDamageSystemComponent::BeginPlay()
 			}
 		}
 	}
-
-	
 }
 
 void UDamageSystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
